@@ -1,0 +1,44 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "Escenario.tmx",
+    "expandedProjectPaths": [
+        "."
+    ],
+    "fileStates": {
+        "Escenario.tmx": {
+            "scale": 0.13,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 3792.307692307692,
+                "y": 2246.153846153846
+            }
+        },
+        "mapaSonic.tsx": {
+            "scaleInDock": 0.06,
+            "scaleInEditor": 1
+        }
+    },
+    "last.imagePath": "C:/Users/aarom/OneDrive/Documentos/Java Proyectos/Sonic/assets",
+    "map.height": 4,
+    "map.lastUsedFormat": "tmx",
+    "map.tileHeight": 128,
+    "map.tileWidth": 128,
+    "map.width": 20,
+    "openFiles": [
+        "Escenario.tmx",
+        "mapaSonic.tsx"
+    ],
+    "project": "Test.tiled-project",
+    "recentFiles": [
+        "mapaSonic.tsx",
+        "Escenario.tmx"
+    ],
+    "tileset.lastUsedFormat": "tsx",
+    "tileset.tileSize": {
+        "height": 128,
+        "width": 128
+    }
+}

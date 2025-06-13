@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="20" height="4" tilewidth="128" tileheight="128" infinite="0" nextlayerid="3" nextobjectid="4">
+ <tileset firstgid="1" source="mapaSonic.tsx"/>
+ <layer id="1" name="Capa de patrones 1" width="20" height="4">
+  <data encoding="csv">
+2,177,177,177,177,177,177,177,177,177,177,177,177,177,177,177,177,177,177,177,
+2,177,177,177,177,177,177,177,177,177,177,177,177,177,177,177,177,177,177,177,
+2,160,0,0,170,170,170,170,170,170,170,170,170,170,170,0,0,160,160,160,
+2,3,4,6,5,5,5,5,5,5,5,5,5,5,5,7,8,9,9,9
+</data>
+ </layer>
+ <objectgroup id="2" name="Capa de Objetos 1">
+  <object id="3" x="325.333" y="410.839">
+   <polygon points="-80,5.33333 38.72,-26.8387 54.6667,25.1613"/>
+  </object>
+ </objectgroup>
+</map>
