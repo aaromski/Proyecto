@@ -7,16 +7,24 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.maps.MapObjects;
+import com.badlogic.gdx.maps.MapObject;
+import com.badlogic.gdx.maps.objects.RectangleMapObject;
+import com.badlogic.gdx.maps.objects.PolygonMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.Input;
+
+import java.util.Arrays;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Main extends ApplicationAdapter {
-    private float posX = 50;
-    private float posY = 50;
+    private float posX = 10;
+    private float posY = 10;
     private float velocidad = 200;
     private boolean salta = false;
     private float velocidadSalto = 300; // Velocidad inicial del salto
@@ -33,7 +41,8 @@ public class Main extends ApplicationAdapter {
     private OrthographicCamera camara;
     private TiledMap map;
     private OrthogonalTiledMapRenderer mapRenderer;
-
+    private MapObjects walls;
+    private Personaje sonic;
     @Override
     public void create() {
 
@@ -42,11 +51,17 @@ public class Main extends ApplicationAdapter {
         map = cargarMapa.load("Escenario2.tmx");
 
         // Crear el renderizador del mapa
-        mapRenderer = new OrthogonalTiledMapRenderer(map);
-
+        mapRenderer = new OrthogonalTiledMapRenderer(map, 1f);
+        /*
+        walls = map.getLayers().get("walls").getObjects();
+        System.out.println("Número de objetos en 'walls': " + walls.getCount());
+        */
         camara = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        camara.position.set(posX, posY, 0); // Centrar la cámara en el personaje
+        camara.position.set(300, 250, 0);
         camara.update();
+
+
+        sonic = new Personaje(100, 100);
         batch = new SpriteBatch();
         animacionCorriendo = new TextureRegion[7];
         animacionCorriendo[0] = new TextureRegion(new Texture("spritesonic/spritesonic0.png"));
@@ -104,9 +119,12 @@ public class Main extends ApplicationAdapter {
             velocidadY = velocidadSalto; // Aplicar impulso inicial
         }
 
-        camara.position.x = Math.max(Gdx.graphics.getWidth() / 2, Math.min(posX, 2048 - Gdx.graphics.getWidth() / 2));
-        camara.position.y = Math.max(Gdx.graphics.getHeight() / 2, Math.min(posY, 2048 - Gdx.graphics.getHeight() / 2));
-        camara.position.set(posX, posY, 0);
+        sonic.actualizar(delta, moviendoIzquierda, moviendoDerecha);
+
+        float limiteX = Math.max(camara.viewportWidth / 2, Math.min(posX, 2048 - camara.viewportWidth / 2));
+        float limiteY = Math.max(camara.viewportHeight / 2, Math.min(posY, 2048 - camara.viewportHeight / 2));
+
+        camara.position.set(limiteX, limiteY, 0);
         camara.update();
 
         if (salta) {
@@ -114,8 +132,8 @@ public class Main extends ApplicationAdapter {
             posY += velocidadY * delta; // Actualizar posición vertical
 
             // Si toca el suelo, detener el salto
-            if (posY <= 50) { // Ajusta según el suelo de tu juego
-                posY = 50;
+            if (posY <= 10) { // Ajusta según el suelo de tu juego
+                posY = 10;
                 salta = false;
                 velocidadY = 0;
             }
@@ -156,10 +174,32 @@ public class Main extends ApplicationAdapter {
         // 📌 Renderizar el mapa antes del personaje
         mapRenderer.setView(camara);
         mapRenderer.render();
+        /*
+        for (MapObject objeto : walls) {
+            if (objeto instanceof RectangleMapObject) {
+                Rectangle rect = ((RectangleMapObject) objeto).getRectangle();
 
+                if (sonic.getBoundingRectangle().overlaps(rect)) {
+                    // Bloquear el movimiento en caso de colisión
+                    if (posX + sonic.getBoundingRectangle().width > rect.x && posX < rect.x + rect.width) {
+                        posX = posX > rect.x ? rect.x - sonic.getBoundingRectangle().width : rect.x + rect.width;
+                    }
+                    if (posY + sonic.getBoundingRectangle().height > rect.y && posY < rect.y + rect.height) {
+                        posY = posY > rect.y ? rect.y - sonic.getBoundingRectangle().height : rect.y + rect.height;
+                    }
+
+                }
+            }
+            if (objeto instanceof PolygonMapObject) {
+                Polygon poligono = ((PolygonMapObject) objeto).getPolygon();
+                float[] vertices = poligono.getTransformedVertices();
+                System.out.println("Vértices del triángulo: " + Arrays.toString(vertices));
+            }
+        }*/
 
         batch.setProjectionMatrix(camara.combined);
         batch.begin();
+        sonic.render(batch);
         batch.draw(frameActual, posX, posY); // Personaje
         batch.end();
     }
