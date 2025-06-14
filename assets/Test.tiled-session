@@ -3,11 +3,14 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "Escenario.tmx",
+    "activeFile": "Escenario2.tmx",
     "expandedProjectPaths": [
         "."
     ],
     "fileStates": {
+        "Assets.tsx": {
+            "scaleInEditor": 1
+        },
         "Escenario.tmx": {
             "scale": 0.13,
             "selectedLayer": 0,
@@ -16,29 +19,48 @@
                 "y": 2246.153846153846
             }
         },
+        "Escenario2.tmx": {
+            "scale": 0.75,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 529.3333333333333,
+                "y": 253.33333333333326
+            }
+        },
+        "Escenario3.tmx": {
+            "scale": 1.5,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 459.3333333333333,
+                "y": 34
+            }
+        },
         "mapaSonic.tsx": {
-            "scaleInDock": 0.06,
+            "scaleInDock": 0.25,
             "scaleInEditor": 1
         }
     },
     "last.imagePath": "C:/Users/aarom/OneDrive/Documentos/Java Proyectos/Sonic/assets",
-    "map.height": 4,
+    "map.height": 10,
     "map.lastUsedFormat": "tmx",
-    "map.tileHeight": 128,
-    "map.tileWidth": 128,
-    "map.width": 20,
+    "map.tileHeight": 10,
+    "map.tileWidth": 25,
+    "map.width": 30,
     "openFiles": [
         "Escenario.tmx",
-        "mapaSonic.tsx"
+        "mapaSonic.tsx",
+        "Escenario2.tmx"
     ],
     "project": "Test.tiled-project",
     "recentFiles": [
+        "Assets.tsx",
+        "Escenario.tmx",
         "mapaSonic.tsx",
-        "Escenario.tmx"
+        "Escenario2.tmx"
     ],
     "tileset.lastUsedFormat": "tsx",
     "tileset.tileSize": {
-        "height": 128,
-        "width": 128
+        "height": 10,
+        "width": 25
     }
 }
