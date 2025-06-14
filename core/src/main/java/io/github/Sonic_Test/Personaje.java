@@ -55,7 +55,9 @@ public class Personaje {
         frameActual = new TextureRegion();
     }
 
-    public void actualizar(float delta, boolean izq, boolean der) {
+    public void actualizar(float delta) {
+        boolean izq = false;
+        boolean der = false;
         // Movimiento con teclado
         if (Gdx.input.isKeyPressed(Input.Keys.A)) {
             posX -= velocidad * delta;
@@ -66,7 +68,7 @@ public class Personaje {
             der = true;
         }
 
-        if (Gdx.input.isKeyPressed(Input.Keys.UP) && !salta) {
+        if (Gdx.input.isKeyPressed(Input.Keys.W) && !salta) {
             salta = true;
             velocidadY = velocidadSalto; // Aplicar impulso inicial
         }

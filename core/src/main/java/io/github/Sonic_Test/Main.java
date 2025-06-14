@@ -119,7 +119,7 @@ public class Main extends ApplicationAdapter {
             velocidadY = velocidadSalto; // Aplicar impulso inicial
         }
 
-        sonic.actualizar(delta, moviendoIzquierda, moviendoDerecha);
+        sonic.actualizar(delta);
 
         float limiteX = Math.max(camara.viewportWidth / 2, Math.min(posX, 2048 - camara.viewportWidth / 2));
         float limiteY = Math.max(camara.viewportHeight / 2, Math.min(posY, 2048 - camara.viewportHeight / 2));
