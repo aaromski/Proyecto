@@ -1,21 +1,13 @@
 package io.github.Sonic_Test;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.maps.objects.RectangleMapObject;
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 
-public class Personaje {
+abstract public class Personaje {
+    protected  boolean izq = false,  der = false;
     protected float posX;
-    protected float posY = 130;
+    protected float posY;
     protected float velocidad = 200;
     protected float velocidadSalto = 300; // Velocidad inicial del salto
     protected float gravedad = -900; // Gravedad que afecta el salto
@@ -32,54 +24,19 @@ public class Personaje {
     public Personaje(float x, float y) {
         this.posX = x;
         this.posY = y;
-        sprite = new Sprite(new Texture(("spritesonic/spritesonic0.png")));
-        sprite.setPosition(x,y);
-        inicializarAnimaciones();
+        inicializarAnimaciones(x, y);
     }
 
-    private void inicializarAnimaciones() {
-        animacionCorriendo = new TextureRegion[7];
-        for (int i = 0; i < 7; i++) {
-            animacionCorriendo[i] = new TextureRegion(new Texture("spritesonic/spritesonic" + i + ".png"));
-        }
-        corriendo = new Animation<>(0.1f, animacionCorriendo);
-        corriendo.setPlayMode(Animation.PlayMode.LOOP);
+    abstract void inicializarAnimaciones(float x, float y);
 
-        animacionSaltando = new TextureRegion[8];
-        for (int i = 0; i < 8; i++) {
-            animacionSaltando[i] = new TextureRegion(new Texture("spritesonic/salto" + (i + 1) + ".png"));
-        }
-        saltando = new Animation<>(0.2f, animacionSaltando);
-        saltando.setPlayMode(Animation.PlayMode.LOOP);
-
-        frameActual = new TextureRegion();
-    }
-
-    public void actualizar(float delta) {
-        boolean izq = false;
-        boolean der = false;
-        // Movimiento con teclado
-        if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-            posX -= velocidad * delta;
-            izq = true;
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.D)) {
-            posX += velocidad * delta;
-            der = true;
-        }
-
-        if (Gdx.input.isKeyPressed(Input.Keys.W) && !salta) {
-            salta = true;
-            velocidadY = velocidadSalto; // Aplicar impulso inicial
-        }
-
+    protected void actualizar(float delta) {
         stateTime += delta;
+
         if (salta) {
             velocidadY += gravedad * delta; // Aplicar gravedad
             posY += velocidadY * delta; // Actualizar posición vertical
-
             // Si toca el suelo, detener el salto
-            if (posY <= 100) { // Ajusta según el suelo de tu juego
+            if (posY <= 100) { // Ajusta según el suelo del juego
                 posY = 100;
                 salta = false;
                 velocidadY = 0;
@@ -119,11 +76,6 @@ public class Personaje {
         sprite.setRegion(frameActual); // 🔄 Actualizar el sprite con la animación actual
         batch.draw(frameActual, posX, posY);
     }
-
-    /*public Rectangle getBoundingRectangle() {
-        sprite.setPosition(posX, posY); // 🔄 Asegura que la posición del sprite se actualiza
-        return sprite.getBoundingRectangle();
-    }*/
 
 
     public void dispose() {
