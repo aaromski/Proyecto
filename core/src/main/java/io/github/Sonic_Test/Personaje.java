@@ -1,66 +1,58 @@
 package io.github.Sonic_Test;
-import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.g2d.*;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
+
 
 abstract public class Personaje {
     protected  boolean izq = false,  der = false;
-    protected float posX;
-    protected float posY;
-    protected float velocidad = 200;
-    protected float velocidadSalto = 300; // Velocidad inicial del salto
-    protected float gravedad = -900; // Gravedad que afecta el salto
-    protected float velocidadY = 0; // Velocidad vertical
+    protected float velocidad = 10;  //200
     protected boolean salta = false;
-    protected TextureRegion[] animacionCorriendo;
-    protected Animation<TextureRegion> corriendo;
-    protected Animation<TextureRegion> saltando;
     protected float stateTime = 0f;
-    protected TextureRegion[] animacionSaltando;
     protected TextureRegion frameActual;
     protected Sprite sprite;
+    protected Animation<Sprite> correr;
+    protected  Animation<Sprite> saltar;
+    protected Body body;
+    public static final float PPM = 32f; // Pixels Per Meter (ejemplo)
+    protected TextureAtlas atlas;
+    protected  Vector2 posicion;
 
-    public Personaje(float x, float y) {
-        this.posX = x;
-        this.posY = y;
-        inicializarAnimaciones(x, y);
-    }
+    public Personaje (Body b) {
+        this.body = b;
+        this.posicion = body.getPosition();
+    };
+
 
     abstract void inicializarAnimaciones(float x, float y);
 
     protected void actualizar(float delta) {
         stateTime += delta;
 
-        if (salta) {
-            velocidadY += gravedad * delta; // Aplicar gravedad
-            posY += velocidadY * delta; // Actualizar posición vertical
-            // Si toca el suelo, detener el salto
-            if (posY <= 100) { // Ajusta según el suelo del juego
-                posY = 100;
-                salta = false;
-                velocidadY = 0;
-            }
+        // SALTO FÍSICO
+        if (Gdx.input.isKeyPressed(Input.Keys.W) && !salta) {
+            body.applyLinearImpulse(new Vector2(0, 5f), body.getWorldCenter(), true);
+            salta = true;
+            stateTime = 0f;
         }
 
-        // Seleccionar animación según el estado
+// ANIMACIÓN SEGÚN ESTADO
         if (salta) {
             stateTime += delta;
-            frameActual = saltando.getKeyFrame(stateTime, false); // No en bucle
-            if (frameActual == null) {
-                System.out.println("Error: getKeyFrame() devolvió NULL");
+            frameActual = saltar.getKeyFrame(stateTime, false);
+
+            // Si terminó el salto, volvemos a caminar
+            if (saltar.isAnimationFinished(stateTime)) {
+                salta = false;
+                stateTime = 0f;
             }
         } else if (izq || der) {
             stateTime += delta;
-            frameActual = corriendo.getKeyFrame(stateTime, true);
-            if (corriendo.getKeyFrames().length == 0) {
-                System.out.println("Error: corriendo no tiene frames cargados");
-            }
+            frameActual = correr.getKeyFrame(stateTime, true);
         } else {
-            frameActual = corriendo.getKeyFrame(0, false);
-            if (frameActual == null) {
-                System.out.println("Error: getKeyFrame3() devolvió NULL");
-            }
+            frameActual = correr.getKeyFrame(0, false);
         }
 
         // Invertir el sprite si se mueve a la izquierda
@@ -70,21 +62,20 @@ abstract public class Personaje {
         if (frameActual != null && der && frameActual.isFlipX()) {
             frameActual.flip(true, false);
         }
+        if (body.getLinearVelocity().y == 0) {
+            salta = false;
+        }
     }
 
     public void render(SpriteBatch batch) {
-        sprite.setRegion(frameActual); // 🔄 Actualizar el sprite con la animación actual
-        batch.draw(frameActual, posX, posY);
+        sprite.setRegion(frameActual);
+        sprite.setPosition(
+            posicion.x - sprite.getWidth() / 2f,
+            posicion.y - sprite.getHeight() / 2f
+        );
+        sprite.draw(batch);
     }
 
 
-    public void dispose() {
-        for (TextureRegion frame : animacionCorriendo) {
-            frame.getTexture().dispose();
-        }
-        for (TextureRegion frame : animacionSaltando) {
-            frame.getTexture().dispose();
-        }
-    }
-
+    public abstract void dispose();
 }

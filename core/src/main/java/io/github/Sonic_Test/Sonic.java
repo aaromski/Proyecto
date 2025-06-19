@@ -1,34 +1,49 @@
 package io.github.Sonic_Test;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.physics.box2d.Body;
 
 public class Sonic extends Personaje{
-    public Sonic (float x, float y) {
-        super (x,y);
-        inicializarAnimaciones(x,y);
+
+
+    public Sonic (Body body) {
+        super(body);
+        inicializarAnimaciones(body.getPosition().x, body.getPosition().y);
     }
 
     @Override
     void inicializarAnimaciones(float x, float y) {
-        sprite = new Sprite(new Texture("spritesonic/spritesonic0.png"));
-        sprite.setPosition(x,y);
-        animacionCorriendo = new TextureRegion[7];
-        for (int i = 0; i < 7; i++) {
-            animacionCorriendo[i] = new TextureRegion(new Texture("spritesonic/spritesonic" + i + ".png"));
-        }
-        corriendo = new Animation<>(0.1f, animacionCorriendo);
-        corriendo.setPlayMode(Animation.PlayMode.LOOP);
+        atlas = new TextureAtlas(Gdx.files.internal("NuevosSprite/Sonicb.atlas"));
+        sprite = atlas.createSprite("spritesonic0");
+        sprite.setSize(29f / PPM, 38f / PPM); // ≈ 0.91 x 1.19
+        sprite.setPosition(
+            x - sprite.getWidth() / 2f,
+            y - sprite.getHeight() / 2f
+        );
 
-        animacionSaltando = new TextureRegion[8];
-        for (int i = 0; i < 8; i++) {
-            animacionSaltando[i] = new TextureRegion(new Texture("spritesonic/salto" + (i + 1) + ".png"));
-        }
-        saltando = new Animation<>(0.2f, animacionSaltando);
-        saltando.setPlayMode(Animation.PlayMode.LOOP);
+        correr = new Animation<>(
+            0.2f,
+            atlas.createSprite("spritesonic0"),
+            atlas.createSprite("spritesonic1"),
+            atlas.createSprite("spritesonic2"),
+            atlas.createSprite("spritesonic3"),
+            atlas.createSprite("spritesonic4"),
+            atlas.createSprite("spritesonic5"),
+            atlas.createSprite("spritesonic6"));
+
+        saltar = new Animation<>(
+            0.3f,
+            atlas.createSprite("salto1"),
+            atlas.createSprite("salto2"),
+            atlas.createSprite("salto3"),
+            atlas.createSprite("salto4"),
+            atlas.createSprite("salto5"),
+            atlas.createSprite("salto6"),
+            atlas.createSprite("salto7"),
+            atlas.createSprite("salto8"));
 
         frameActual = new TextureRegion();
     }
@@ -39,18 +54,18 @@ public class Sonic extends Personaje{
         der = false;
         // Movimiento con teclado
         if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-            posX -= velocidad * delta;
+            body.setLinearVelocity(-velocidad, body.getLinearVelocity().y);
             izq = true;
         }
         if (Gdx.input.isKeyPressed(Input.Keys.D)) {
-            posX += velocidad * delta;
+            body.setLinearVelocity(velocidad, body.getLinearVelocity().y);
             der = true;
         }
-
-        if (Gdx.input.isKeyPressed(Input.Keys.W) && !salta) {
-            salta = true;
-            velocidadY = velocidadSalto; // Aplicar impulso inicial
-        }
         super.actualizar(delta);
+    }
+
+    @Override
+    public void dispose() {
+        atlas.dispose();
     }
 }

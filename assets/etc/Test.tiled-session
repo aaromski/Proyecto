@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "",
+    "activeFile": "Assets.tsx",
     "expandedProjectPaths": [
         "."
     ],
@@ -32,8 +32,8 @@
             "scale": 0.75,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 529.3333333333333,
-                "y": 253.33333333333326
+                "x": 1280,
+                "y": 255.3333333333333
             }
         },
         "Escenario3.tmx": {
@@ -41,7 +41,7 @@
             "selectedLayer": 1,
             "viewCenter": {
                 "x": 604.6666666666667,
-                "y": 155.33333333333334
+                "y": 249.99999999999997
             }
         },
         "adventure.tsx": {
@@ -64,18 +64,19 @@
         "Background_1.tsx",
         "Background_2.tsx",
         "Escenario3.tmx",
-        "Assets.tsx"
+        "Assets.tsx",
+        "Escenario2.tmx"
     ],
     "project": "Test.tiled-project",
     "recentFiles": [
-        "Assets.tsx",
-        "Escenario3.tmx",
-        "Background_2.tsx",
-        "Background_1.tsx",
         "adventure.tsx",
+        "Background_1.tsx",
+        "Background_2.tsx",
+        "Escenario3.tmx",
+        "Escenario2.tmx",
+        "Assets.tsx",
         "Escenario.tmx",
-        "mapaSonic.tsx",
-        "Escenario2.tmx"
+        "mapaSonic.tsx"
     ],
     "tileset.lastUsedFormat": "tsx",
     "tileset.tileSize": {
