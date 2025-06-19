@@ -6,6 +6,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
@@ -15,36 +17,59 @@ public class Main extends ApplicationAdapter {
     public TiledMap map;
     private OrthogonalTiledMapRenderer mapRenderer;
     private Sonic sonic;
+    private crearObjetos obj;
+    Box2DDebugRenderer debugRenderer;
+    BodyDef bodySonic;
+
+
     @Override
     public void create() {
         // Cargar el mapa TMX
-        TmxMapLoader cargarMapa = new TmxMapLoader();
-        map = cargarMapa.load("Escenario2.tmx");
+       /* TmxMapLoader cargarMapa = new TmxMapLoader();
+        map = cargarMapa.load("Escenario2.tmx");*/
 
         // Crear el renderizador del mapa
-        mapRenderer = new OrthogonalTiledMapRenderer(map, 1.2f);
-
-        camara = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        camara.position.set(400, 250, 0);
+       // mapRenderer = new OrthogonalTiledMapRenderer(map, 1.2f);
+        debugRenderer = new Box2DDebugRenderer();
+        camara = new OrthographicCamera();
+        camara.setToOrtho(false, 32, 18); // Ajusta según tu escala y resolución
         camara.update();
-        sonic = new Sonic(270, 150);
+        bodySonic = new BodyDef();
+        bodySonic.position.set( 0 , 5 );
+        bodySonic.type = BodyDef.BodyType.DynamicBody;
+
         batch = new SpriteBatch();
+        obj = new crearObjetos();
+        PolygonShape box = new PolygonShape();
+        box.setAsBox(1.19f / 2f, 0.91f / 2f); // Mitades, porque setAsBox mide desde el centro
+        FixtureDef fixDef = new FixtureDef();
+        fixDef.shape = box;
+        Body oBody = obj.world.createBody(bodySonic);
+        oBody.createFixture(fixDef);
+        sonic = new Sonic(oBody); //270-150
+        obj.crearPlataforma(2f, 1f);
+        obj.crearPlataforma( 8f, 2f);
+        obj.crearPlataforma(14f, 3f);
+        obj.crearPlataforma(20f, 4f);
     }
 
     @Override
     public void render() {
+        Vector2 sonicPos = sonic.body.getPosition(); // O usa sonic.body si es público
         float delta = Gdx.graphics.getDeltaTime(); // Tiempo entre frames
         sonic.actualizar(delta);
-
-        camara.position.set(sonic.posX, sonic.posY, 0);
+        obj.actualizar(delta);
+        camara.position.set(sonicPos.x, sonicPos.y, 0);
         camara.update();
 
         // Dibujar en nueva posición
         ScreenUtils.clear(0, 0, 0, 1);
 
         // 📌 Renderizar el mapa antes del personaje
-        mapRenderer.setView(camara);
-        mapRenderer.render();
+        /*mapRenderer.setView(camara);
+        mapRenderer.render();*/
+
+        debugRenderer.render(obj.world, camara.combined);
 
         batch.setProjectionMatrix(camara.combined);
         batch.begin();
