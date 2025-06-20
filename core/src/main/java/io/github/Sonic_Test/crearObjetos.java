@@ -1,5 +1,11 @@
 package io.github.Sonic_Test;
 
+import com.badlogic.gdx.maps.MapLayer;
+import com.badlogic.gdx.maps.MapObject;
+import com.badlogic.gdx.maps.objects.PolygonMapObject;
+import com.badlogic.gdx.maps.objects.RectangleMapObject;
+import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 
@@ -11,7 +17,7 @@ public class crearObjetos {
     PolygonShape suelo;
 
     public crearObjetos() {
-        world = new World(new Vector2(0,-9.8f), true);
+        world = new World(new Vector2(0,-30f), true);
         bd = new BodyDef();
         bd.position.set( -14 , 2 );
         bd.type = BodyDef.BodyType.DynamicBody;
@@ -21,6 +27,47 @@ public class crearObjetos {
         objetos();
 
     }
+public void objetosMapa (TiledMap map) {
+    MapLayer capaWalls = map.getLayers().get("walls");
+    for (MapObject objeto : capaWalls.getObjects()) {
+        if (objeto instanceof RectangleMapObject) {
+            Rectangle rect = ((RectangleMapObject) objeto).getRectangle();
+
+            BodyDef bdef = new BodyDef();
+            bdef.type = BodyDef.BodyType.StaticBody;
+            bdef.position.set(
+                (rect.x + rect.width / 2) * 0.05f,
+                (rect.y + rect.height / 2) * 0.05f
+            );
+
+            PolygonShape shape = new PolygonShape();
+            shape.setAsBox(rect.width / 2 * 0.05f, rect.height / 2 * 0.05f);
+
+            Body body = world.createBody(bdef);
+            body.createFixture(shape, 0.0f);
+            shape.dispose();
+        } else if (objeto instanceof PolygonMapObject) {
+            PolygonMapObject polyObject = (PolygonMapObject) objeto;
+            float[] vertices = polyObject.getPolygon().getTransformedVertices();
+            float[] worldVertices = new float[vertices.length];
+
+            for (int i = 0; i < vertices.length; i++) {
+                worldVertices[i] = vertices[i] * 0.05f; // Escala igual que el mapa
+            }
+
+            PolygonShape shape = new PolygonShape();
+            shape.set(worldVertices);
+
+            BodyDef bdef = new BodyDef();
+            bdef.type = BodyDef.BodyType.StaticBody;
+
+            Body body = world.createBody(bdef);
+            body.createFixture(shape, 0.0f);
+            shape.dispose();
+        }
+
+    }
+}
 
     public void actualizar(float delta) {
         world.step(delta, 8,6);
