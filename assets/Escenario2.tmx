@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="20" height="4" tilewidth="128" tileheight="128" infinite="0" nextlayerid="3" nextobjectid="8">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="20" height="4" tilewidth="128" tileheight="128" infinite="0" nextlayerid="3" nextobjectid="10">
  <tileset firstgid="1" source="mapaSonic.tsx"/>
- <layer id="1" name="Capa de patrones 1" width="20" height="4">
+ <layer id="1" name="capa" width="20" height="4">
   <data encoding="csv">
 2,177,177,177,177,177,177,177,177,177,177,177,177,177,177,177,177,177,177,177,
 2,177,177,177,177,177,177,177,177,177,177,177,177,177,177,177,177,177,177,177,
@@ -11,7 +11,7 @@
  </layer>
  <objectgroup id="2" name="walls">
   <object id="3" x="325.333" y="410.839">
-   <polygon points="-80,5.33333 38.72,-26.8387 54.6667,25.1613"/>
+   <polygon points="-80,5.33333 42.72,-25.5054 54.6667,25.1613"/>
   </object>
   <object id="4" x="368" y="385.333" width="74.6667" height="26.6667"/>
   <object id="5" x="446.667" y="414.667" width="53.3333" height="28"/>
@@ -21,5 +21,9 @@
   <object id="7" x="170.667" y="420">
    <polygon points="0,0 73.3333,-4 72,37.3333"/>
   </object>
+  <object id="8" x="518.667" y="384">
+   <polygon points="0,0 -17.3333,28 12,26.6667"/>
+  </object>
+  <object id="9" x="533.333" y="396" width="1381.33" height="12"/>
  </objectgroup>
 </map>

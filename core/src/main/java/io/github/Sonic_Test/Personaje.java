@@ -33,7 +33,7 @@ abstract public class Personaje {
 
         // SALTO FÍSICO
         if (Gdx.input.isKeyPressed(Input.Keys.W) && !salta) {
-            body.applyLinearImpulse(new Vector2(0, 5f), body.getWorldCenter(), true);
+            body.applyLinearImpulse(new Vector2(0, 15f), body.getWorldCenter(), true);
             salta = true;
             stateTime = 0f;
         }
