@@ -35,17 +35,6 @@ public class Sonic extends Personaje {
             atlas.createSprite("spritesonic5"),
             atlas.createSprite("spritesonic6"));
 
-        saltar = new Animation<>(
-            0.3f,
-            atlas.createSprite("salto1"),
-            atlas.createSprite("salto2"),
-            atlas.createSprite("salto3"),
-            atlas.createSprite("salto4"),
-            atlas.createSprite("salto5"),
-            atlas.createSprite("salto6"),
-            atlas.createSprite("salto7"),
-            atlas.createSprite("salto8"));
-
         frameActual = new TextureRegion();
     }
 
