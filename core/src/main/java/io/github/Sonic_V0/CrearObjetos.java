@@ -17,14 +17,14 @@ public class CrearObjetos {
     PolygonShape suelo;
 
     public CrearObjetos() {
-        world = new World(new Vector2(0,-30f), true);
+        world = new World(new Vector2(0,0), true);
         bd = new BodyDef();
         bd.position.set( -14 , 2 );
         bd.type = BodyDef.BodyType.DynamicBody;
         s = new BodyDef();
         s.position.set(0,0);
         s.type = BodyDef.BodyType.StaticBody;
-        objetos();
+        //objetos();
 
     }
 
@@ -32,7 +32,49 @@ public class CrearObjetos {
         world.step(delta, 8,6);
     }
 
-    public void objetos() {
+    public void objetosMapa (TiledMap map) {
+        MapLayer capaWalls = map.getLayers().get("Muro");
+        for (MapObject objeto : capaWalls.getObjects()) {
+            if (objeto instanceof RectangleMapObject) {
+                Rectangle rect = ((RectangleMapObject) objeto).getRectangle();
+                System.out.println("Rect: x=" + rect.x + ", y=" + rect.y + ", w=" + rect.width + ", h=" + rect.height);
+                BodyDef bdef = new BodyDef();
+                bdef.type = BodyDef.BodyType.StaticBody;
+                bdef.position.set(
+                    (rect.x + rect.width / 2) * 0.0625f,
+                    (rect.y + rect.height / 2) * 0.0625f
+                );
+
+                PolygonShape shape = new PolygonShape();
+                shape.setAsBox(rect.width / 2 * 0.0625f, rect.height / 2 * 0.0625f);
+
+                Body body = world.createBody(bdef);
+                body.createFixture(shape, 0.0f);
+                shape.dispose();
+            } else if (objeto instanceof PolygonMapObject) {
+                PolygonMapObject polyObject = (PolygonMapObject) objeto;
+                float[] vertices = polyObject.getPolygon().getTransformedVertices();
+                float[] worldVertices = new float[vertices.length];
+
+                for (int i = 0; i < vertices.length; i++) {
+                    worldVertices[i] = vertices[i] * 0.05f; // Escala igual que el mapa
+                }
+
+                PolygonShape shape = new PolygonShape();
+                shape.set(worldVertices);
+
+                BodyDef bdef = new BodyDef();
+                bdef.type = BodyDef.BodyType.StaticBody;
+
+                Body body = world.createBody(bdef);
+                body.createFixture(shape, 0.0f);
+                shape.dispose();
+            }
+
+        }
+    }
+
+   /* public void objetos() {
         //suelo
         PolygonShape sueloShape = new PolygonShape();
         sueloShape.setAsBox(100f, 0.5f); // ancho = 10, alto = 0.5 (mitades)
@@ -44,7 +86,7 @@ public class CrearObjetos {
         Body sue = world.createBody(s);
         sue.createFixture(fixDef2);
 
-    }
+    }*/
 
     public void crearPlataforma(float x, float y) {
         BodyDef body = new BodyDef();

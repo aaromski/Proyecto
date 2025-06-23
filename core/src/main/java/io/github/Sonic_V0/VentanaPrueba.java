@@ -1,13 +1,8 @@
 package io.github.Sonic_V0;
 
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.maps.tiled.TmxMapLoader;
-import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.ScreenUtils;
@@ -15,16 +10,17 @@ import com.badlogic.gdx.utils.ScreenUtils;
 public class VentanaPrueba implements Screen {
     private SpriteBatch batch;
     private OrthographicCamera camara;
-    private OrthogonalTiledMapRenderer mapRenderer;
     private Sonic sonic;
     private CrearObjetos obj;
     Box2DDebugRenderer debugRenderer;
     BodyDef bodySonic;
+    private CargarMapa map;
 
     public VentanaPrueba() {
+        map = new CargarMapa("Mapa1/mapa1.tmx", 0.0625f);
         debugRenderer = new Box2DDebugRenderer();
         camara = new OrthographicCamera();
-        camara.setToOrtho(false, 16, 10); // Ajusta según tu escala y resolución
+        camara.setToOrtho(false, 50f, 40f); // Ajusta según tu escala y resolución
         camara.update();
         bodySonic = new BodyDef();
         bodySonic.position.set( 20 , 10 );
@@ -41,10 +37,11 @@ public class VentanaPrueba implements Screen {
         fixDef.friction = 1f;
         oBody.createFixture(fixDef);
         sonic = new Sonic(oBody); //270-150
-        obj.crearPlataforma(2f, 1f);
+       /* obj.crearPlataforma(2f, 1f);
         obj.crearPlataforma( 8f, 2f);
         obj.crearPlataforma(14f, 3f);
-        obj.crearPlataforma(20f, 4f);
+        obj.crearPlataforma(20f, 4f);*/
+        obj.objetosMapa(map.getMap());
     }
 
         @Override
@@ -57,11 +54,13 @@ public class VentanaPrueba implements Screen {
         Vector2 sonicPos = sonic.body.getPosition(); // O usa sonic.body si es público
         sonic.actualizar(delta);
         obj.actualizar(delta);
-        camara.position.set(sonicPos.x, sonicPos.y, 0);
-        camara.update();
+       // camara.position.set(sonicPos.x, sonicPos.y, 0);
+
 
         // Dibujar en nueva posición
         ScreenUtils.clear(0, 0, 0, 1);
+        map.renderarMapa(camara);
+        camara.update();
 
         // 📌 Renderizar el mapa antes del personaje
 
@@ -102,5 +101,6 @@ public class VentanaPrueba implements Screen {
         // Destroy screen's assets here.
         sonic.dispose();
         batch.dispose();
+        map.dispose();
     }
 }

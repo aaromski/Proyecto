@@ -5,21 +5,22 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 
 public class Sonic extends Personaje {
+
     public Sonic (Body body) {
         super(body);
         inicializarAnimaciones(body.getPosition().x, body.getPosition().y);
         this.name = "Sonic";
+
     }
 
     @Override
     void inicializarAnimaciones(float x, float y) {
         atlas = new TextureAtlas(Gdx.files.internal("SpriteSonic/Sonicb.atlas"));
         sprite = atlas.createSprite("spritesonic0");
-        sprite.setSize(29f / PPM, 38f / PPM); // ≈ 0.91 x 1.19
+        sprite.setSize(40f / PPM, 49f / PPM); // ≈ 0.91 x 1.19
         sprite.setPosition(
             x - sprite.getWidth() / 2f,
             y - sprite.getHeight() / 2f
