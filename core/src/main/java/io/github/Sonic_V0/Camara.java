@@ -13,4 +13,6 @@ public class Camara {
     public OrthographicCamera getCamara() {
         return camara;
     }
+
+
 }
