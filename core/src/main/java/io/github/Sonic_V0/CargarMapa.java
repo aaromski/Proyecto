@@ -7,8 +7,8 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.tiles.AnimatedTiledMapTile;
 
 public class CargarMapa {
-    private TiledMap map;
-    private OrthogonalTiledMapRenderer mapRenderer;
+    private final TiledMap map;
+    private final OrthogonalTiledMapRenderer mapRenderer;
 
     public CargarMapa(String rutaMapa, float escala) {
         TmxMapLoader loader = new TmxMapLoader();
