@@ -37,7 +37,7 @@ public class ConjuntoDeObjetos <T> {
                 break;
             }
             cont++;
-            } 
+            }
         }
 
         @SuppressWarnings("unchecked")
@@ -99,7 +99,7 @@ public class ConjuntoDeObjetos <T> {
                         System.out.print("}");
                     }
                 }
-                
+
             }
         }
 
