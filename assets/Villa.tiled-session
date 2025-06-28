@@ -1,0 +1,150 @@
+{
+    "activeFile": "",
+    "expandedProjectPaths": [
+        "Mapa1"
+    ],
+    "fileStates": {
+        "Mapa1/1.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "Mapa1/Basic_Furniture.tsx": {
+            "scaleInDock": 1
+        },
+        "Mapa1/Basic_Plants.tsx": {
+            "scaleInDock": 1
+        },
+        "Mapa1/Dungeon1.tmx": {
+            "scale": 0.7619791666666667,
+            "selectedLayer": 11,
+            "viewCenter": {
+                "x": -0.656185919343784,
+                "y": 314.96924128503076
+            }
+        },
+        "Mapa1/Dungeon1.tmx#Objects": {
+            "scaleInDock": 1
+        },
+        "Mapa1/Dungeon1.tmx#Water_coasts_animation": {
+            "scaleInDock": 1
+        },
+        "Mapa1/Dungeon1.tmx#Water_coasts_animation_decorative_cracks": {
+            "scaleInDock": 1
+        },
+        "Mapa1/Dungeon1.tmx#Water_detilazation": {
+            "scaleInDock": 1
+        },
+        "Mapa1/Dungeon1.tmx#cracked_tiles": {
+            "scaleInDock": 1
+        },
+        "Mapa1/Dungeon1.tmx#cracked_tiles_floor": {
+            "scaleInDock": 1
+        },
+        "Mapa1/Dungeon1.tmx#doors_lever_chest_animation": {
+            "scaleInDock": 1
+        },
+        "Mapa1/Dungeon1.tmx#fire_animation": {
+            "scaleInDock": 1
+        },
+        "Mapa1/Dungeon1.tmx#fire_animation2": {
+            "scaleInDock": 1
+        },
+        "Mapa1/Dungeon1.tmx#trap_animation": {
+            "scaleInDock": 1
+        },
+        "Mapa1/Dungeon1.tmx#walls_floor": {
+            "scaleInDock": 1
+        },
+        "Mapa1/Fences.tsx": {
+            "scaleInDock": 1
+        },
+        "Mapa1/Grass.tsx": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "Mapa1/Hills.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "Mapa1/Solo.tsx": {
+            "dynamicWrapping": true,
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "Mapa1/Village/1.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "Mapa1/Village/Tile2_01.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "Mapa1/Village/Tileset2.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "Mapa1/mapa1.tmx": {
+            "scale": 1,
+            "selectedLayer": 6,
+            "viewCenter": {
+                "x": 420.5,
+                "y": 234
+            }
+        },
+        "Mapa1/village/1.tsx": {
+            "scaleInDock": 1
+        },
+        "Mapa1/village/2.tsx": {
+            "scaleInDock": 1
+        },
+        "Mapa1/village/3.tsx": {
+            "scaleInDock": 1
+        },
+        "Mapa1/village/4.tsx": {
+            "scaleInDock": 1
+        },
+        "Mapa1/village/5.tsx": {
+            "scaleInDock": 1
+        },
+        "Mapa1/village/6.tsx": {
+            "scaleInDock": 1
+        },
+        "Mapa1/village/Door1.tsx": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "Mapa1/village/Tileset2.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "Mapa1/village/house.tsx": {
+            "scaleInDock": 1
+        }
+    },
+    "frame.defaultDuration": 250,
+    "last.imagePath": "C:/Users/aarom/Downloads/Nueva carpeta/3 Objects/Gems",
+    "openFiles": [
+    ],
+    "project": "Villa.tiled-project",
+    "recentFiles": [
+        "Mapa1/1.tsx",
+        "Mapa1/Dungeon1.tmx",
+        "Mapa1/village/Tileset2.tsx",
+        "Mapa1/Hills.tsx",
+        "Mapa1/Village/Tileset2.tsx",
+        "Mapa1/village/Door1.tsx",
+        "Mapa1/Grass.tsx",
+        "Mapa1/mapa1.tmx",
+        "Mapa1/Solo.tsx",
+        "Mapa1/Village/1.tsx",
+        "Mapa1/Village/Tile2_01.tsx"
+    ],
+    "tileset.lastUsedFormat": "tsx",
+    "tileset.tileSize": {
+        "height": 16,
+        "width": 16
+    },
+    "tileset.type": 0
+}

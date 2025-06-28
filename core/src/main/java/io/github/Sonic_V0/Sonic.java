@@ -5,21 +5,22 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 
 public class Sonic extends Personaje {
+
     public Sonic (Body body) {
         super(body);
         inicializarAnimaciones(body.getPosition().x, body.getPosition().y);
         this.name = "Sonic";
+
     }
 
     @Override
     void inicializarAnimaciones(float x, float y) {
         atlas = new TextureAtlas(Gdx.files.internal("SpriteSonic/Sonicb.atlas"));
         sprite = atlas.createSprite("spritesonic0");
-        sprite.setSize(29f / PPM, 38f / PPM); // ≈ 0.91 x 1.19
+        sprite.setSize(30f / PPM, 39f / PPM); // ≈ 0.91 x 1.19
         sprite.setPosition(
             x - sprite.getWidth() / 2f,
             y - sprite.getHeight() / 2f
@@ -42,14 +43,28 @@ public class Sonic extends Personaje {
     protected void actualizar(float delta) {
         izq = false;
         der = false;
+        abj = false;
+        arr = false;
+
+
+
+        if (Gdx.input.isKeyPressed(Input.Keys.W)) {
+            body.setLinearVelocity(0, velocidad.y);
+            arr = true;
+        }
+
+        if (Gdx.input.isKeyPressed(Input.Keys.S)) {
+            body.setLinearVelocity(0, -velocidad.y);
+            abj = true;
+        }
 
         if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-            body.setLinearVelocity(-velocidad, body.getLinearVelocity().y);
+            body.setLinearVelocity(-velocidad.x, body.getLinearVelocity().y);
             izq = true;
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.D)) {
-            body.setLinearVelocity(velocidad, body.getLinearVelocity().y);
+            body.setLinearVelocity(velocidad.x, body.getLinearVelocity().y);
             der = true;
         }
         super.actualizar(delta);
