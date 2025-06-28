@@ -5,8 +5,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 
 public abstract class Personaje {
-    protected  boolean izq = false,  der = false, salta = false;  //Estados
-    protected float velocidad = 10;  //200
+    protected  boolean izq = false,  der = false, arr = false, abj = false;  //Estados
+    protected Vector2 velocidad;  //200
     protected float stateTime = 0f;
     protected TextureRegion frameActual;
     protected Sprite sprite;
@@ -21,6 +21,7 @@ public abstract class Personaje {
     public Personaje (Body b) {
         this.body = b;
         this.posicion = body.getPosition();
+        velocidad = new Vector2(5f, 2f);
     };
 
 
