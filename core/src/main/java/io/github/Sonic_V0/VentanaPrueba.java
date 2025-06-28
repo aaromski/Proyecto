@@ -11,7 +11,7 @@ public class VentanaPrueba implements Screen {
     private final SpriteBatch batch;
     private final Sonic sonic;
     private final Mundo mundo;
-    private CargarMapa map;
+    private final CargarMapa map;
     private final Camara camara;
 
     public VentanaPrueba() {
@@ -31,7 +31,6 @@ public class VentanaPrueba implements Screen {
 
     @Override
     public void render(float delta) {
-        Vector2 sonicPos = sonic.body.getPosition();
         sonic.actualizar(delta);
         mundo.actualizar(delta);
 

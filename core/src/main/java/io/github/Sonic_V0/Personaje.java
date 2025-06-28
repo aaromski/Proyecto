@@ -21,7 +21,7 @@ public abstract class Personaje {
         this.body = b;
         this.posicion = body.getPosition();
         velocidad = new Vector2(5f, 2f);
-    };
+    }
 
 
     abstract void inicializarAnimaciones(float x, float y);
