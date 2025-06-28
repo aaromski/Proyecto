@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.maps.tiled.tiles.AnimatedTiledMapTile;
 
 public class CargarMapa {
     private TiledMap map;
@@ -20,6 +21,7 @@ public class CargarMapa {
     }
 
     public void renderarMapa(OrthographicCamera camara) {
+        AnimatedTiledMapTile.updateAnimationBaseTime();
         mapRenderer.setView(camara);
         mapRenderer.render();
     }
