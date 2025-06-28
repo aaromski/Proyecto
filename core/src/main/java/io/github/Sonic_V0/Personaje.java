@@ -11,7 +11,6 @@ public abstract class Personaje {
     protected TextureRegion frameActual;
     protected Sprite sprite;
     protected Animation<Sprite> correr;
-    protected  Animation<Sprite> saltar;
     protected Body body;
     public static final float PPM = 32f; // Pixels Per Meter
     protected TextureAtlas atlas;
