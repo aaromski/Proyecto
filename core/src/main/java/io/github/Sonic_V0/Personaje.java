@@ -28,6 +28,7 @@ public abstract class Personaje {
 
     protected void actualizar(float delta) {
         stateTime += delta;
+        this.posicion = body.getPosition(); // <-- así actualizas la posición cada frame
 
          if (izq || der) {
             stateTime += delta;
