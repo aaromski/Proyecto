@@ -1,50 +1,27 @@
 package io.github.Sonic_V0;
 
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.maps.tiled.TmxMapLoader;
-import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.*;
+//import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 public class VentanaPrueba implements Screen {
-    private SpriteBatch batch;
-    private OrthographicCamera camara;
-    private OrthogonalTiledMapRenderer mapRenderer;
-    private Sonic sonic;
-    private CrearObjetos obj;
-    Box2DDebugRenderer debugRenderer;
-    BodyDef bodySonic;
+    //Box2DDebugRenderer debugRenderer;
+    private final SpriteBatch batch;
+    private final Sonic sonic;
+    private final Mundo mundo;
+    private final CargarMapa map;
+    private final Camara camara;
 
     public VentanaPrueba() {
-        debugRenderer = new Box2DDebugRenderer();
-        camara = new OrthographicCamera();
-        camara.setToOrtho(false, 16, 10); // Ajusta según tu escala y resolución
-        camara.update();
-        bodySonic = new BodyDef();
-        bodySonic.position.set( 20 , 10 );
-        bodySonic.type = BodyDef.BodyType.DynamicBody;
-
+        //debugRenderer = new Box2DDebugRenderer();
+        map = new CargarMapa("Mapa1/mapa.tmx", 0.039f);
+        camara = new Camara();
+        mundo = new Mundo();
         batch = new SpriteBatch();
-        obj = new CrearObjetos();
-        CircleShape box = new CircleShape();
-        box.setRadius(0.5f);
-        FixtureDef fixDef = new FixtureDef();
-        fixDef.shape = box;
-        Body oBody = obj.world.createBody(bodySonic);
-        oBody.setLinearDamping(5f); // Esto reduce el deslizamiento horizontal
-        fixDef.friction = 1f;
-        oBody.createFixture(fixDef);
-        sonic = new Sonic(oBody); //270-150
-        obj.crearPlataforma(2f, 1f);
-        obj.crearPlataforma( 8f, 2f);
-        obj.crearPlataforma(14f, 3f);
-        obj.crearPlataforma(20f, 4f);
+        sonic = new Sonic(mundo.crearCuerpo(new Vector2(20f, 10f))); //270-150
+        mundo.objetosMapa(map.getMap());
     }
 
         @Override
@@ -54,20 +31,16 @@ public class VentanaPrueba implements Screen {
 
     @Override
     public void render(float delta) {
-        Vector2 sonicPos = sonic.body.getPosition(); // O usa sonic.body si es público
         sonic.actualizar(delta);
-        obj.actualizar(delta);
-        camara.position.set(sonicPos.x, sonicPos.y, 0);
-        camara.update();
+        mundo.actualizar(delta);
 
-        // Dibujar en nueva posición
         ScreenUtils.clear(0, 0, 0, 1);
+        map.renderarMapa(camara.getCamara());
 
-        // 📌 Renderizar el mapa antes del personaje
+        // 📌 Dibujar cuerpo de los objetos
+       //debugRenderer.render(obj.world, camara.combined);
 
-        debugRenderer.render(obj.world, camara.combined);
-
-        batch.setProjectionMatrix(camara.combined);
+        batch.setProjectionMatrix(camara.getCamara().combined);
         batch.begin();
         sonic.render(batch);
         batch.end();
@@ -102,5 +75,6 @@ public class VentanaPrueba implements Screen {
         // Destroy screen's assets here.
         sonic.dispose();
         batch.dispose();
+        map.dispose();
     }
 }
