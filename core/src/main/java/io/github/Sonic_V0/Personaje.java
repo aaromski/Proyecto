@@ -10,7 +10,11 @@ public abstract class Personaje {
     protected float stateTime = 0f;
     protected TextureRegion frameActual;
     protected Sprite sprite;
-    protected Animation<Sprite> correr;
+    protected Animation<TextureRegion> correr;
+    protected Animation<TextureRegion> abajo;
+    protected Animation<TextureRegion> arriba;
+    protected Animation<TextureRegion> diagonalarr;
+    protected Animation<TextureRegion> diagonalabj;
     protected Body body;
     public static final float PPM = 32f; // Pixels Per Meter
     protected TextureAtlas atlas;
@@ -27,33 +31,55 @@ public abstract class Personaje {
     abstract void inicializarAnimaciones(float x, float y);
 
     protected void actualizar(float delta) {
-        stateTime += delta;
-        this.posicion = body.getPosition(); // <-- así actualizas la posición cada frame
+        this.posicion = body.getPosition(); // actualiza posición
+        boolean diagonalArriba = arr && (izq || der);
+        boolean diagonalAbajo = abj && (izq || der);
 
-         if (izq || der) {
+        // solo sumar stateTime si se anima
+        if (diagonalArriba || diagonalAbajo || izq || der || abj || arr) {
             stateTime += delta;
+        } else {
+            stateTime = 0;
+        }
+
+        // Lógica de animaciones
+        if (diagonalArriba) {
+            frameActual = diagonalarr.getKeyFrame(stateTime, true);
+            if (der && !frameActual.isFlipX()) frameActual.flip(true, false); // invertir para mirar derecha
+            if (izq && frameActual.isFlipX()) frameActual.flip(true, false); // restaurar si está invertido
+        } else if (diagonalAbajo) {
+            frameActual = diagonalabj.getKeyFrame(stateTime, true);
+            if (izq && !frameActual.isFlipX()) frameActual.flip(true, false); // invertir para mirar izquierda
+            if (der && frameActual.isFlipX()) frameActual.flip(true, false); // restaurar si está invertido
+        } else if (abj) {
+            frameActual = abajo.getKeyFrame(stateTime, true);
+        } else if (arr) {
+            frameActual = arriba.getKeyFrame(stateTime, true);
+        } else if (izq || der) {
             frameActual = correr.getKeyFrame(stateTime, true);
         } else {
-            frameActual = correr.getKeyFrame(0, false);
+            frameActual = sprite;
         }
 
-        // Invertir el sprite si se mueve a la izquierda
-        if (frameActual != null && izq && !frameActual.isFlipX()) {
-            frameActual.flip(true, false);
+        // Flip adicional por si hay inversión en otras direcciones
+        if (!diagonalArriba && !diagonalAbajo) {
+            if (izq && frameActual != null && !frameActual.isFlipX()) {
+                frameActual.flip(true, false);
+            } else if (der && frameActual != null && frameActual.isFlipX()) {
+                frameActual.flip(true, false);
+            }
         }
-        if (frameActual != null && der && frameActual.isFlipX()) {
-            frameActual.flip(true, false);
-        }
-
     }
 
     public void render(SpriteBatch batch) {
-        sprite.setRegion(frameActual);
-        sprite.setPosition(
+        // Si estás usando solo TextureRegion:
+        batch.draw(
+            frameActual,
             posicion.x - sprite.getWidth() / 2f,
-            posicion.y - sprite.getHeight() / 2f
+            posicion.y - sprite.getHeight() / 2f,
+            sprite.getWidth(),
+            sprite.getHeight()
         );
-        sprite.draw(batch);
     }
 
 
