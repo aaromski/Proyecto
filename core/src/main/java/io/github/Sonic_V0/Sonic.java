@@ -36,7 +36,6 @@ public class Sonic extends Personaje {
             x - sprite.getWidth() / 2f,
             y - sprite.getHeight() / 2f
         );
-
         correr = crearAnimacion("SonicSprite", 8, 0.9f);       // del 1 al 8
         abajo = crearAnimacion("abajo", 10, 0.1f);
         arriba = crearAnimacion("arriba", 6, 0.1f);
