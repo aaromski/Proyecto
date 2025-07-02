@@ -6,7 +6,7 @@ public class ConjuntoDeObjetos <T> {
         if (Tamano <= 0) {
             throw new MiExcepciones("Tamano invalido");
         }
-        conjunto = (T[]) new Object [Tamano];
+        conjunto = (T[]) new Integer [Tamano];
     }
 
     public ConjuntoDeObjetos(T[] elementos) {
@@ -43,7 +43,7 @@ public class ConjuntoDeObjetos <T> {
         @SuppressWarnings("unchecked")
         public ConjuntoDeObjetos<T> unir(T segundoConjunto[]) {
             int tamano = conjunto.length + segundoConjunto.length;
-            T[] union = (T[]) new Object[tamano];
+            T[] union = (T[]) new Integer[tamano];
 
             int cont = 0;
 
