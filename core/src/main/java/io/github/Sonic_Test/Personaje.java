@@ -15,7 +15,7 @@ abstract public class Personaje {
     protected Sprite sprite;
     protected Animation<Sprite> correr;
     protected  Animation<Sprite> saltar;
-    protected Body body;
+    public Body body;
     public static final float PPM = 32f; // Pixels Per Meter (ejemplo)
     protected TextureAtlas atlas;
     protected  Vector2 posicion;
