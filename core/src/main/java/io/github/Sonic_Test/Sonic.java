@@ -49,7 +49,7 @@ public class Sonic extends Personaje{
     }
 
     @Override
-    protected void actualizar(float delta) {
+    public void actualizar(float delta) {
         izq = false;
         der = false;
         // Movimiento con teclado
