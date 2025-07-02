@@ -36,23 +36,11 @@ public class Sonic extends Personaje {
             x - sprite.getWidth() / 2f,
             y - sprite.getHeight() / 2f
         );
-
-        correr = crearAnimacion("SonicSprite", 8, 0.1f);       // del 1 al 8
+        correr = crearAnimacion("SonicSprite", 8, 0.09f);       // del 1 al 8
         abajo = crearAnimacion("abajo", 10, 0.1f);
         arriba = crearAnimacion("arriba", 6, 0.1f);
         diagonalarr = crearAnimacion("diagonal", 6, 0.1f);
         diagonalabj = crearAnimacion("Diagonalabj", 7, 0.1f);
-
-        saltar = new Animation<>(
-            0.3f,
-            atlas.createSprite("salto1"),
-            atlas.createSprite("salto2"),
-            atlas.createSprite("salto3"),
-            atlas.createSprite("salto4"),
-            atlas.createSprite("salto5"),
-            atlas.createSprite("salto6"),
-            atlas.createSprite("salto7"),
-            atlas.createSprite("salto8"));
 
         frameActual = new TextureRegion();
     }
