@@ -1,39 +1,25 @@
-package io.github.Sonic_Test.Menu;
-
+package io.github.Sonic_V0.Menu;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import io.github.Sonic_Test.Main;
+import io.github.Sonic_V0.Main;
 
-public class PantallaAyuda implements Screen {
 
-    private final Main game;
-    private SpriteBatch batch;
-    private BitmapFont font;
-    private Texture fondo;
-    private Texture boton;
-    private GlyphLayout layout;
-
-    private float scrollX = 0f;
-
+public class PantallaAyuda extends BaseMenu {
     // Estado: 0 = Ayuda, 1 = Acerca de
     private int seccionActual = 0;
-
+    private final Fondo fondo;
     public PantallaAyuda(Main game) {
-        this.game = game;
+        super(game);
+        fondo = new Fondo();
     }
 
     @Override
     public void show() {
-        batch = new SpriteBatch();
-        font = new BitmapFont();
-        fondo = new Texture("Menu/Sunset_Hill.png");
-        boton = new Texture("Menu/button.png");
-        layout = new GlyphLayout();
+
     }
 
     private boolean dibujarBotonConTexto(SpriteBatch batch, BitmapFont font, GlyphLayout layout,
@@ -56,22 +42,14 @@ public class PantallaAyuda implements Screen {
 
     @Override
     public void render(float delta) {
-        float scrollSpeed = 50f;
-        scrollX -= scrollSpeed * delta;
-        if (scrollX <= -fondo.getWidth()) scrollX += fondo.getWidth();
+        fondo.actualizar(delta);
 
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         batch.begin();
 
-        int screenW = Gdx.graphics.getWidth();
-        int screenH = Gdx.graphics.getHeight();
-        int fondoW = fondo.getWidth();
-
-        for (int x = (int) scrollX; x < screenW; x += fondoW) {
-            batch.draw(fondo, x, 0, fondoW, screenH);
-        }
+        fondo.dibujar(batch, screenW, screenH);
 
         // Botones de pestañas
         int botonPestanaW = 150;
@@ -140,7 +118,7 @@ public class PantallaAyuda implements Screen {
         if (clicVolver) game.setScreen(new MenuPrincipal(game));
     }
 
-    @Override public void resize(int width, int height) {}
+
     @Override public void pause() {}
     @Override public void resume() {}
     @Override public void hide() {}

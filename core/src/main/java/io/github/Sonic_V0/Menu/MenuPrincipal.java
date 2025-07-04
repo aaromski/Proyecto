@@ -1,70 +1,46 @@
-package io.github.Sonic_Test.Menu;
+package io.github.Sonic_V0.Menu;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.GlyphLayout;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.Color;
-import io.github.Sonic_Test.Main;
+import io.github.Sonic_V0.Main;
 
-public class MenuPrincipal implements Screen {
 
-    private final Main game;
-    private SpriteBatch batch;
-    private BitmapFont font;
-    private Texture fondo, boton, logo;
-    private GlyphLayout layout;
-
+public class MenuPrincipal extends BaseMenu {
+    private Texture logo;
+    private final Fondo fondo;
     private final int botonW = 250, botonH = 60;
     private final int startX = Gdx.graphics.getWidth() / 2 - botonW / 2;
     private final int startY = 300;
     private final int espacio = 70;
 
-    private final float fondoX = 0f;
-
     private float logoAlpha = 0f;
     private float logoYactual;
     private final float logoYfinal = Gdx.graphics.getHeight() - 120 - 30;
-    private float scrollX;
 
 
     public MenuPrincipal(Main game) {
-        this.game = game;
+        super(game);
+        fondo = new Fondo();
     }
 
     @Override
     public void show() {
-        batch = new SpriteBatch();
-        font = new BitmapFont();
-        fondo = new Texture("Menu/Sunset_Hill.png");
-        boton = new Texture("Menu/button.png");
         logo = new Texture("Menu/sonicmania.png");
-        layout = new GlyphLayout();
         logoYactual = logoYfinal + 100f; // Arranca más arriba
     }
 
     @Override
     public void render(float delta) {
-        // Desplazamiento del fondo
-        scrollX -= delta * 50f; // velocidad de desplazamiento
-        if (scrollX <= -fondo.getWidth()) scrollX += fondo.getWidth();
+        fondo.actualizar(delta);
 
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         batch.begin();
 
-        int screenW = Gdx.graphics.getWidth();
-        int screenH = Gdx.graphics.getHeight();
-        int fondoW = fondo.getWidth();
-
-        // Dibujar copias encadenadas del fondo
-        for (int x = (int)scrollX; x < screenW; x += fondoW) {
-            batch.draw(fondo, x, 0, fondoW, screenH);
-        }
+       fondo.dibujar(batch, screenW, screenH);
 
         // Animación del logo
         if (logoAlpha < 1f) logoAlpha += delta;
@@ -128,7 +104,7 @@ public class MenuPrincipal implements Screen {
         font.draw(batch, texto, textoX, textoY);
     }
 
-    @Override public void resize(int width, int height) {}
+
     @Override public void pause() {}
     @Override public void resume() {}
     @Override public void hide() {}
