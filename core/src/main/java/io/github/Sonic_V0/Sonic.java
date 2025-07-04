@@ -46,7 +46,7 @@ public class Sonic extends Personaje {
     }
 
     @Override
-    protected void actualizar(float delta) {
+    public void actualizar(float delta) {
         izq = der = abj = arr = false;
         boolean presionando = false;
 

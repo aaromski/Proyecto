@@ -69,6 +69,7 @@ public abstract class Personaje {
                 frameActual.flip(true, false);
             }
         }
+
     }
 
     public void render(SpriteBatch batch) {
