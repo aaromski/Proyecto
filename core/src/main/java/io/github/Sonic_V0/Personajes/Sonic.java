@@ -1,4 +1,4 @@
-package io.github.Sonic_V0;
+package io.github.Sonic_V0.Personajes;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.utils.Array;
 
-public class Sonic extends Personaje {
+public class Sonic extends Amigas {
 
     public Sonic (Body body) {
         super(body);
@@ -16,16 +16,6 @@ public class Sonic extends Personaje {
         this.name = "Sonic";
 
     }
-
-    private Animation<TextureRegion> crearAnimacion(String baseNombre, int cantidadFrames, float duracion) {
-        Array<TextureRegion> frames = new Array<>();
-        for (int i = 1; i <= cantidadFrames; i++) {
-            frames.add(atlas.findRegion(baseNombre + i));
-        }
-        return new Animation<>(duracion, frames);
-    }
-
-
 
     @Override
     void inicializarAnimaciones(float x, float y) {

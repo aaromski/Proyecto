@@ -1,34 +1,20 @@
-package io.github.Sonic_V0;
+package io.github.Sonic_V0.Personajes;
 
-import com.badlogic.gdx.graphics.g2d.*;
-import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.physics.box2d.Body;
 
-public abstract class Personaje {
+public abstract class Amigas extends Personaje {
     protected  boolean izq = false,  der = false, arr = false, abj = false;  //Estados
-    protected Vector2 velocidad;  //200
-    protected float stateTime = 0f;
-    protected TextureRegion frameActual;
-    protected Sprite sprite;
-    protected Animation<TextureRegion> correr;
     protected Animation<TextureRegion> abajo;
     protected Animation<TextureRegion> arriba;
     protected Animation<TextureRegion> diagonalarr;
     protected Animation<TextureRegion> diagonalabj;
-    protected Body body;
-    public static final float PPM = 32f; // Pixels Per Meter
-    protected TextureAtlas atlas;
-    protected Vector2 posicion;
-    protected String name;
 
-    public Personaje (Body b) {
-        this.body = b;
-        this.posicion = body.getPosition();
-        velocidad = new Vector2(5f, 2f);
+    public Amigas(Body b) {
+        super(b);
     }
-
-
-    abstract void inicializarAnimaciones(float x, float y);
 
     protected void actualizar(float delta) {
         this.posicion = body.getPosition(); // actualiza posición
@@ -72,18 +58,4 @@ public abstract class Personaje {
 
     }
 
-    public void render(SpriteBatch batch) {
-        // Si estás usando solo TextureRegion:
-        batch.draw(
-            frameActual,
-            posicion.x - sprite.getWidth() / 2f,
-            posicion.y - sprite.getHeight() / 2f,
-            sprite.getWidth(),
-            sprite.getHeight()
-        );
-    }
-
-
-    public abstract void dispose();
 }
-

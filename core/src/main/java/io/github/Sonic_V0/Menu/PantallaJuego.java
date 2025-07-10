@@ -5,6 +5,8 @@ import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.*;
 import io.github.Sonic_V0.*;
+import io.github.Sonic_V0.Personajes.Robot;
+import io.github.Sonic_V0.Personajes.Sonic;
 
 public class PantallaJuego extends BaseMenu {
     //Box2DDebugRenderer debugRenderer;
@@ -17,6 +19,7 @@ public class PantallaJuego extends BaseMenu {
     private final CargarMapa map;
     private final Camara camara;
     private ShapeRenderer shape;
+    private final Robot robot;
 
     // Pausa
     private boolean enPausa = false;
@@ -29,6 +32,10 @@ public class PantallaJuego extends BaseMenu {
         camara = new Camara();
         mundo = new Mundo();
         sonic = new Sonic(mundo.crearCuerpo(new Vector2(20f, 10f))); //270-150
+        robot = new Robot(
+            mundo.crearCuerpo(new Vector2(30f, 15f)),
+            new Vector2(0f, 0f)
+        );
         mundo.objetosMapa(map.getMap());
     }
 
@@ -47,6 +54,8 @@ public class PantallaJuego extends BaseMenu {
         if (!enPausa) {
             sonic.actualizar(delta);
             mundo.actualizar(delta);
+            robot.setObjetivo(sonic.getPosicion());
+            robot.actualizar(delta);
         }
 
         Gdx.gl.glClearColor(0, 0, 0, 1);
@@ -56,6 +65,7 @@ public class PantallaJuego extends BaseMenu {
         batch.setProjectionMatrix(camara.getCamara().combined);
         batch.begin();
         sonic.render(batch);
+        robot.render(batch);
         batch.end();
 
         if (enPausa) {
@@ -150,6 +160,7 @@ public class PantallaJuego extends BaseMenu {
     @Override
     public void dispose() {
         batch.dispose();
+        robot.dispose();
         shape.dispose();
         font.dispose();
         sonic.dispose();
