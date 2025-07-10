@@ -5,6 +5,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 //import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.ScreenUtils;
+import io.github.Sonic_V0.Personajes.Robot;
+import io.github.Sonic_V0.Personajes.Sonic;
 
 public class VentanaPrueba implements Screen {
     //Box2DDebugRenderer debugRenderer;
@@ -13,6 +15,7 @@ public class VentanaPrueba implements Screen {
     private final Mundo mundo;
     private CargarMapa map;
     private final Camara camara;
+    private final Robot robot;
 
     public VentanaPrueba() {
         //debugRenderer = new Box2DDebugRenderer();
@@ -20,7 +23,11 @@ public class VentanaPrueba implements Screen {
         camara = new Camara();
         mundo = new Mundo();
         batch = new SpriteBatch();
-        sonic = new Sonic(mundo.crearCuerpo(new Vector2(20f, 10f))); //270-150
+        sonic = new Sonic(mundo.crearCuerpo(new Vector2(30f, 15f))); //270-150
+        robot = new Robot(
+            mundo.crearCuerpo(new Vector2(30f, 15f)),
+            new Vector2(0f, 0f)
+        );
         mundo.objetosMapa(map.getMap());
     }
 
@@ -34,6 +41,7 @@ public class VentanaPrueba implements Screen {
         Vector2 sonicPos = sonic.body.getPosition();
         sonic.actualizar(delta);
         mundo.actualizar(delta);
+        robot.actualizar(delta);
 
         ScreenUtils.clear(0, 0, 0, 1);
         map.renderarMapa(camara.getCamara());
@@ -44,6 +52,7 @@ public class VentanaPrueba implements Screen {
         batch.setProjectionMatrix(camara.getCamara().combined);
         batch.begin();
         sonic.render(batch);
+        robot.render(batch);
         batch.end();
     }
 
@@ -77,5 +86,6 @@ public class VentanaPrueba implements Screen {
         sonic.dispose();
         batch.dispose();
         map.dispose();
+        robot.dispose();
     }
 }
