@@ -5,11 +5,10 @@ import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.*;
 import io.github.Sonic_V0.*;
-import io.github.Sonic_V0.Personajes.Robot;
+import io.github.Sonic_V0.Personajes.Etapa;
 import io.github.Sonic_V0.Personajes.Sonic;
 
 public class PantallaJuego extends BaseMenu {
-    //Box2DDebugRenderer debugRenderer;
     private float botonPixelW;
     private float botonPixelH;
     private final float botonW = 6f;
@@ -19,7 +18,7 @@ public class PantallaJuego extends BaseMenu {
     private final CargarMapa map;
     private final Camara camara;
     private ShapeRenderer shape;
-    private final Robot robot;
+    private final Etapa etapa; // <-- NUEVO: clase que genera y maneja los robots
 
     // Pausa
     private boolean enPausa = false;
@@ -27,15 +26,11 @@ public class PantallaJuego extends BaseMenu {
 
     public PantallaJuego(Main game) {
         super(game);
-        //debugRenderer = new Box2DDebugRenderer();
         map = new CargarMapa("Mapa1/mapa.tmx", 0.039f);
         camara = new Camara();
         mundo = new Mundo();
-        sonic = new Sonic(mundo.crearCuerpo(new Vector2(20f, 10f))); //270-150
-        robot = new Robot(
-            mundo.crearCuerpo(new Vector2(30f, 15f)),
-            new Vector2(0f, 0f)
-        );
+        sonic = new Sonic(mundo.crearCuerpo(new Vector2(20f, 10f))); // Posición inicial
+        etapa = new Etapa(mundo, sonic); // <-- Se instancia etapa en lugar de robot único
         mundo.objetosMapa(map.getMap());
     }
 
@@ -54,8 +49,7 @@ public class PantallaJuego extends BaseMenu {
         if (!enPausa) {
             sonic.actualizar(delta);
             mundo.actualizar(delta);
-            robot.setObjetivo(sonic.getPosicion());
-            robot.actualizar(delta);
+            etapa.actualizar(delta); // <-- Actualiza todos los robots generados
         }
 
         Gdx.gl.glClearColor(0, 0, 0, 1);
@@ -65,7 +59,7 @@ public class PantallaJuego extends BaseMenu {
         batch.setProjectionMatrix(camara.getCamara().combined);
         batch.begin();
         sonic.render(batch);
-        robot.render(batch);
+        etapa.renderizar(batch); // <-- Dibuja todos los robots generados
         batch.end();
 
         if (enPausa) {
@@ -84,14 +78,11 @@ public class PantallaJuego extends BaseMenu {
             Gdx.gl.glDisable(GL20.GL_BLEND);
 
             if (alphaPausa >= 0.8f) {
-                // Declaraciones
-
                 float cx = camara.getCamara().position.x - botonW / 2f;
                 float cy1 = camara.getCamara().position.y + 3f;  // SEGUIR
                 float cy3 = camara.getCamara().position.y;      // MENÚ
                 float cy2 = camara.getCamara().position.y - 3f; // SALIR
 
-                // Convertir a coordenadas de pantalla
                 Vector3 screenPos1 = camara.getProject(cx, cy1, 0);
                 Vector3 screenPos2 = camara.getProject(cx, cy2, 0);
                 Vector3 screenPos3 = camara.getProject(cx, cy3, 0);
@@ -99,7 +90,6 @@ public class PantallaJuego extends BaseMenu {
                 batch.setProjectionMatrix(batch.getProjectionMatrix().idt().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
                 batch.begin();
 
-                // Dibujar botones
                 batch.draw(boton, screenPos1.x, screenPos1.y, botonPixelW, botonPixelH); // SEGUIR
                 batch.draw(boton, screenPos3.x, screenPos3.y, botonPixelW, botonPixelH); // MENÚ
                 batch.draw(boton, screenPos2.x, screenPos2.y, botonPixelW, botonPixelH); // SALIR
@@ -132,7 +122,7 @@ public class PantallaJuego extends BaseMenu {
                         if (my >= cy1 && my <= cy1 + botonH) {
                             enPausa = false;
                         } else if (my >= cy3 && my <= cy3 + botonH) {
-                            game.setScreen(new MenuPrincipal(game)); // ← Regresa al menú
+                            game.setScreen(new MenuPrincipal(game));
                             dispose();
                         } else if (my >= cy2 && my <= cy2 + botonH) {
                             Gdx.app.exit();
@@ -143,14 +133,10 @@ public class PantallaJuego extends BaseMenu {
         }
     }
 
-
     @Override
     public void resize(int width, int height) {
         botonPixelW = (int) (botonW * (width / camara.getCamara().viewportWidth));
         botonPixelH = (int)(botonH * (height / camara.getCamara().viewportHeight));
-        if(width <= 0 || height <= 0) return;
-
-        // Resize your screen here. The parameters represent the new window size.
     }
 
     @Override public void pause() {}
@@ -160,12 +146,11 @@ public class PantallaJuego extends BaseMenu {
     @Override
     public void dispose() {
         batch.dispose();
-        robot.dispose();
         shape.dispose();
         font.dispose();
         sonic.dispose();
         map.dispose();
         boton.dispose();
-
+        etapa.dispose(); // <-- Importante: liberar recursos de los robots
     }
 }
