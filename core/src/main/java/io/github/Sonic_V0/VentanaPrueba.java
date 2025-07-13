@@ -23,11 +23,11 @@ public class VentanaPrueba implements Screen {
         camara = new Camara();
         mundo = new Mundo();
         batch = new SpriteBatch();
-        sonic = new Sonic(mundo.crearCuerpo(new Vector2(30f, 15f))); //270-150
+        sonic = new Sonic(mundo.crearCuerpo(new Vector2(30f, 15f),"Sonic")); //270-150
         robot = new Robot(
-            mundo.crearCuerpo(new Vector2(30f, 15f)),
-            new Vector2(0f, 0f)
-        );
+            mundo.crearCuerpo(new Vector2(30f, 15f), "Robot"),
+            new Vector2(0f, 0f),
+            mundo);
         mundo.objetosMapa(map.getMap());
     }
 
@@ -47,7 +47,7 @@ public class VentanaPrueba implements Screen {
         map.renderarMapa(camara.getCamara());
 
         // 📌 Dibujar cuerpo de los objetos
-       //debugRenderer.render(obj.world, camara.combined);
+      // debugRenderer.render(obj.world, camara.combined);
 
         batch.setProjectionMatrix(camara.getCamara().combined);
         batch.begin();
