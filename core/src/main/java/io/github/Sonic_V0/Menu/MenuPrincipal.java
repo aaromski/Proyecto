@@ -6,19 +6,15 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Color;
 import io.github.Sonic_V0.Main;
 
-
 public class MenuPrincipal extends BaseMenu {
     private Texture logo;
     private final Fondo fondo;
-    private final int botonW = 250, botonH = 60;
-    private final int startX = Gdx.graphics.getWidth() / 2 - botonW / 2;
+    private final int startX = Gdx.graphics.getWidth() / 2 - (int)botonW / 2;
     private final int startY = 300;
     private final int espacio = 70;
-
     private float logoAlpha = 0f;
     private float logoYactual;
     private final float logoYfinal = Gdx.graphics.getHeight() - 120 - 30;
-
 
     public MenuPrincipal(Main game) {
         super(game);

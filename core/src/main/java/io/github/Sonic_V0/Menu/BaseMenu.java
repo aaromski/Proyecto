@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import io.github.Sonic_V0.*;
 
 public abstract class BaseMenu implements Screen {
+    protected Camara camara;
     protected final Main game;
     protected SpriteBatch batch;
     protected BitmapFont font;
@@ -14,6 +15,8 @@ public abstract class BaseMenu implements Screen {
     protected GlyphLayout layout;
     protected int screenW;
     protected int screenH;
+    protected float botonW = 250f;
+    protected float botonH = 60f;
 
     public BaseMenu(Main Game) {
         this.game = Game;
@@ -21,7 +24,7 @@ public abstract class BaseMenu implements Screen {
         font = new BitmapFont();
         layout = new GlyphLayout();
         boton = new Texture("Menu/button.png"); // Usa la misma textura que en el menú
-
+        camara = new Camara();
     }
 
     @Override

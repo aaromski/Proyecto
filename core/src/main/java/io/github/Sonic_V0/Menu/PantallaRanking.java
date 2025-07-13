@@ -21,7 +21,7 @@ public class PantallaRanking extends BaseMenu {
 
     private boolean dibujarBotonConTexto(SpriteBatch batch, BitmapFont font, GlyphLayout layout,
                                          Texture botonTex) {
-        batch.draw(botonTex, (float) 100, (float) 100, (float) 200, (float) 60);
+        batch.draw(botonTex, (float) 100, (float) 100, botonW, botonH);
         font.setColor(1, 1, 1, 1);
         layout.setText(font, "VOLVER");
         float textoX = (float) 100 + (float) 200 / 2f - layout.width / 2f;

@@ -5,12 +5,16 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 //import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
+import io.github.Sonic_V0.Mundo;
 
 public class Robot extends Enemigas{
-    public Robot(Body b, Vector2 objetivo) {
+    private final Mundo world;
+    private float tiempoBasura;
+    public Robot(Body b, Vector2 objetivo, Mundo world) {
         super(b);
         inicializarAnimaciones(body.getPosition().x, body.getPosition().y);
         this.objetivo = objetivo;
+        this.world = world;
         this.name = "Robot";
     }
 
@@ -35,6 +39,18 @@ public class Robot extends Enemigas{
             stateTime = 0f;
             body.setLinearVelocity(0, 0);
             body.getWorld().destroyBody(body); // destruye físicamente
+        }
+    }
+
+    @Override
+    public void actualizar(float delta) {
+        super.actualizar(delta); // si el padre tiene lógica
+
+        tiempoBasura += delta;
+        if (tiempoBasura >= 20f) { // cada 3 segundos, por ejemplo
+            Vector2 posicionActual = body.getPosition().cpy();
+            world.generarBasura(posicionActual);
+            tiempoBasura = 0f;
         }
     }
 
