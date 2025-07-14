@@ -9,7 +9,7 @@ import io.github.Sonic_V0.Mundo;
 
 public class Robot extends Enemigas{
     private float tiempoBasura;
-    private Mundo world;
+    private final Mundo world;
     public Robot(Body b, Vector2 objetivo, Mundo world) {
         super(b);
         inicializarAnimaciones(body.getPosition().x, body.getPosition().y);
