@@ -2,22 +2,15 @@ package io.github.Sonic_V0.Menu;
 
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.*;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.*;
-import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+//import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import io.github.Sonic_V0.*;
-import io.github.Sonic_V0.Personajes.Robot;
-import io.github.Sonic_V0.Personajes.Sonic;
 
 public class PantallaJuego extends BaseMenu {
     //Box2DDebugRenderer debugRenderer;
-    private final float botonW1 = 6f;
-    private final float botonH1 = 2f;
-    private final Sonic sonic;
     private final Mundo mundo;
     private ShapeRenderer shape;
-    private final Robot robot;
 
     // Pausa
     private boolean enPausa = false;
@@ -27,11 +20,6 @@ public class PantallaJuego extends BaseMenu {
         super(game);
        // debugRenderer = new Box2DDebugRenderer();
         mundo = new Mundo();
-        sonic = new Sonic(mundo.crearCuerpo(new Vector2(20f, 10f), "Sonic")); //270-150
-        robot = new Robot(
-            mundo.crearCuerpo(new Vector2(40f, 15f), "Robot"),
-            new Vector2(0f, 0f),
-            mundo);
     }
 
     @Override
@@ -47,11 +35,7 @@ public class PantallaJuego extends BaseMenu {
         }
 
         if (!enPausa) {
-            sonic.actualizar(delta);
             mundo.actualizar(delta);
-            robot.setObjetivo(sonic.getPosicion());
-            robot.actualizar(delta);
-
         }
 
         Gdx.gl.glClearColor(0, 0, 0, 1);
@@ -64,8 +48,6 @@ public class PantallaJuego extends BaseMenu {
      //  debugRenderer.render(mundo.getWorld(), camara.getCamara().combined);
         batch.begin();
         mundo.render(batch);
-        sonic.render(batch);
-        robot.render(batch);
         batch.end();
 
         if (enPausa) {
@@ -84,19 +66,15 @@ public class PantallaJuego extends BaseMenu {
             Gdx.gl.glDisable(GL20.GL_BLEND);
 
             if (alphaPausa >= 0.8f) {
-                // Declaraciones
-
-                float cx = camara.getCamara().position.x - botonW1 / 2f;
+                float cx = camara.getCamara().position.x - 6f / 2f;
                 float cy1 = camara.getCamara().position.y + 3f;  // SEGUIR
                 float cy3 = camara.getCamara().position.y;      // MENÚ
                 float cy2 = camara.getCamara().position.y - 3f; // SALIR
 
-                // Convertir a coordenadas de pantalla
                 Vector3 screenPos1 = camara.getProject(cx, cy1, 0);
                 Vector3 screenPos2 = camara.getProject(cx, cy2, 0);
                 Vector3 screenPos3 = camara.getProject(cx, cy3, 0);
-                System.out.println("Camara posición: " + camara.getCamara().position);
-                System.out.println("Botón X: " + cx + ", Y: " + cy1);
+
                 batch.setProjectionMatrix(batch.getProjectionMatrix().idt().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
                 batch.begin();
 
@@ -151,10 +129,8 @@ public class PantallaJuego extends BaseMenu {
     @Override
     public void dispose() {
         batch.dispose();
-        robot.dispose();
         shape.dispose();
         font.dispose();
-        sonic.dispose();
         boton.dispose();
         mundo.dispose();
     }

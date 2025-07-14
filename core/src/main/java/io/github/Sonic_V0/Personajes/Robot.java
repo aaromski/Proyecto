@@ -2,6 +2,7 @@ package io.github.Sonic_V0.Personajes;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+//import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import io.github.Sonic_V0.Mundo;
@@ -13,11 +14,8 @@ public class Robot extends Enemigas{
         super(b);
         inicializarAnimaciones(body.getPosition().x, body.getPosition().y);
         this.objetivo = objetivo;
-        this.world = world;
         this.name = "Robot";
     }
-
-
 
     @Override
     public void inicializarAnimaciones(float x, float y){
@@ -32,6 +30,15 @@ public class Robot extends Enemigas{
         KO = crearAnimacion("robot", 4, 0.1f);
 
 
+    }
+    @Override
+    public void destruir() {
+        if (!destruido) {
+            destruido = true;
+            stateTime = 0f;
+            body.setLinearVelocity(0, 0);
+            body.getWorld().destroyBody(body); // destruye físicamente
+        }
     }
 
     @Override
