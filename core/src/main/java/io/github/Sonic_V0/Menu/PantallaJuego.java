@@ -2,28 +2,15 @@ package io.github.Sonic_V0.Menu;
 
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.*;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.*;
-import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+//import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import io.github.Sonic_V0.*;
-import io.github.Sonic_V0.Personajes.Etapa;
-import io.github.Sonic_V0.Personajes.Sonic;
 
 public class PantallaJuego extends BaseMenu {
     //Box2DDebugRenderer debugRenderer;
-    private final float botonW1 = 6f;
-    private final float botonH1 = 2f;
-    private float botonPixelW;
-    private float botonPixelH;
-    private final float botonW = 6f;
-    private final float botonH = 2f;
-    private final Sonic sonic;
     private final Mundo mundo;
-    private final CargarMapa map;
-    private final Camara camara;
     private ShapeRenderer shape;
-    private final Etapa etapa; // <-- NUEVO: clase que genera y maneja los robots
 
     // Pausa
     private boolean enPausa = false;
@@ -33,14 +20,6 @@ public class PantallaJuego extends BaseMenu {
         super(game);
        // debugRenderer = new Box2DDebugRenderer();
         mundo = new Mundo();
-        sonic = new Sonic(mundo.crearCuerpo(new Vector2(20f, 10f), "Sonic")); //270-150
-        robot = new Robot(
-            mundo.crearCuerpo(new Vector2(40f, 15f), "Robot"),
-            new Vector2(0f, 0f),
-            mundo);
-        sonic = new Sonic(mundo.crearCuerpo(new Vector2(20f, 10f))); // Posición inicial
-        etapa = new Etapa(mundo, sonic); // <-- Se instancia etapa en lugar de robot único
-        mundo.objetosMapa(map.getMap());
     }
 
     @Override
@@ -56,12 +35,7 @@ public class PantallaJuego extends BaseMenu {
         }
 
         if (!enPausa) {
-            sonic.actualizar(delta);
             mundo.actualizar(delta);
-            etapa.actualizar(delta); // <-- Actualiza todos los robots generados
-            robot.setObjetivo(sonic.getPosicion());
-            robot.actualizar(delta);
-
         }
 
         Gdx.gl.glClearColor(0, 0, 0, 1);
@@ -74,8 +48,6 @@ public class PantallaJuego extends BaseMenu {
      //  debugRenderer.render(mundo.getWorld(), camara.getCamara().combined);
         batch.begin();
         mundo.render(batch);
-        sonic.render(batch);
-        etapa.renderizar(batch); // <-- Dibuja todos los robots generados
         batch.end();
 
         if (enPausa) {
@@ -94,7 +66,7 @@ public class PantallaJuego extends BaseMenu {
             Gdx.gl.glDisable(GL20.GL_BLEND);
 
             if (alphaPausa >= 0.8f) {
-                float cx = camara.getCamara().position.x - botonW / 2f;
+                float cx = camara.getCamara().position.x - 6f / 2f;
                 float cy1 = camara.getCamara().position.y + 3f;  // SEGUIR
                 float cy3 = camara.getCamara().position.y;      // MENÚ
                 float cy2 = camara.getCamara().position.y - 3f; // SALIR
@@ -159,9 +131,7 @@ public class PantallaJuego extends BaseMenu {
         batch.dispose();
         shape.dispose();
         font.dispose();
-        sonic.dispose();
         boton.dispose();
-        etapa.dispose(); // <-- Importante: liberar recursos de los robots
         mundo.dispose();
     }
 }

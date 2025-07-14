@@ -2,9 +2,8 @@ package io.github.Sonic_V0.Personajes;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
 import io.github.Sonic_V0.Mundo;
-//import io.github.Sonic_V0.Personajes.Robot;
-//import io.github.Sonic_V0.Personajes.Sonic;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -35,7 +34,7 @@ public class Etapa {
         float intervalo = 5f;
         if (timer >= intervalo) {
             timer = 0f;
-            generarRobot();
+            generarRobot(mundo.crearCuerpo(getEntrada(), "Robot"));
         }
 
         // Actualiza cada robot y destruye si están cerca de Sonic
@@ -62,13 +61,14 @@ public class Etapa {
         }
     }
 
-    private void generarRobot() {
+    private Vector2 getEntrada() {
         int index = random.nextInt(puntosEntrada.size());
-        Vector2 spawn = puntosEntrada.get(index);
-        Robot robot = new Robot(mundo.crearCuerpo(spawn), sonic.getPosicion().cpy()); // primer objetivo
+        return puntosEntrada.get(index);
+    }
+
+    private void generarRobot(Body body) {
+        Robot robot = new Robot(body, sonic.getPosicion().cpy(), mundo); // primer objetivo
         robots.add(robot);
-
-
     }
 
     public void dispose() {

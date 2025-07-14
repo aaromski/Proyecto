@@ -32,7 +32,8 @@ public class Basura {
         fdef.shape = shape;
         fdef.density = 1f;
         fdef.friction = 0.3f;
-
+        fdef.filter.categoryBits = Constantes.CATEGORY_TRASH;
+        fdef.filter.maskBits = ~(Constantes.CATEGORY_ROBOT); // o una lista explícita sin incluir `TRASH`
         cuerpo.createFixture(fdef).setUserData(this);
         shape.dispose();
     }

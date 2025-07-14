@@ -2,30 +2,26 @@ package io.github.Sonic_V0;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.*;
-import com.badlogic.gdx.maps.MapLayer;
-import com.badlogic.gdx.maps.MapObject;
-import com.badlogic.gdx.maps.MapObjects;
-import com.badlogic.gdx.maps.objects.EllipseMapObject;
-import com.badlogic.gdx.maps.objects.PolygonMapObject;
-import com.badlogic.gdx.maps.objects.RectangleMapObject;
-import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.math.Ellipse;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
+import io.github.Sonic_V0.Personajes.Etapa;
+import io.github.Sonic_V0.Personajes.Sonic;
+
 import java.util.ArrayList;
 
 public class Mundo {
     private final World world;
     private final CargarMapa map;
     private final ArrayList<Basura> listaBasura;
-    float escala = 0.039f;
+    private final Sonic sonic;
+    private final Etapa etapa;
 
     public Mundo() {
         world = new World(new Vector2(0, 0), true);
+        sonic = new Sonic(crearCuerpo(new Vector2(20f, 10f), "Sonic")); //270-150
+        etapa = new Etapa(this, sonic);
         listaBasura = new ArrayList<>();
-        map = new CargarMapa("Mapa1/mapa.tmx", 0.039f);
-        objetosMapa(map.getMap());
+        map = new CargarMapa("Mapa1/mapa.tmx", world);
 
         // Configurar el ContactListener aquí mismo
         world.setContactListener(new ContactListener() {
@@ -52,7 +48,6 @@ public class Mundo {
 
     public void actualizar(float delta) {
         world.step(delta, 8, 6);
-
         // Limpiar basuras inactivas después del step
         listaBasura.removeIf(b -> {
             if (!b.estaActiva()) {
@@ -62,69 +57,10 @@ public class Mundo {
             }
             return false;
         });
+        sonic.actualizar(delta);
+        etapa.actualizar(delta); // <-- Actualiza todos los robots generados
     }
-    public void objetosMapa(TiledMap map) {
-        for (MapLayer capa : map.getLayers()) {
-            MapObjects objetos = capa.getObjects();
-                for (MapObject objeto : objetos) {
-                    if (objeto instanceof RectangleMapObject) {
-                        Rectangle rect = ((RectangleMapObject) objeto).getRectangle();
 
-                        BodyDef bdef = new BodyDef();
-                        bdef.type = BodyDef.BodyType.StaticBody;
-                        bdef.position.set(
-                            (rect.x + rect.width / 2) * escala,
-                            (rect.y + rect.height / 2) * escala
-                        );
-
-                        PolygonShape shape = new PolygonShape();
-                        shape.setAsBox(rect.width / 2 * escala, rect.height / 2 * escala);
-
-                        Body cuerpo = world.createBody(bdef);
-                        cuerpo.createFixture(shape, 0.0f);
-                        shape.dispose();
-                    }
-
-                    // Si tienes objetos poligonales:
-                    if (objeto instanceof PolygonMapObject) {
-                        PolygonMapObject poly = (PolygonMapObject) objeto;
-                        float[] vertices = poly.getPolygon().getTransformedVertices();
-                        float[] verticesEscalados = new float[vertices.length];
-
-                        for (int i = 0; i < vertices.length; i++) {
-                            verticesEscalados[i] = vertices[i] * escala;
-                        }
-
-                        PolygonShape shape = new PolygonShape();
-                        shape.set(verticesEscalados);
-
-                        BodyDef bdef = new BodyDef();
-                        bdef.type = BodyDef.BodyType.StaticBody;
-                        Body cuerpo = world.createBody(bdef);
-                        cuerpo.createFixture(shape, 0.0f);
-                        shape.dispose();
-                    }
-
-                    if (objeto instanceof EllipseMapObject) {
-                        Ellipse elipse = ((EllipseMapObject) objeto).getEllipse();
-                        float radio = (elipse.width / 2 + elipse.height / 2) / 2 * escala;
-
-                        CircleShape shape = new CircleShape();
-                        shape.setRadius(radio);
-                        shape.setPosition(new Vector2(
-                            (elipse.x + elipse.width / 2) * escala,
-                            (elipse.y + elipse.height / 2) * escala
-                        ));
-
-                        BodyDef bdef = new BodyDef();
-                        bdef.type = BodyDef.BodyType.StaticBody;
-                        Body cuerpo = world.createBody(bdef);
-                        cuerpo.createFixture(shape, 0.0f);
-                        shape.dispose();
-                    }
-                }
-            }
-    }
 
     public Body crearCuerpo(Vector2 posicion, String userData) {
         BodyDef bd = new BodyDef();
@@ -137,10 +73,17 @@ public class Mundo {
         FixtureDef fixDef = new FixtureDef();
         fixDef.shape = circle;
 
-
         Body oBody = world.createBody(bd);
         oBody.setLinearDamping(5f); // Esto reduce el deslizamiento horizontal
-        fixDef.friction = 1f;
+
+        if (userData.equals("Robot")) {
+            fixDef.filter.categoryBits = Constantes.CATEGORY_ROBOT;
+            fixDef.filter.maskBits = ~(Constantes.CATEGORY_TRASH); // o una lista explícita sin incluir `TRASH`
+        } else if (userData.equals("Sonic")) {
+            fixDef.filter.categoryBits = Constantes.CATEGORY_PERSONAJES;
+            fixDef.filter.maskBits = -1; // o una lista explícita sin incluir `TRASH`
+        }
+
         Fixture f = oBody.createFixture(fixDef);
         f.setUserData(userData);
 
@@ -159,6 +102,8 @@ public class Mundo {
                 b.render(batch);
             }
         }
+        sonic.render(batch);
+        etapa.renderizar(batch);
     }
 
     public void renderizarMapa(OrthographicCamera camara) {
@@ -171,6 +116,8 @@ public class Mundo {
         }
         map.dispose();      // ← Libera el mapa
         world.dispose();    // ← Libera el mundo Box2D
+        sonic.dispose();
+        etapa.dispose();
     }
 
 }
