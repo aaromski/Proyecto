@@ -8,13 +8,14 @@ import com.badlogic.gdx.physics.box2d.Body;
 import io.github.Sonic_V0.Mundo;
 
 public class Robot extends Enemigas{
-    private final Mundo world;
     private float tiempoBasura;
+    private Mundo world;
     public Robot(Body b, Vector2 objetivo, Mundo world) {
         super(b);
         inicializarAnimaciones(body.getPosition().x, body.getPosition().y);
         this.objetivo = objetivo;
         this.name = "Robot";
+        this.world = world;
     }
 
     @Override
