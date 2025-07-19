@@ -1,11 +1,11 @@
-package io.github.Sonic_V0;
+package io.github.Sonic_V0; // Asegúrate de que este sea el paquete correcto
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import io.github.Sonic_V0.Personajes.Etapa;
-import io.github.Sonic_V0.Personajes.Sonic;
+import io.github.Sonic_V0.Personajes.Knuckles;
 
 import java.util.ArrayList;
 
@@ -13,33 +13,29 @@ public class Mundo {
     private final World world;
     private final CargarMapa map;
     private final ArrayList<Basura> listaBasura;
-    private final Sonic sonic;
+    private final Knuckles knuckles;
     private final Etapa etapa;
 
     public Mundo() {
         world = new World(new Vector2(0, 0), true);
-        sonic = new Sonic(crearCuerpo(new Vector2(20f, 10f), "Sonic")); //270-150
-        etapa = new Etapa(this, sonic);
+        knuckles = new Knuckles(crearCuerpo(new Vector2(20f, 10f), "knuckles"));
+        etapa = new Etapa(this, knuckles);
         listaBasura = new ArrayList<>();
         map = new CargarMapa("Mapa1/mapa.tmx", world);
 
-        // Configurar el ContactListener aquí mismo
         world.setContactListener(new ContactListener() {
             @Override
             public void beginContact(Contact contact) {
-
                 Object ua = contact.getFixtureA().getUserData();
                 Object ub = contact.getFixtureB().getUserData();
 
-                if ("Sonic".equals(ua) && ub instanceof Basura) {
+                if ("knuckles".equals(ua) && ub instanceof Basura) {
                     ((Basura) ub).setActiva();
                 }
-
-                if ("Sonic".equals(ub) && ua instanceof Basura) {
+                if ("knuckles".equals(ub) && ua instanceof Basura) {
                     ((Basura) ua).setActiva();
                 }
             }
-
             @Override public void endContact(Contact contact) {}
             @Override public void preSolve(Contact contact, Manifold oldManifold) {}
             @Override public void postSolve(Contact contact, ContactImpulse impulse) {}
@@ -48,7 +44,6 @@ public class Mundo {
 
     public void actualizar(float delta) {
         world.step(delta, 8, 6);
-        // Limpiar basuras inactivas después del step
         listaBasura.removeIf(b -> {
             if (!b.estaActiva()) {
                 b.destruir(world);
@@ -57,10 +52,10 @@ public class Mundo {
             }
             return false;
         });
-        sonic.actualizar(delta);
-        etapa.actualizar(delta); // <-- Actualiza todos los robots generados
-    }
 
+        knuckles.actualizar(delta);
+        etapa.actualizar(delta);
+    }
 
     public Body crearCuerpo(Vector2 posicion, String userData) {
         BodyDef bd = new BodyDef();
@@ -72,16 +67,18 @@ public class Mundo {
 
         FixtureDef fixDef = new FixtureDef();
         fixDef.shape = circle;
+        fixDef.density = 1.0f; // Mantengo la densidad para un comportamiento físico correcto
 
         Body oBody = world.createBody(bd);
-        oBody.setLinearDamping(5f); // Esto reduce el deslizamiento horizontal
+        oBody.setLinearDamping(5f);
 
-        if (userData.equals("Robot")) {
+        if ("Robot".equals(userData)) {
             fixDef.filter.categoryBits = Constantes.CATEGORY_ROBOT;
-            fixDef.filter.maskBits = ~(Constantes.CATEGORY_TRASH); // o una lista explícita sin incluir `TRASH`
-        } else if (userData.equals("Sonic")) {
+            // Vuelve a como estaba: todo excepto TRASH
+            fixDef.filter.maskBits = ~(Constantes.CATEGORY_TRASH);
+        } else if ("knuckles".equals(userData)) {
             fixDef.filter.categoryBits = Constantes.CATEGORY_PERSONAJES;
-            fixDef.filter.maskBits = -1; // o una lista explícita sin incluir `TRASH`
+            fixDef.filter.maskBits = -1; // -1 significa que colisiona con todo
         }
 
         Fixture f = oBody.createFixture(fixDef);
@@ -102,7 +99,7 @@ public class Mundo {
                 b.render(batch);
             }
         }
-        sonic.render(batch);
+        knuckles.render(batch);
         etapa.renderizar(batch);
     }
 
@@ -114,10 +111,9 @@ public class Mundo {
         for (Basura b : listaBasura) {
             b.dispose();
         }
-        map.dispose();      // ← Libera el mapa
-        world.dispose();    // ← Libera el mundo Box2D
-        sonic.dispose();
+        map.dispose();
+        world.dispose();
+        knuckles.dispose();
         etapa.dispose();
     }
-
 }
