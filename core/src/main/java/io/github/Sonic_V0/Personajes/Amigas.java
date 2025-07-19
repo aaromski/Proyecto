@@ -42,7 +42,7 @@ public abstract class Amigas extends Personaje {
 
         } else if (diagonalAbajo) {
             frameActual = diagonalabj.getKeyFrame(stateTime, true);
-            if (this instanceof Sonic) {
+            if (this instanceof Sonic || this instanceof Tails) {
                 if (izq && !frameActual.isFlipX()) frameActual.flip(true, false); // invertir para mirar izquierda
                 if (der && frameActual.isFlipX()) frameActual.flip(true, false); // restaurar si está invertido
             } else {
