@@ -24,7 +24,7 @@ public class Mundo {
     public Mundo() {
         world = new World(new Vector2(0, 0), true);
         sonic = new Sonic(crearCuerpo(new Vector2(25f, 22f), "Sonic")); //270-150
-        knuckles = new Knuckles(crearCuerpo(new Vector2(20f, 10f), "knuckles"));
+        knuckles = new Knuckles(crearCuerpo(new Vector2(20f, 10f), "Knuckles"));
         tails = new Tails(crearCuerpo(new Vector2(20f, 22f), "Tails")); //270-150
         etapa = new Etapa(this, sonic, knuckles, tails);
         listaBasura = new ArrayList<>();
@@ -55,7 +55,7 @@ public class Mundo {
 
                 if("Sonic".equals(ub) && "Robot".equals(ua)) {
                     Constantes.VIDAS[0] -= 1;
-                    if ( Constantes.VIDAS[0] >= 0) {
+                    if ( Constantes.VIDAS[0] > 0) {
                         sonic.setTLT();
                     } else {
                         sonic.setKO();
@@ -73,7 +73,7 @@ public class Mundo {
 
                 if("Knuckles".equals(ub) && "Robot".equals(ua)) {
                     Constantes.VIDAS[1] -= 1;
-                    if ( Constantes.VIDAS[1] >= 0) {
+                    if ( Constantes.VIDAS[1] > 0) {
                         knuckles.setTLT();
                     } else {
                         knuckles.setKO();
@@ -91,7 +91,7 @@ public class Mundo {
 
                 if("Tails".equals(ub) && "Robot".equals(ua)) {
                     Constantes.VIDAS[2] -= 1;
-                    if ( Constantes.VIDAS[2] >= 0) {
+                    if ( Constantes.VIDAS[2] > 0) {
                         tails.setTLT();
                     } else {
                         tails.setKO();
