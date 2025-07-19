@@ -13,16 +13,18 @@ import java.util.Random;
 public class Etapa {
     private final Mundo mundo;
     private final Sonic sonic;
+    private final Knuckles knuckles;
     private final List<Robot> robots = new ArrayList<>();
     private final List<Vector2> puntosEntrada = new ArrayList<>();
     private float timer = 0f;
     private final Random random = new Random();
     private final Tails tails;
 
-    public Etapa(Mundo mundo, Sonic sonic, Tails tails) {
+    public Etapa(Mundo mundo, Sonic sonic, Knuckles knuckles, Tails tails) {
         this.mundo = mundo;
         this.sonic = sonic;
         this.tails = tails;
+        this.knuckles = knuckles;
 
         // Ajusta estos puntos para que no estén pegados a las esquinas
         puntosEntrada.add(new Vector2(3f, 21f));

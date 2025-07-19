@@ -1,0 +1,160 @@
+KnucklesSprite.png
+size: 687, 126
+format: RGBA8888
+filter: Linear, Linear
+repeat: none
+pma: false
+Abajo1
+  bounds: 593, 1, 23, 39
+  offsets: 2, 0, 25, 42
+Abajo2
+  bounds: 569, 42, 24, 39
+  offsets: 1, 2, 26, 42
+Abajo3
+  bounds: 545, 83, 25, 39
+  offsets: 0, 0, 28, 42
+Abajo4
+  bounds: 593, 1, 23, 39
+  offsets: 3, 0, 26, 42
+Abajo5
+  bounds: 565, 1, 26, 39
+  offsets: 0, 2, 27, 42
+Abajo6
+  bounds: 545, 83, 25, 39
+  offsets: 0, 0, 28, 42
+Arriba1
+  bounds: 73, 63, 32, 60
+  offsets: 2, 0, 34, 60
+Arriba2
+  bounds: 107, 63, 34, 56
+  offsets: 0, 4, 34, 60
+Arriba3
+  bounds: 1, 1, 34, 60
+Arriba4
+  bounds: 1, 63, 34, 60
+Arriba5
+  bounds: 73, 1, 33, 60
+  offsets: 0, 0, 34, 60
+Arriba6
+  bounds: 108, 1, 34, 56
+  offsets: 0, 4, 34, 60
+Arriba7
+  bounds: 37, 1, 34, 60
+Arriba8
+  bounds: 37, 63, 34, 60
+DiagonalDelantera1
+  bounds: 318, 90, 36, 35
+  offsets: 19, 15, 67, 68
+DiagonalDelantera2
+  bounds: 261, 91, 35, 33
+  offsets: 19, 17, 67, 68
+DiagonalDelantera3
+  bounds: 655, 1, 31, 37
+  offsets: 18, 12, 67, 68
+DiagonalDelantera4
+  bounds: 618, 1, 35, 37
+  offsets: 16, 12, 67, 68
+DiagonalDelantera5
+  bounds: 414, 1, 36, 40
+  offsets: 19, 12, 67, 68
+DiagonalDelantera6
+  bounds: 642, 79, 33, 37
+  offsets: 18, 15, 65, 68
+DiagonalTrasera1
+  bounds: 215, 1, 34, 44
+  offsets: 20, 11, 66, 82
+DiagonalTrasera2
+  bounds: 572, 83, 32, 38
+  offsets: 21, 16, 66, 82
+DiagonalTrasera3
+  bounds: 511, 83, 32, 39
+  offsets: 20, 17, 66, 82
+DiagonalTrasera4
+  bounds: 251, 1, 33, 43
+  offsets: 19, 13, 66, 82
+DiagonalTrasera5
+  bounds: 221, 47, 31, 44
+  offsets: 19, 12, 66, 82
+DiagonalTrasera6
+  bounds: 379, 1, 33, 41
+  offsets: 20, 13, 66, 82
+DiagonalTrasera7
+  bounds: 356, 89, 34, 36
+  offsets: 17, 19, 66, 82
+DiagonalTrasera8
+  bounds: 476, 83, 33, 39
+  offsets: 17, 17, 66, 82
+knucklesFist1
+  bounds: 606, 81, 34, 37
+  offsets: 0, 0, 34, 52
+knucklesFist2
+  bounds: 637, 40, 34, 37
+  offsets: 0, 0, 34, 52
+knucklesFist3
+  bounds: 143, 59, 34, 52
+knucklesFist4
+  bounds: 144, 1, 28, 52
+  offsets: 2, 0, 33, 52
+knucklesFist5
+  bounds: 174, 1, 39, 48
+  offsets: 1, 2, 40, 52
+knucklesFist6
+  bounds: 179, 51, 40, 47
+  offsets: 0, 3, 40, 52
+knucklesFist7
+  bounds: 595, 42, 40, 37
+  offsets: 0, 0, 40, 52
+knucklesFist8
+  bounds: 221, 93, 38, 31
+  offsets: 1, 0, 40, 52
+KnucklesRunning1
+  bounds: 436, 85, 38, 39
+  offsets: 0, 1, 42, 41
+KnucklesRunning2
+  bounds: 426, 43, 35, 40
+  offsets: 3, 0, 42, 41
+KnucklesRunning3
+  bounds: 536, 42, 31, 39
+  offsets: 6, 0, 42, 41
+KnucklesRunning4
+  bounds: 501, 42, 33, 39
+  offsets: 4, 0, 42, 41
+KnucklesRunning5
+  bounds: 452, 1, 40, 39
+  offsets: 2, 0, 42, 41
+KnucklesRunning6
+  bounds: 392, 86, 42, 39
+  offsets: 0, 1, 42, 41
+KnucklesRunning7
+  bounds: 385, 44, 39, 40
+  offsets: 0, 0, 42, 41
+KnucklesRunning8
+  bounds: 530, 1, 33, 39
+  offsets: 5, 0, 42, 41
+KnucklesRunning9
+  bounds: 494, 1, 34, 39
+  offsets: 4, 0, 42, 41
+KnucklesRunning10
+  bounds: 463, 42, 36, 39
+  offsets: 2, 0, 42, 41
+KnucklesStanding1
+  bounds: 318, 1, 27, 43
+  offsets: 0, 0, 34, 43
+KnucklesStanding2
+  bounds: 288, 46, 28, 43
+  offsets: 2, 0, 34, 43
+KnucklesStanding3
+  bounds: 347, 1, 30, 42
+  offsets: 0, 0, 34, 43
+KnucklesStanding4
+  bounds: 286, 1, 30, 43
+  offsets: 0, 0, 34, 43
+KnucklesStanding5
+  bounds: 318, 46, 34, 42
+  offsets: 0, 0, 34, 43
+KnucklesStanding6
+  bounds: 354, 45, 29, 42
+  offsets: 0, 0, 34, 43
+KnucklesStanding7
+  bounds: 254, 46, 32, 43
+  offsets: 2, 0, 34, 43
