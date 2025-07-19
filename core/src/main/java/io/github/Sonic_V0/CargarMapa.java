@@ -1,6 +1,10 @@
 package io.github.Sonic_V0;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.MapObjects;
@@ -15,24 +19,43 @@ import com.badlogic.gdx.math.Ellipse;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
-
+import com.badlogic.gdx.utils.TimeUtils;
 
 
 public class CargarMapa {
-    private TiledMap map;
-    private OrthogonalTiledMapRenderer mapRenderer;
+    private final TiledMap map;
+    private final OrthogonalTiledMapRenderer mapRenderer;
+    private final SpriteBatch batch;
+    private final BitmapFont font;
 
     public CargarMapa(String rutaMapa, World world) {
         TmxMapLoader loader = new TmxMapLoader();
         map = loader.load(rutaMapa);
         mapRenderer = new OrthogonalTiledMapRenderer(map, Constantes.WORLD_ESCALA);
         objetosMapa(world);
+        batch = new SpriteBatch();
+        font = new BitmapFont(Gdx.files.internal("Mapa1/letra.fnt"));
+        font.getData().setScale(1f);
     }
 
     public void renderarMapa(OrthographicCamera camara) {
         AnimatedTiledMapTile.updateAnimationBaseTime();
         mapRenderer.setView(camara);
         mapRenderer.render();
+
+        long tiempo = TimeUtils.millis();
+        boolean mostrarTexto = (tiempo / 400) % 2 == 0; // Alterna cada 500 ms
+
+        batch.begin();
+        if (mostrarTexto) {
+            int aux = Constantes.SCORE[0] + Constantes.SCORE[1] + Constantes.SCORE[2];
+            font.setColor(Color.WHITE); // O el color que prefieras
+            font.draw(batch, "X" + Constantes.VIDAS[0], 80, 970);
+            font.draw(batch, "X" + Constantes.VIDAS[1], 180, 970);
+            font.draw(batch, "X" + Constantes.VIDAS[2], 280, 970);
+            font.draw(batch, String.valueOf(aux) , 1080, 960);
+        }
+        batch.end();
     }
 
     public void objetosMapa(World world) {
