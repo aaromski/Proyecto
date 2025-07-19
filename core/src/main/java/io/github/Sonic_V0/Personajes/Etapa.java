@@ -12,15 +12,16 @@ import java.util.Random;
 
 public class Etapa {
     private final Mundo mundo;
-    private final Sonic sonic;
+    private final Knuckles knuckles; // Reemplazado Sonic por Knuckles
+
     private final List<Robot> robots = new ArrayList<>();
     private final List<Vector2> puntosEntrada = new ArrayList<>();
     private float timer = 0f;
     private final Random random = new Random();
 
-    public Etapa(Mundo mundo, Sonic sonic) {
+    public Etapa(Mundo mundo, Knuckles knuckles) { // Constructor actualizado para recibir Knuckles
         this.mundo = mundo;
-        this.sonic = sonic;
+        this.knuckles = knuckles; // Asignación de Knuckles
 
         // Ajusta estos puntos para que no estén pegados a las esquinas
         puntosEntrada.add(new Vector2(3f, 21f));
@@ -37,18 +38,18 @@ public class Etapa {
             generarRobot(mundo.crearCuerpo(getEntrada(), "Robot"));
         }
 
-        // Actualiza cada robot y destruye si están cerca de Sonic
+        // Actualiza cada robot y destruye si están cerca de Knuckles
         Iterator<Robot> it = robots.iterator();
         while (it.hasNext()) {
             Robot r = it.next();
 
-            // Actualiza el objetivo con la posición de Sonic
-            r.setObjetivo(sonic.getPosicion().cpy());
+            // Actualiza el objetivo con la posición de Knuckles
+            r.setObjetivo(knuckles.getPosicion().cpy()); // Usa la posición de Knuckles
 
             r.actualizar(delta);
 
-            // Destruir si llegó cerca de Sonic
-            if (r.getPosicion().dst(sonic.getPosicion()) < 0.8f) {
+            // Destruir si llegó cerca de Knuckles
+            if (r.getPosicion().dst(knuckles.getPosicion()) < 0.8f) { // Compara con la posición de Knuckles
                 r.destruir();
                 it.remove();
             }
@@ -67,7 +68,7 @@ public class Etapa {
     }
 
     private void generarRobot(Body body) {
-        Robot robot = new Robot(body, sonic.getPosicion().cpy(), mundo); // primer objetivo
+        Robot robot = new Robot(body, knuckles.getPosicion().cpy(), mundo); // primer objetivo
         robots.add(robot);
     }
 
