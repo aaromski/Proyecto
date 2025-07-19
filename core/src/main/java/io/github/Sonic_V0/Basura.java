@@ -35,9 +35,7 @@ public class Basura {
         fdef.filter.categoryBits = Constantes.CATEGORY_TRASH;
         fdef.filter.maskBits = ~(Constantes.CATEGORY_ROBOT); // o una lista explícita sin incluir `TRASH`
         cuerpo.createFixture(fdef).setUserData(this);
-        System.out.println("Número de fixtures en cuerpo basura: " + cuerpo.getFixtureList().size);
         shape.dispose();
-
     }
 
 
