@@ -7,6 +7,7 @@ import com.badlogic.gdx.physics.box2d.*;
 import io.github.Sonic_V0.Personajes.Etapa;
 import io.github.Sonic_V0.Personajes.Robot;
 import io.github.Sonic_V0.Personajes.Sonic;
+import io.github.Sonic_V0.Personajes.Knuckles;
 
 import java.util.ArrayList;
 
@@ -16,20 +17,20 @@ public class Mundo {
     private final CargarMapa map;
     private final ArrayList<Basura> listaBasura;
     private final Sonic sonic;
+    private final Knuckles knuckles;
     private final Etapa etapa;
 
     public Mundo() {
         world = new World(new Vector2(0, 0), true);
-        sonic = new Sonic(crearCuerpo(new Vector2(25f, 22f), "Sonic")); //270-150
-        etapa = new Etapa(this, sonic);
+        knuckles = new Knuckles(crearCuerpo(new Vector2(20f, 10f), "knuckles"));
+        sonic = new Sonic(crearCuerpo(new Vector2(25f, 10f), "Sonic")); //270-150
+        etapa = new Etapa(this, sonic, knuckles);
         listaBasura = new ArrayList<>();
         map = new CargarMapa("Mapa1/mapa.tmx", world);
 
-        // Configurar el ContactListener aquí mismo
         world.setContactListener(new ContactListener() {
             @Override
             public void beginContact(Contact contact) {
-
                 Object ua = contact.getFixtureA().getUserData();
                 Object ub = contact.getFixtureB().getUserData();
 
@@ -59,7 +60,6 @@ public class Mundo {
                     }
                 }
             }
-
             @Override public void endContact(Contact contact) {}
             @Override public void preSolve(Contact contact, Manifold oldManifold) {}
             @Override public void postSolve(Contact contact, ContactImpulse impulse) {}
@@ -68,7 +68,6 @@ public class Mundo {
 
     public void actualizar(float delta) {
         world.step(delta, 8, 6);
-        // Limpiar basuras inactivas después del step
         listaBasura.removeIf(b -> {
             if (!b.estaActiva()) {
                 b.destruir(world);
@@ -86,9 +85,6 @@ public class Mundo {
         etapa.actualizar(delta); // <-- Actualiza todos los robots generados
     }
 
-    /*private void inicio {
-
-    }*/
 
     public Body crearCuerpo(Vector2 posicion, String userData) {
         BodyDef bd = new BodyDef();
@@ -131,6 +127,7 @@ public class Mundo {
             }
         }
         if(!sonic.getKO()) {
+            knuckles.render(batch);
             sonic.render(batch);
         }
 
@@ -148,7 +145,7 @@ public class Mundo {
         map.dispose();      // ← Libera el mapa
         world.dispose();    // ← Libera el mundo Box2D
         sonic.dispose();
+        knuckles.dispose();
         etapa.dispose();
     }
-
 }

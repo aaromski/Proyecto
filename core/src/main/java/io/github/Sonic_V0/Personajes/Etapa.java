@@ -13,14 +13,16 @@ import java.util.Random;
 public class Etapa {
     private final Mundo mundo;
     private final Sonic sonic;
+    private final Knuckles knuckles;
     private final List<Robot> robots = new ArrayList<>();
     private final List<Vector2> puntosEntrada = new ArrayList<>();
     private float timer = 0f;
     private final Random random = new Random();
 
-    public Etapa(Mundo mundo, Sonic sonic) {
+    public Etapa(Mundo mundo, Sonic sonic, Knuckles knuckles) {
         this.mundo = mundo;
         this.sonic = sonic;
+        this.knuckles = knuckles;
 
         // Ajusta estos puntos para que no estén pegados a las esquinas
         puntosEntrada.add(new Vector2(3f, 21f));
@@ -37,7 +39,7 @@ public class Etapa {
             generarRobot(mundo.crearCuerpo(getEntrada(), "Robot"));
         }
 
-        // Actualiza cada robot y destruye si están cerca de Sonic
+        // Actualiza cada robot y destruye si están cerca de Knuckles
         Iterator<Robot> it = robots.iterator();
         while (it.hasNext()) {
             Robot r = it.next();
