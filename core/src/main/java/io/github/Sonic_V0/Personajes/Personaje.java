@@ -16,6 +16,7 @@ public abstract class Personaje {
     protected TextureAtlas atlas;
     protected Vector2 posicion;
     protected String name;
+    protected boolean ko = false;
 
     public Personaje (Body b) {
         this.body = b;
@@ -37,7 +38,7 @@ public abstract class Personaje {
 
      public void render(SpriteBatch batch) {
         // Si estás usando solo TextureRegion:
-         if (frameActual != null && body != null) {
+         if (frameActual != null) {
              batch.draw(
                  frameActual,
                  posicion.x - sprite.getWidth() / 2f,
@@ -46,12 +47,20 @@ public abstract class Personaje {
                  sprite.getHeight()
              );
          } else {
-             System.out.println("Null " + this.name);
+             System.out.println("⚠️ Textura nula en: " + this.name);
          }
     }
 
     public Vector2 getPosicion(){
         return posicion;
+    }
+
+    public Body getCuerpo() {return body;}
+
+    public boolean getKO() {return ko;}
+
+    public void setKO() {ko = !ko;
+    stateTime = 0f;
     }
 
     public abstract void dispose();
