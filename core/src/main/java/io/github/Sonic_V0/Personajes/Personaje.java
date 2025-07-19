@@ -86,6 +86,14 @@ public abstract class Personaje {
     stateTime = 0f;
     }
 
+    public Body getCuerpo() {return body;}
+
+    public boolean getKO() {return ko;}
+
+    public void setKO() {ko = !ko;
+    stateTime = 0f;
+    }
+
     public abstract void dispose();
 }
 

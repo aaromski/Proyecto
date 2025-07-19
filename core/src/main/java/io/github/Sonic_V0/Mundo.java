@@ -22,8 +22,8 @@ public class Mundo {
 
     public Mundo() {
         world = new World(new Vector2(0, 0), true);
-        knuckles = new Knuckles(crearCuerpo(new Vector2(20f, 10f), "knuckles"));
-        sonic = new Sonic(crearCuerpo(new Vector2(25f, 10f), "Sonic")); //270-150
+        knuckles = new Knuckles(crearCuerpo(new Vector2(22f, 22f), "Knuckles"));
+        sonic = new Sonic(crearCuerpo(new Vector2(25f, 22f), "Sonic")); //270-150
         etapa = new Etapa(this, sonic, knuckles);
         listaBasura = new ArrayList<>();
         map = new CargarMapa("Mapa1/mapa.tmx", world);
@@ -59,6 +59,24 @@ public class Mundo {
                         sonic.setKO();
                     }
                 }
+
+                if("Knuckles".equals(ua) && "Robot".equals(ub)) {
+                    Constantes.VIDAS[1] -= 1;
+                    if ( Constantes.VIDAS[1] > 0) {
+                        knuckles.setTLT();
+                    } else {
+                        knuckles.setKO();
+                    }
+                }
+
+                if("Knuckles".equals(ub) && "Robot".equals(ua)) {
+                    Constantes.VIDAS[1] -= 1;
+                    if ( Constantes.VIDAS[1] >= 0) {
+                        knuckles.setTLT();
+                    } else {
+                        knuckles.setKO();
+                    }
+                }
             }
             @Override public void endContact(Contact contact) {}
             @Override public void preSolve(Contact contact, Manifold oldManifold) {}
@@ -79,9 +97,14 @@ public class Mundo {
         if(sonic.getKO()) {
             sonic.destruir(world);
             sonic.dispose();
+        } else if(knuckles.getKO()) {
+            knuckles.destruir(world);
+            knuckles.dispose();
         }
         sonic.teletransportar();
+        knuckles.teletransportar();
         sonic.actualizar(delta);
+        knuckles.actualizar(delta);
         etapa.actualizar(delta); // <-- Actualiza todos los robots generados
     }
 
@@ -103,7 +126,7 @@ public class Mundo {
         if (userData.equals("Robot")) {
             fixDef.filter.categoryBits = Constantes.CATEGORY_ROBOT;
             fixDef.filter.maskBits = ~(Constantes.CATEGORY_TRASH); // o una lista explícita sin incluir `TRASH`
-        } else if (userData.equals("Sonic")) {
+        } else if (userData.equals("Sonic") ) {
             fixDef.filter.categoryBits = Constantes.CATEGORY_PERSONAJES;
             fixDef.filter.maskBits = -1; // o una lista explícita sin incluir `TRASH`
         }
@@ -126,9 +149,12 @@ public class Mundo {
                 b.render(batch);
             }
         }
-        if(!sonic.getKO()) {
+
+        if (knuckles.getCuerpo() != null) {
             knuckles.render(batch);
-            sonic.render(batch);
+        }
+        if (sonic.getCuerpo() != null) {
+           sonic.render(batch);
         }
 
         etapa.renderizar(batch);
