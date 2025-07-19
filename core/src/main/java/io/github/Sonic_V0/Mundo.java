@@ -5,9 +5,11 @@ import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import io.github.Sonic_V0.Personajes.Etapa;
+import io.github.Sonic_V0.Personajes.Robot;
 import io.github.Sonic_V0.Personajes.Sonic;
 
 import java.util.ArrayList;
+
 
 public class Mundo {
     private final World world;
@@ -18,7 +20,7 @@ public class Mundo {
 
     public Mundo() {
         world = new World(new Vector2(0, 0), true);
-        sonic = new Sonic(crearCuerpo(new Vector2(20f, 10f), "Sonic")); //270-150
+        sonic = new Sonic(crearCuerpo(new Vector2(25f, 22f), "Sonic")); //270-150
         etapa = new Etapa(this, sonic);
         listaBasura = new ArrayList<>();
         map = new CargarMapa("Mapa1/mapa.tmx", world);
@@ -32,11 +34,29 @@ public class Mundo {
                 Object ub = contact.getFixtureB().getUserData();
 
                 if ("Sonic".equals(ua) && ub instanceof Basura) {
-                    ((Basura) ub).setActiva();
+                    ((Basura) ub).setActiva(1);
                 }
 
                 if ("Sonic".equals(ub) && ua instanceof Basura) {
-                    ((Basura) ua).setActiva();
+                    ((Basura) ua).setActiva(1);
+                }
+
+                if("Sonic".equals(ua) && "Robot".equals(ub)) {
+                    Constantes.VIDAS[0] -= 1;
+                    if ( Constantes.VIDAS[0] > 0) {
+                        sonic.setTLT();
+                    } else {
+                        sonic.setKO();
+                    }
+                }
+
+                if("Sonic".equals(ub) && "Robot".equals(ua)) {
+                    Constantes.VIDAS[0] -= 1;
+                    if ( Constantes.VIDAS[0] >= 0) {
+                        sonic.setTLT();
+                    } else {
+                        sonic.setKO();
+                    }
                 }
             }
 
@@ -57,10 +77,18 @@ public class Mundo {
             }
             return false;
         });
+        if(sonic.getKO()) {
+            sonic.destruir(world);
+            sonic.dispose();
+        }
+        sonic.teletransportar();
         sonic.actualizar(delta);
         etapa.actualizar(delta); // <-- Actualiza todos los robots generados
     }
 
+    /*private void inicio {
+
+    }*/
 
     public Body crearCuerpo(Vector2 posicion, String userData) {
         BodyDef bd = new BodyDef();
@@ -102,7 +130,10 @@ public class Mundo {
                 b.render(batch);
             }
         }
-        sonic.render(batch);
+        if(!sonic.getKO()) {
+            sonic.render(batch);
+        }
+
         etapa.renderizar(batch);
     }
 

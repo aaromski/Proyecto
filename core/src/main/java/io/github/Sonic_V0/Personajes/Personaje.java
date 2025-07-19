@@ -37,7 +37,7 @@ public abstract class Personaje {
 
      public void render(SpriteBatch batch) {
         // Si estás usando solo TextureRegion:
-         if (frameActual != null) {
+         if (frameActual != null && body != null) {
              batch.draw(
                  frameActual,
                  posicion.x - sprite.getWidth() / 2f,

@@ -16,5 +16,9 @@ public final class Constantes {
     // Textura de la basura
     public static final String TRASH_TEXTURE_PATH = "Mapa1/trash.png";
 
-    // Otros valores que quieras centralizar...
+    //Vida personajes
+    public static final int[] VIDAS = {3,3,3};
+
+    //Score
+    public static final int[] SCORE = {0,0,0};
 }

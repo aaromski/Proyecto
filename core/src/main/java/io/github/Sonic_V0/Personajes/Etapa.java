@@ -43,7 +43,11 @@ public class Etapa {
             Robot r = it.next();
 
             // Actualiza el objetivo con la posición de Sonic
-            r.setObjetivo(sonic.getPosicion().cpy());
+            if (!sonic.getKO()) {
+                r.setObjetivo(sonic.getPosicion().cpy());
+            } else {
+                r.setObjetivo(r.getPosicion());
+            }
 
             r.actualizar(delta);
 

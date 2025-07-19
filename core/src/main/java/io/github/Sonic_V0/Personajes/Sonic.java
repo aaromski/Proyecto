@@ -35,35 +35,37 @@ public class Sonic extends Amigas {
 
     @Override
     public void actualizar(float delta) {
-        izq = der = abj = arr = false;
-        boolean presionando = false;
+        if (!ko) {
+            izq = der = abj = arr = false;
+            boolean presionando = false;
 
-        if (Gdx.input.isKeyPressed(Input.Keys.W)) {
-            body.setLinearVelocity(0, velocidad.y);
-            arr = true;
-            presionando = true;
+            if (Gdx.input.isKeyPressed(Input.Keys.W)) {
+                body.setLinearVelocity(0, velocidad.y);
+                arr = true;
+                presionando = true;
+            }
+            if (Gdx.input.isKeyPressed(Input.Keys.S)) {
+                body.setLinearVelocity(0, -velocidad.y);
+                abj = true;
+                presionando = true;
+            }
+            if (Gdx.input.isKeyPressed(Input.Keys.A)) {
+                body.setLinearVelocity(-velocidad.x, body.getLinearVelocity().y);
+                izq = true;
+                presionando = true;
+            }
+            if (Gdx.input.isKeyPressed(Input.Keys.D)) {
+                body.setLinearVelocity(velocidad.x, body.getLinearVelocity().y);
+                der = true;
+                presionando = true;
+            }
+            if (!presionando) {
+                body.setLinearVelocity(0, 0);
+                frameActual = sprite;
+                stateTime = 0f;
+            }
+            super.actualizar(delta);
         }
-        if (Gdx.input.isKeyPressed(Input.Keys.S)) {
-            body.setLinearVelocity(0, -velocidad.y);
-            abj = true;
-            presionando = true;
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-            body.setLinearVelocity(-velocidad.x, body.getLinearVelocity().y);
-            izq = true;
-            presionando = true;
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.D)) {
-            body.setLinearVelocity(velocidad.x, body.getLinearVelocity().y);
-            der = true;
-            presionando = true;
-        }
-        if (!presionando) {
-            body.setLinearVelocity(0, 0);
-            frameActual = sprite;
-            stateTime = 0f;
-        }
-        super.actualizar(delta);
     }
 
     @Override

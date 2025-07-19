@@ -8,7 +8,7 @@ public class Camara {
     private final OrthographicCamera camara;
     public Camara() {
         camara = new OrthographicCamera();
-        camara.setToOrtho(false, 50f, 40f); // Ajusta según tu escala y resolución
+        camara.setToOrtho(false, 50f, 41.1f); // Ajusta según tu escala y resolución
         camara.update();
     }
 
