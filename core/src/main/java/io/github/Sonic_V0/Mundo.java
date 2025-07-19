@@ -82,7 +82,7 @@ public class Mundo {
 
                 if("Tails".equals(ua) && "Robot".equals(ub)) {
                     Constantes.VIDAS[2] -= 1;
-                    if ( Constantes.VIDAS[1] > 0) {
+                    if ( Constantes.VIDAS[2] > 0) {
                         tails.setTLT();
                     } else {
                         tails.setKO();
@@ -91,7 +91,7 @@ public class Mundo {
 
                 if("Tails".equals(ub) && "Robot".equals(ua)) {
                     Constantes.VIDAS[2] -= 1;
-                    if ( Constantes.VIDAS[1] >= 0) {
+                    if ( Constantes.VIDAS[2] >= 0) {
                         tails.setTLT();
                     } else {
                         tails.setKO();
