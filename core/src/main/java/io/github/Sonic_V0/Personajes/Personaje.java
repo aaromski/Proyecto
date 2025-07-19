@@ -51,10 +51,6 @@ public abstract class Personaje {
          }
     }
 
-    public Vector2 getPosicion(){
-        return posicion;
-    }
-
     public Body getCuerpo() {return body;}
 
     public boolean getKO() {return ko;}

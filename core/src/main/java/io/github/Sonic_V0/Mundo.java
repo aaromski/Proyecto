@@ -5,7 +5,6 @@ import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import io.github.Sonic_V0.Personajes.Etapa;
-import io.github.Sonic_V0.Personajes.Robot;
 import io.github.Sonic_V0.Personajes.Sonic;
 import io.github.Sonic_V0.Personajes.Knuckles;
 import io.github.Sonic_V0.Personajes.Tails;
