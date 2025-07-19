@@ -16,7 +16,11 @@ public class Mundo {
     private final World world;
     private final CargarMapa map;
     private final ArrayList<Basura> listaBasura;
+    private final ArrayList<Nube> listaNube;
+    private final ArrayList<CharcoAceite> listaCharcos;
     private final Sonic sonic;
+    private final Etapa2 etapa;
+    private final float fuerzaGolpe = 15f;
     private final Tails tails;
     private final Knuckles knuckles;
     private final Etapa etapa;
@@ -28,11 +32,15 @@ public class Mundo {
         tails = new Tails(crearCuerpo(new Vector2(20f, 22f), "Tails")); //270-150
         etapa = new Etapa(this, sonic, tails, knuckles);
         listaBasura = new ArrayList<>();
+        listaNube = new ArrayList<>();
+        listaCharcos = new ArrayList<>();
         map = new CargarMapa("Mapa1/mapa.tmx", world);
 
+        // Configurar el ContactListener aquí mismo
         world.setContactListener(new ContactListener() {
             @Override
             public void beginContact(Contact contact) {
+
                 Object ua = contact.getFixtureA().getUserData();
                 Object ub = contact.getFixtureB().getUserData();
 
@@ -51,8 +59,12 @@ public class Mundo {
                     } else {
                         sonic.setKO();
                     }
+                if ("Sonic".equals(ua) && ub instanceof CharcoAceite) {
+                    ((CharcoAceite) ub).setActiva();
                 }
 
+                if ("Sonic".equals(ub) && ua instanceof CharcoAceite) {
+                    ((CharcoAceite) ua).setActiva();
                 if("Sonic".equals(ub) && "Robot".equals(ua)) {
                     Constantes.VIDAS[0] -= 1;
                     if ( Constantes.VIDAS[0] >= 0) {
@@ -62,6 +74,10 @@ public class Mundo {
                     }
                 }
 
+                if ("Sonic".equals(ua) && ub instanceof Nube) {
+                    Vector2 direccionKnockback = sonic.getBody().getPosition().cpy().sub(((Nube) ub).getCuerpo().getPosition()).nor();
+                    sonic.getBody().applyLinearImpulse(direccionKnockback.scl(fuerzaGolpe), sonic.getBody().getWorldCenter(), true);
+                    ((Nube) ub).setActiva();
                 if("Knuckles".equals(ua) && "Robot".equals(ub)) {
                     Constantes.VIDAS[1] -= 1;
                     if ( Constantes.VIDAS[1] > 0) {
@@ -71,6 +87,12 @@ public class Mundo {
                     }
                 }
 
+                if ("Sonic".equals(ub) && ua instanceof Nube) {
+                    Vector2 direccionKnockback = sonic.getBody().getPosition().cpy().sub(((Nube) ua).getCuerpo().getPosition()).nor();
+                    sonic.getBody().applyLinearImpulse(direccionKnockback.scl(fuerzaGolpe), sonic.getBody().getWorldCenter(), true);
+                    ((Nube) ua).setActiva();
+                }
+            }
                 if("Knuckles".equals(ub) && "Robot".equals(ua)) {
                     Constantes.VIDAS[1] -= 1;
                     if ( Constantes.VIDAS[1] >= 0) {
@@ -126,6 +148,24 @@ public class Mundo {
             tails.dispose();
         }
 
+        listaNube.removeIf(n -> {
+            if (!n.estaActiva()) {
+                n.destruir(world);
+                n.dispose();
+                return true;
+            }
+            return false;
+        });
+
+        listaCharcos.removeIf(c -> {
+            if (!c.estaActiva()) {
+                c.destruir(world);
+                c.dispose();
+                return true;
+            }
+            return false;
+        });
+
         sonic.teletransportar();
         knuckles.teletransportar();
         sonic.actualizar(delta);
@@ -151,18 +191,29 @@ public class Mundo {
         oBody.setLinearDamping(5f); // Esto reduce el deslizamiento horizontal
 
         if (userData.equals("Robot")) {
+        if (userData.equals("Aceite")) {
+            oBody.setType(BodyDef.BodyType.StaticBody);
+            fixDef.isSensor = true;
+            oBody.createFixture(fixDef).setUserData(userData);
+        } else if (userData.equals("Robot")) {
             fixDef.filter.categoryBits = Constantes.CATEGORY_ROBOT;
-            fixDef.filter.maskBits = ~(Constantes.CATEGORY_TRASH); // o una lista explícita sin incluir `TRASH`
-        } else if (userData.equals("Sonic") ) {
+            fixDef.filter.maskBits = (short) ~(Constantes.CATEGORY_TRASH | Constantes.CATEGORY_NUBE);
+        } else if (userData.equals("Sonic")) {
             fixDef.filter.categoryBits = Constantes.CATEGORY_PERSONAJES;
-            fixDef.filter.maskBits = -1; // o una lista explícita sin incluir `TRASH`
+            fixDef.filter.maskBits = -1;
+        }   else if (userData.equals("Nube")) {
+            fixDef.filter.categoryBits = Constantes.CATEGORY_NUBE;
+            fixDef.filter.maskBits = (short) ~(Constantes.CATEGORY_ROBOT | Constantes.CATEGORY_TRASH);
         }
 
         Fixture f = oBody.createFixture(fixDef);
         f.setUserData(userData);
+        circle.dispose();
 
         return oBody;
     }
+
+    //Ataques de Robots
 
     public void generarBasura(Vector2 posicion) {
         Basura basura = new Basura(world);
@@ -170,7 +221,35 @@ public class Mundo {
         listaBasura.add(basura);
     }
 
+    //Ataques de Robotnik :)
+
+    public void generarCharco(Vector2 posicion) {
+        Body body = crearCuerpo(posicion, "Aceite");
+        CharcoAceite charco = new CharcoAceite(body);
+        if (!body.getFixtureList().isEmpty()) {
+            body.getFixtureList().first().setUserData(charco);
+        }
+        listaCharcos.add(charco);
+    }
+
+    public void generarNube(Vector2 posicion, Vector2 direccion) {
+        Nube nube = new Nube(world);
+        nube.crearCuerpo(posicion, direccion);
+        listaNube.add(nube);
+    }
+
+    public void generarRobot(Vector2 posicion) {
+        etapa.generarRobot(posicion);
+    }
+
+
     public void render(SpriteBatch batch) {
+        for (CharcoAceite c : listaCharcos) {
+            if (c.estaActiva() && c.getCuerpo() != null) {
+                c.render(batch);
+            }
+        }
+
         for (Basura b : listaBasura) {
             if (b.estaActiva() && b.getCuerpo() != null) {
                 b.render(batch);
@@ -185,9 +264,54 @@ public class Mundo {
         }
         if(!tails.getKO()) {
             tails.render(batch);
+        etapa.renderizar(batch);
+
+        for (Nube n : listaNube) {
+            if (n.estaActiva() && n.getCuerpo() != null) {
+                n.render(batch);
+            }
         }
 
-        etapa.renderizar(batch);
+        sonic.render(batch);
+    }
+
+    public void limpiarArea(Vector2 posicionAtaque) {
+        float radioAtaque = 1.3f;
+
+        for (Basura basura : listaBasura) {
+            if (basura.estaActiva()) {
+                float distancia = basura.getCuerpo().getPosition().dst(posicionAtaque);
+                if (distancia < radioAtaque) {
+                    basura.setActiva();
+                }
+            }
+        }
+
+        for (CharcoAceite charco : listaCharcos) {
+            if (charco.estaActiva()) {
+                float distancia = charco.getCuerpo().getPosition().dst(posicionAtaque);
+                if (distancia < radioAtaque) {
+                    charco.setActiva();
+                }
+            }
+        }
+
+        for (Enemigas enemigo : etapa.getEnemigos()) {
+            if (enemigo instanceof Robot) {
+                float distancia = enemigo.getBody().getPosition().dst(posicionAtaque);
+                if (distancia < radioAtaque) {
+                    ((Robot) enemigo).destruir();
+                }
+            }
+        }
+
+        for (Robot robot : etapa.getRobots()) {
+            float distancia = robot.getBody().getPosition().dst(posicionAtaque);
+            if (distancia < radioAtaque) {
+                robot.destruir();
+            }
+        }
+
     }
 
     public void renderizarMapa(OrthographicCamera camara) {
@@ -204,5 +328,10 @@ public class Mundo {
         knuckles.dispose();
         tails.dispose();
         etapa.dispose();
+    }
+
+
+    public World getWorld() {
+        return world;
     }
 }

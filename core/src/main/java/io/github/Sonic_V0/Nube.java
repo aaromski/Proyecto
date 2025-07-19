@@ -6,21 +6,21 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 
-public class Basura {
+public class Nube {
     private Body cuerpo;
     private final Sprite textura;
     private boolean activa = true;
     private final World world;
 
-    public Basura(World world) {
-        textura = new Sprite(new Texture("Mapa1/trash.png"));
+    public Nube(World world) {
+        textura = new Sprite(new Texture("Mapa1/dr-robotnik-130.png"));
         textura.setSize(0.8f, 0.8f);
         this.world = world;
     }
 
-    public void crearCuerpo(Vector2 posicion) {
+    public void crearCuerpo(Vector2 posicion, Vector2 direccion) {
         BodyDef bdef = new BodyDef();
-        bdef.type = BodyDef.BodyType.StaticBody;
+        bdef.type = BodyDef.BodyType.DynamicBody;
         bdef.position.set(posicion);
 
         cuerpo = world.createBody(bdef);
@@ -32,12 +32,16 @@ public class Basura {
         fdef.shape = shape;
         fdef.density = 1f;
         fdef.friction = 0.3f;
-        fdef.filter.categoryBits = Constantes.CATEGORY_TRASH;
-        fdef.filter.maskBits = ~(Constantes.CATEGORY_ROBOT); // o una lista explícita sin incluir `TRASH`
+
+        fdef.filter.categoryBits = Constantes.CATEGORY_NUBE;
+        fdef.filter.maskBits = (short) ~(Constantes.CATEGORY_ROBOT | Constantes.CATEGORY_TRASH);
+
         cuerpo.createFixture(fdef).setUserData(this);
         shape.dispose();
-    }
 
+        float fuerza = 3.0f;
+        cuerpo.applyLinearImpulse(direccion.scl(fuerza), cuerpo.getWorldCenter(), true);
+    }
 
     public void render(SpriteBatch batch) {
         if (!activa) return;
@@ -51,7 +55,6 @@ public class Basura {
         textura.draw(batch);
     }
 
-
     public void destruir(World world) {
         if (!activa) {
             world.destroyBody(cuerpo);
@@ -63,20 +66,7 @@ public class Basura {
         return activa;
     }
 
-    public void setActiva (int op) {
-        if (activa) {
-            switch (op) {
-                case 1:
-                    Constantes.SCORE[0] += 5;
-                    break;
-                case 2:
-                    Constantes.SCORE[1] += 5;
-                    break;
-                case 3:
-                    Constantes.SCORE[2] += 5;
-                    break;
-            }
-        }
+    public void setActiva () {
         activa = false;
     }
 

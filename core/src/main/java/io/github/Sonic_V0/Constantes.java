@@ -8,6 +8,7 @@ public final class Constantes {
     public static final short CATEGORY_ROBOT = 0x0001;
     public static final short CATEGORY_TRASH = 0x0002;
     public static final short CATEGORY_PERSONAJES = 0x0004;
+    public static final short CATEGORY_NUBE = 0x0008;
 
     // Tamaños estándar
     public static final float TRASH_WIDTH = 0.8f;
