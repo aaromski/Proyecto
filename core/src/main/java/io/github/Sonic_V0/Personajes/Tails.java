@@ -37,7 +37,7 @@ public class Tails extends Amigas {
     void inicializarAnimaciones(float x, float y) {
         atlas = new TextureAtlas(Gdx.files.internal("SpriteTails/Tails..atlas"));
         sprite = atlas.createSprite("TailsSprite0");
-        sprite.setSize(40 / PPM, 50f / PPM);
+        sprite.setSize(30 / PPM, 39f / PPM);
         sprite.setPosition(
             x - sprite.getWidth() / 2f,
             y - sprite.getHeight() / 2f

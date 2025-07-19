@@ -17,10 +17,12 @@ public class Etapa {
     private final List<Vector2> puntosEntrada = new ArrayList<>();
     private float timer = 0f;
     private final Random random = new Random();
+    private final Tails tails;
 
-    public Etapa(Mundo mundo, Sonic sonic) {
+    public Etapa(Mundo mundo, Sonic sonic, Tails tails) {
         this.mundo = mundo;
         this.sonic = sonic;
+        this.tails = tails;
 
         // Ajusta estos puntos para que no estén pegados a las esquinas
         puntosEntrada.add(new Vector2(3f, 21f));

@@ -7,6 +7,7 @@ import com.badlogic.gdx.physics.box2d.*;
 import io.github.Sonic_V0.Personajes.Etapa;
 import io.github.Sonic_V0.Personajes.Robot;
 import io.github.Sonic_V0.Personajes.Sonic;
+import io.github.Sonic_V0.Personajes.Tails;
 
 import java.util.ArrayList;
 
@@ -16,12 +17,14 @@ public class Mundo {
     private final CargarMapa map;
     private final ArrayList<Basura> listaBasura;
     private final Sonic sonic;
+    private final Tails tails;
     private final Etapa etapa;
 
     public Mundo() {
         world = new World(new Vector2(0, 0), true);
         sonic = new Sonic(crearCuerpo(new Vector2(25f, 22f), "Sonic")); //270-150
-        etapa = new Etapa(this, sonic);
+        tails = new Tails(crearCuerpo(new Vector2(20f, 22f), "Tails")); //270-150
+        etapa = new Etapa(this, sonic, tails);
         listaBasura = new ArrayList<>();
         map = new CargarMapa("Mapa1/mapa.tmx", world);
 
@@ -81,8 +84,15 @@ public class Mundo {
             sonic.destruir(world);
             sonic.dispose();
         }
+        if(tails.getKO()) {
+            tails.destruir(world);
+            tails.dispose();
+        }
+
         sonic.teletransportar();
         sonic.actualizar(delta);
+        tails.teletransportar();
+        tails.actualizar(delta);
         etapa.actualizar(delta); // <-- Actualiza todos los robots generados
     }
 
@@ -133,6 +143,9 @@ public class Mundo {
         if(!sonic.getKO()) {
             sonic.render(batch);
         }
+        if(!tails.getKO()) {
+            tails.render(batch);
+        }
 
         etapa.renderizar(batch);
     }
@@ -148,6 +161,7 @@ public class Mundo {
         map.dispose();      // ← Libera el mapa
         world.dispose();    // ← Libera el mundo Box2D
         sonic.dispose();
+        tails.dispose();
         etapa.dispose();
     }
 
