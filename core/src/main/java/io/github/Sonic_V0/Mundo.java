@@ -7,6 +7,7 @@ import com.badlogic.gdx.physics.box2d.*;
 import io.github.Sonic_V0.Personajes.Etapa;
 import io.github.Sonic_V0.Personajes.Sonic;
 import io.github.Sonic_V0.Personajes.Knuckles;
+import io.github.Sonic_V0.Personajes.Tails;
 
 import java.util.ArrayList;
 
@@ -16,6 +17,7 @@ public class Mundo {
     private final CargarMapa map;
     private final ArrayList<Basura> listaBasura;
     private final Sonic sonic;
+    private final Tails tails;
     private final Knuckles knuckles;
     private final Etapa etapa;
 
@@ -23,7 +25,8 @@ public class Mundo {
         world = new World(new Vector2(0, 0), true);
         knuckles = new Knuckles(crearCuerpo(new Vector2(22f, 22f), "Knuckles"));
         sonic = new Sonic(crearCuerpo(new Vector2(25f, 22f), "Sonic")); //270-150
-        etapa = new Etapa(this, sonic, knuckles);
+        tails = new Tails(crearCuerpo(new Vector2(20f, 22f), "Tails")); //270-150
+        etapa = new Etapa(this, sonic, tails, knuckles);
         listaBasura = new ArrayList<>();
         map = new CargarMapa("Mapa1/mapa.tmx", world);
 
@@ -100,10 +103,17 @@ public class Mundo {
             knuckles.destruir(world);
             knuckles.dispose();
         }
+        if(tails.getKO()) {
+            tails.destruir(world);
+            tails.dispose();
+        }
+
         sonic.teletransportar();
         knuckles.teletransportar();
         sonic.actualizar(delta);
         knuckles.actualizar(delta);
+        tails.teletransportar();
+        tails.actualizar(delta);
         etapa.actualizar(delta); // <-- Actualiza todos los robots generados
     }
 
@@ -155,6 +165,9 @@ public class Mundo {
         if (sonic.getCuerpo() != null) {
            sonic.render(batch);
         }
+        if(!tails.getKO()) {
+            tails.render(batch);
+        }
 
         etapa.renderizar(batch);
     }
@@ -171,6 +184,7 @@ public class Mundo {
         world.dispose();    // ← Libera el mundo Box2D
         sonic.dispose();
         knuckles.dispose();
+        tails.dispose();
         etapa.dispose();
     }
 }

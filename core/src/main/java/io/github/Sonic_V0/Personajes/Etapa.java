@@ -19,10 +19,12 @@ public class Etapa {
     private float timer = 0f;
     private float timer2 = 0f;
     private final Random random = new Random();
+    private final Tails tails;
 
-    public Etapa(Mundo mundo, Sonic sonic, Knuckles knuckles) {
+    public Etapa(Mundo mundo, Sonic sonic, Tails tails, Knuckles knuckles) {
         this.mundo = mundo;
         this.sonic = sonic;
+        this.tails = tails;
         this.knuckles = knuckles;
 
         // Ajusta estos puntos para que no estén pegados a las esquinas
