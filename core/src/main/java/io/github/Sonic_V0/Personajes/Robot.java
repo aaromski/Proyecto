@@ -10,7 +10,7 @@ import io.github.Sonic_V0.Mundo;
 public class Robot extends Enemigas{
     private float tiempoBasura;
     private final Mundo world;
-    public Robot(Body b, Vector2 objetivo, Mundo world) {
+    public Robot(Body b, Body objetivo, Mundo world) {
         super(b);
         inicializarAnimaciones(body.getPosition().x, body.getPosition().y);
         this.objetivo = objetivo;
@@ -28,14 +28,14 @@ public class Robot extends Enemigas{
             y - sprite.getHeight() / 2f
         );
         correr = crearAnimacion("robotmove", 7, 0.09f);       // del 1 al 8
-        KO = crearAnimacion("robot", 4, 0.1f);
+        KO = crearAnimacion("robot", 4, 0.15f);
 
 
     }
     @Override
     public void destruir() {
-        if (!destruido) {
-            destruido = true;
+        if (!ko) {
+            ko = true;
             stateTime = 0f;
             body.setLinearVelocity(0, 0);
             body.getWorld().destroyBody(body); // destruye físicamente
@@ -44,10 +44,11 @@ public class Robot extends Enemigas{
 
     @Override
     public void actualizar(float delta) {
-        super.actualizar(delta); // si el padre tiene lógica
 
+        super.actualizar(delta); // si el padre tiene lógica
+        if (ko) {return;}
         tiempoBasura += delta;
-        if (tiempoBasura >= 20f) { // cada 3 segundos, por ejemplo
+        if (tiempoBasura >= 30f) { // cada 3 segundos, por ejemplo
             Vector2 posicionActual = body.getPosition().cpy();
             world.generarBasura(posicionActual);
             tiempoBasura = 0f;

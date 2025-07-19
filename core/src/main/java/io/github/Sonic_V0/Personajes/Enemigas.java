@@ -7,37 +7,49 @@ import com.badlogic.gdx.physics.box2d.Body;
 
 public abstract class Enemigas extends Personaje {
     protected Animation<TextureRegion> KO;
-    protected boolean destruido = false;
-    protected Vector2 objetivo;
+    protected Body objetivo;
 
     public Enemigas(Body b) {
         super(b);
     }
 
     public void destruir() {
-        destruido = true;
+        ko = true;
         stateTime = 0f; // reiniciar animación KO
         body.setLinearVelocity(0, 0); // detener movimiento si aplica
     }
 
-    public void setObjetivo(Vector2 pos) {
-        this.objetivo = pos;
+    public void setObjetivo(Body pos) {
+        if(!ko) {
+            this.objetivo = pos;
+        }
     }
 
     @Override
     public void actualizar(float delta) {
         posicion = body.getPosition();
-        stateTime += delta;
+        if (ko) {
+            body.setLinearVelocity(0, 0);
+            objetivo = null;
 
-        if (destruido) {
-            frameActual = KO.getKeyFrame(stateTime, false);
-            body.setLinearVelocity(0, 0); // asegurar que se queda quieto
+            if (KO.isAnimationFinished(stateTime)) {
+                frameActual = KO.getKeyFrame(KO.getAnimationDuration(), false); // ❄️ Último frame fijo
+            } else {
+                frameActual = KO.getKeyFrame(stateTime, false); // ▶️ Reproducción normal
+                stateTime += delta;
+            }
             return;
         }
 
-        if (objetivo != null) {
+        if (objetivo == null) {
+            // Si no hay objetivo, quedarse quieto
+            body.setLinearVelocity(0, 0);
+            return;
+        }
+        stateTime += delta;
+        if (objetivo.getPosition() != null && objetivo != body) {
             // Vector hacia el objetivo
-            Vector2 direccion = objetivo.cpy().sub(posicion).nor().scl(velocidad);
+            Vector2 direccion = objetivo.getPosition().cpy().sub(posicion).nor().scl(velocidad);
             body.setLinearVelocity(direccion);
 
             // Voltear sprite si el objetivo está a la izquierda o derecha
@@ -49,11 +61,7 @@ public abstract class Enemigas extends Personaje {
                     frameActual.flip(true, false);
                 }
             }
-        } else {
-            // Si no hay objetivo, quedarse quieto
-            body.setLinearVelocity(0, 0);
         }
-
         // Animación de movimiento
         frameActual = correr.getKeyFrame(stateTime, true);
     }

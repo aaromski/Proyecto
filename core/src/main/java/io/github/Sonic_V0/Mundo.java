@@ -62,6 +62,42 @@ public class Mundo {
                         sonic.setKO();
                     }
                 }
+
+                if("Knuckles".equals(ua) && "Robot".equals(ub)) {
+                    Constantes.VIDAS[1] -= 1;
+                    if ( Constantes.VIDAS[1] > 0) {
+                        knuckles.setTLT();
+                    } else {
+                        knuckles.setKO();
+                    }
+                }
+
+                if("Knuckles".equals(ub) && "Robot".equals(ua)) {
+                    Constantes.VIDAS[1] -= 1;
+                    if ( Constantes.VIDAS[1] >= 0) {
+                        knuckles.setTLT();
+                    } else {
+                        knuckles.setKO();
+                    }
+                }
+
+                if("Tails".equals(ua) && "Robot".equals(ub)) {
+                    Constantes.VIDAS[2] -= 1;
+                    if ( Constantes.VIDAS[1] > 0) {
+                        tails.setTLT();
+                    } else {
+                        tails.setKO();
+                    }
+                }
+
+                if("Tails".equals(ub) && "Robot".equals(ua)) {
+                    Constantes.VIDAS[2] -= 1;
+                    if ( Constantes.VIDAS[1] >= 0) {
+                        tails.setTLT();
+                    } else {
+                        tails.setKO();
+                    }
+                }
             }
             @Override public void endContact(Contact contact) {}
             @Override public void preSolve(Contact contact, Manifold oldManifold) {}
@@ -82,6 +118,10 @@ public class Mundo {
         if(sonic.getKO()) {
             sonic.destruir(world);
             sonic.dispose();
+        }
+        if(knuckles.getKO()) {
+            knuckles.destruir(world);
+            knuckles.dispose();
         }
         if(tails.getKO()) {
             tails.destruir(world);

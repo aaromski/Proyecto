@@ -17,6 +17,7 @@ public class Etapa {
     private final List<Robot> robots = new ArrayList<>();
     private final List<Vector2> puntosEntrada = new ArrayList<>();
     private float timer = 0f;
+    private float timer2 = 0f;
     private final Random random = new Random();
     private final Tails tails;
 
@@ -35,31 +36,26 @@ public class Etapa {
 
     public void actualizar(float delta) {
         timer += delta;
-        float intervalo = 5f;
+        float intervalo = 8f;
+        timer2 += delta;
+        float intervalo2 = 10f;
         if (timer >= intervalo) {
             timer = 0f;
             generarRobot(mundo.crearCuerpo(getEntrada(), "Robot"));
         }
 
-        // Actualiza cada robot y destruye si están cerca de Sonic
+        if (timer2 >= intervalo2) {
+            timer2 = 0f;
+            Robot primerRobot = robots.get(0);
+            primerRobot.setKO();
+
+        }
+
+        // Actualiza cada robot y destruye si están cerca de Knuckles
         Iterator<Robot> it = robots.iterator();
         while (it.hasNext()) {
             Robot r = it.next();
-
-            // Actualiza el objetivo con la posición de Sonic
-            if (!sonic.getKO()) {
-                r.setObjetivo(sonic.getPosicion().cpy());
-            } else {
-                r.setObjetivo(r.getPosicion());
-            }
-
             r.actualizar(delta);
-
-            // Destruir si llegó cerca de Sonic
-            if (r.getPosicion().dst(sonic.getPosicion()) < 0.8f) {
-                r.destruir();
-                it.remove();
-            }
         }
     }
 
@@ -75,8 +71,22 @@ public class Etapa {
     }
 
     private void generarRobot(Body body) {
-        Robot robot = new Robot(body, sonic.getPosicion().cpy(), mundo); // primer objetivo
-        robots.add(robot);
+        Amigas objetivo;
+
+        if (Math.random() < 0.5) {
+            objetivo = sonic;
+        } else {
+            objetivo = knuckles;
+        }
+
+        Robot r = new Robot(body, sonic.getCuerpo(), mundo); // primer objetivo
+
+        if (!objetivo.getKO()) {
+            r.setObjetivo(objetivo.getCuerpo());
+        } else {
+            r.setObjetivo(r.getCuerpo());
+        }
+        robots.add(r);
     }
 
     public void dispose() {
