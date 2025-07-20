@@ -79,6 +79,24 @@ public class Mundo {
                         knuckles.setKO();
                     }
                 }
+
+                if("Tails".equals(ua) && "Robot".equals(ub)) {
+                    Constantes.VIDAS[2] -= 1;
+                    if ( Constantes.VIDAS[2] > 0) {
+                        knuckles.setTLT();
+                    } else {
+                        knuckles.setKO();
+                    }
+                }
+
+                if("Tails".equals(ub) && "Robot".equals(ua)) {
+                    Constantes.VIDAS[2] -= 1;
+                    if ( Constantes.VIDAS[2] >= 0) {
+                        knuckles.setTLT();
+                    } else {
+                        knuckles.setKO();
+                    }
+                }
             }
             @Override public void endContact(Contact contact) {}
             @Override public void preSolve(Contact contact, Manifold oldManifold) {}
