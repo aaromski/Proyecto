@@ -4,10 +4,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
-import io.github.Sonic_V0.Personajes.Etapa;
-import io.github.Sonic_V0.Personajes.Sonic;
-import io.github.Sonic_V0.Personajes.Knuckles;
-import io.github.Sonic_V0.Personajes.Tails;
+import io.github.Sonic_V0.Personajes.*;
 
 import java.util.ArrayList;
 
@@ -19,7 +16,7 @@ public class Mundo {
     private final ArrayList<Nube> listaNube;
     private final ArrayList<CharcoAceite> listaCharcos;
     private final Sonic sonic;
-    private final Etapa2 etapa;
+    private final Etapa2 etapa2;
     private final float fuerzaGolpe = 15f;
     private final Tails tails;
     private final Knuckles knuckles;
@@ -31,6 +28,7 @@ public class Mundo {
         sonic = new Sonic(crearCuerpo(new Vector2(25f, 22f), "Sonic")); //270-150
         tails = new Tails(crearCuerpo(new Vector2(20f, 22f), "Tails")); //270-150
         etapa = new Etapa(this, sonic, tails, knuckles);
+        etapa2 = new Etapa2(this, sonic, etapa);
         listaBasura = new ArrayList<>();
         listaNube = new ArrayList<>();
         listaCharcos = new ArrayList<>();
@@ -52,71 +50,47 @@ public class Mundo {
                     ((Basura) ua).setActiva(1);
                 }
 
-                if("Sonic".equals(ua) && "Robot".equals(ub)) {
-                    Constantes.VIDAS[0] -= 1;
-                    if ( Constantes.VIDAS[0] > 0) {
-                        sonic.setTLT();
-                    } else {
-                        sonic.setKO();
-                    }
                 if ("Sonic".equals(ua) && ub instanceof CharcoAceite) {
                     ((CharcoAceite) ub).setActiva();
                 }
 
                 if ("Sonic".equals(ub) && ua instanceof CharcoAceite) {
                     ((CharcoAceite) ua).setActiva();
-                if("Sonic".equals(ub) && "Robot".equals(ua)) {
+                }
+
+                if ("Sonic".equals(ua) && ub instanceof Nube) {
+                    Vector2 direccionKnockback = sonic.getCuerpo().getPosition().cpy().sub(((Nube) ub).getCuerpo().getPosition()).nor();
+                    sonic.getCuerpo().applyLinearImpulse(direccionKnockback.scl(fuerzaGolpe), sonic.getCuerpo().getWorldCenter(), true);
+                    ((Nube) ub).setActiva();
+                }
+
+                if (("Sonic".equals(ua) && "Robot".equals(ub)) ||
+                    ("Sonic".equals(ub) && "Robot".equals(ua))) {
                     Constantes.VIDAS[0] -= 1;
-                    if ( Constantes.VIDAS[0] >= 0) {
+                    if (Constantes.VIDAS[0] > 0) {
                         sonic.setTLT();
                     } else {
                         sonic.setKO();
                     }
                 }
 
-                if ("Sonic".equals(ua) && ub instanceof Nube) {
-                    Vector2 direccionKnockback = sonic.getBody().getPosition().cpy().sub(((Nube) ub).getCuerpo().getPosition()).nor();
-                    sonic.getBody().applyLinearImpulse(direccionKnockback.scl(fuerzaGolpe), sonic.getBody().getWorldCenter(), true);
-                    ((Nube) ub).setActiva();
-                if("Knuckles".equals(ua) && "Robot".equals(ub)) {
+                if (("Knuckles".equals(ua) && "Robot".equals(ub)) ||
+                    ("Knuckles".equals(ub) && "Robot".equals(ua))) {
                     Constantes.VIDAS[1] -= 1;
-                    if ( Constantes.VIDAS[1] > 0) {
+                    if (Constantes.VIDAS[1] > 0) {
                         knuckles.setTLT();
                     } else {
                         knuckles.setKO();
                     }
                 }
 
-                if ("Sonic".equals(ub) && ua instanceof Nube) {
-                    Vector2 direccionKnockback = sonic.getBody().getPosition().cpy().sub(((Nube) ua).getCuerpo().getPosition()).nor();
-                    sonic.getBody().applyLinearImpulse(direccionKnockback.scl(fuerzaGolpe), sonic.getBody().getWorldCenter(), true);
-                    ((Nube) ua).setActiva();
-                }
-            }
-                if("Knuckles".equals(ub) && "Robot".equals(ua)) {
-                    Constantes.VIDAS[1] -= 1;
-                    if ( Constantes.VIDAS[1] >= 0) {
-                        knuckles.setTLT();
-                    } else {
-                        knuckles.setKO();
-                    }
-                }
-
-                if("Tails".equals(ua) && "Robot".equals(ub)) {
+                if (("Tails".equals(ua) && "Robot".equals(ub)) ||
+                    ("Tails".equals(ub) && "Robot".equals(ua))) {
                     Constantes.VIDAS[2] -= 1;
-                    if ( Constantes.VIDAS[2] > 0) {
-                        knuckles.setTLT();
+                    if (Constantes.VIDAS[2] > 0) {
+                        tails.setTLT();
                     } else {
-                        knuckles.setKO();
-                    }
-                }
-
-                if("Tails".equals(ub) && "Robot".equals(ua)) {
-                    Constantes.VIDAS[2] -= 1;
-                    if ( Constantes.VIDAS[2] >= 0) {
-                        knuckles.setTLT();
-                    } else {
-                        knuckles.setKO();
+                        tails.setKO();
                     }
                 }
             }
@@ -139,7 +113,8 @@ public class Mundo {
         if(sonic.getKO()) {
             sonic.destruir(world);
             sonic.dispose();
-        } else if(knuckles.getKO()) {
+        }
+        if(knuckles.getKO()) {
             knuckles.destruir(world);
             knuckles.dispose();
         }
@@ -173,6 +148,7 @@ public class Mundo {
         tails.teletransportar();
         tails.actualizar(delta);
         etapa.actualizar(delta); // <-- Actualiza todos los robots generados
+        //etapa2.actualizar(delta);
     }
 
 
@@ -190,7 +166,6 @@ public class Mundo {
         Body oBody = world.createBody(bd);
         oBody.setLinearDamping(5f); // Esto reduce el deslizamiento horizontal
 
-        if (userData.equals("Robot")) {
         if (userData.equals("Aceite")) {
             oBody.setType(BodyDef.BodyType.StaticBody);
             fixDef.isSensor = true;
@@ -238,8 +213,8 @@ public class Mundo {
         listaNube.add(nube);
     }
 
-    public void generarRobot(Vector2 posicion) {
-        etapa.generarRobot(posicion);
+    public void robotEtapa2() {
+        etapa.generarRobot(crearCuerpo(etapa.getEntrada(), "Robot"));
     }
 
 
@@ -264,15 +239,14 @@ public class Mundo {
         }
         if(!tails.getKO()) {
             tails.render(batch);
+        }
         etapa.renderizar(batch);
-
+        //etapa2.renderizar(batch);
         for (Nube n : listaNube) {
             if (n.estaActiva() && n.getCuerpo() != null) {
                 n.render(batch);
             }
         }
-
-        sonic.render(batch);
     }
 
     public void limpiarArea(Vector2 posicionAtaque) {
@@ -282,7 +256,7 @@ public class Mundo {
             if (basura.estaActiva()) {
                 float distancia = basura.getCuerpo().getPosition().dst(posicionAtaque);
                 if (distancia < radioAtaque) {
-                    basura.setActiva();
+                    basura.setActiva(1);
                 }
             }
         }
@@ -296,17 +270,17 @@ public class Mundo {
             }
         }
 
-        for (Enemigas enemigo : etapa.getEnemigos()) {
+        for (Enemigas enemigo : etapa2.getEnemigos()) {
             if (enemigo instanceof Robot) {
-                float distancia = enemigo.getBody().getPosition().dst(posicionAtaque);
+                float distancia = enemigo.getCuerpo().getPosition().dst(posicionAtaque);
                 if (distancia < radioAtaque) {
                     ((Robot) enemigo).destruir();
                 }
             }
         }
 
-        for (Robot robot : etapa.getRobots()) {
-            float distancia = robot.getBody().getPosition().dst(posicionAtaque);
+        for (Robot robot : etapa2.getRobots()) {
+            float distancia = robot.getCuerpo().getPosition().dst(posicionAtaque);
             if (distancia < radioAtaque) {
                 robot.destruir();
             }

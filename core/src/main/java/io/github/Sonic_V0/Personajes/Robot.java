@@ -13,7 +13,6 @@ public class Robot extends Enemigas{
     private final Mundo world;
     private float deathTimer = 0f;
 
-    public Robot(Body b, Vector2 objetivo, Mundo world) {
     public Robot(Body b, Body objetivo, Mundo world) {
         super(b);
         this.destruido = false;
@@ -53,47 +52,17 @@ public class Robot extends Enemigas{
 
     @Override
     public void actualizar(float delta) {
-        stateTime += delta;
-        if(destruido){
-            deathTimer += delta;
-        } else {
-            super.actualizar(delta);
-            tiempoBasura += delta;
-            if (tiempoBasura >= 10f) {
-                Vector2 posicionActual = body.getPosition().cpy();
-                world.generarBasura(posicionActual);
-                tiempoBasura = 0f;
-            }
+        super.actualizar(delta); // si el padre tiene lógica
+        if (ko) {return;}
+        tiempoBasura += delta;
+        if (tiempoBasura >= 30f) { // cada 3 segundos, por ejemplo
+            Vector2 posicionActual = body.getPosition().cpy();
+            world.generarBasura(posicionActual);
+            tiempoBasura = 0f;
         }
     }
 
-    @Override
-    public void render(SpriteBatch batch) {
-        if (body == null) {
-            return;
-        }
 
-        if (destruido) {
-            if (KO != null) {
-                frameActual = KO.getKeyFrame(stateTime);
-            }
-        } else {
-            if (correr != null) {
-                frameActual = correr.getKeyFrame(stateTime, true);
-            }
-        }
-
-        if (frameActual != null) {
-            sprite.setRegion(frameActual);
-
-            sprite.setPosition(
-                body.getPosition().x - sprite.getWidth() / 2f,
-                body.getPosition().y - sprite.getHeight() / 2f
-            );
-
-            sprite.draw(batch);
-        }
-    }
 
 
     @Override

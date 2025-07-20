@@ -8,6 +8,7 @@ import com.badlogic.gdx.physics.box2d.Body;
 public abstract class Enemigas extends Personaje {
     protected Animation<TextureRegion> KO;
     protected Body objetivo;
+    protected boolean destruido = false;
 
     public Enemigas(Body b) {
         super(b);
@@ -33,9 +34,10 @@ public abstract class Enemigas extends Personaje {
             objetivo = null;
 
             if (KO.isAnimationFinished(stateTime)) {
-                frameActual = KO.getKeyFrame(KO.getAnimationDuration(), false); // ❄️ Último frame fijo
+                System.out.println("Paso por aqui");
+                frameActual = KO.getKeyFrame(KO.getAnimationDuration(), false);
             } else {
-                frameActual = KO.getKeyFrame(stateTime, false); // ▶️ Reproducción normal
+                frameActual = KO.getKeyFrame(stateTime, false);
                 stateTime += delta;
             }
             return;

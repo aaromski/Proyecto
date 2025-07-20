@@ -11,13 +11,15 @@ import io.github.Sonic_V0.Nube;
 public class Robotnik extends Enemigas {
 
     private final Mundo world;
+    private final Etapa etapa1;
     private enum Fase { FASE1, FASE2, FASE3 }
     private Fase currentPhase = Fase.FASE1;
     private float habilidadTimer = 0;
     private int nubeCounter = 0;
 
-    public Robotnik(Body b, Vector2 objetivo, Mundo world, Etapa2 etapa) {
+    public Robotnik(Body b, Body objetivo, Mundo world, Etapa2 etapa, Etapa etapa1) {
         super(b);
+        this.etapa1 = etapa1;
         inicializarAnimaciones(body.getPosition().x, body.getPosition().y);
         this.objetivo = objetivo;
         this.velocidad = new Vector2(2f, 2f);
@@ -65,7 +67,7 @@ public class Robotnik extends Enemigas {
     }
 
     private void lanzarNube() {
-        Vector2 direccion = objetivo.cpy().sub(body.getPosition()).nor();
+        Vector2 direccion = objetivo.getPosition().cpy().sub(body.getPosition()).nor();
         world.generarNube(body.getPosition().cpy(), direccion);
         nubeCounter++;
 
@@ -79,7 +81,7 @@ public class Robotnik extends Enemigas {
         if (currentPhase == Fase.FASE1) {
             currentPhase = Fase.FASE2;
             for (int i = 0; i < 5; i++) {
-                world.generarRobot(body.getPosition());
+                world.robotEtapa2();
             }
         } else if (currentPhase == Fase.FASE2) {
             currentPhase = Fase.FASE3;
