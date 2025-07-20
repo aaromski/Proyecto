@@ -65,12 +65,13 @@ public class Etapa {
         }
     }
 
-    private Vector2 getEntrada() {
+    public Vector2 getEntrada() {
         int index = random.nextInt(puntosEntrada.size());
         return puntosEntrada.get(index);
     }
 
-    private void generarRobot(Body body) {
+
+    public void generarRobot(Body body) {
         Amigas objetivo;
 
         if (Math.random() < 0.5) {
