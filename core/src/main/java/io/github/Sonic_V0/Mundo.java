@@ -61,7 +61,7 @@ public class Mundo {
                 if ("Sonic".equals(ua) && ub instanceof Nube) {
                     Vector2 direccionKnockback = sonic.getCuerpo().getPosition().cpy().sub(((Nube) ub).getCuerpo().getPosition()).nor();
                     sonic.getCuerpo().applyLinearImpulse(direccionKnockback.scl(fuerzaGolpe), sonic.getCuerpo().getWorldCenter(), true);
-                    ((Nube) ub).setActiva();
+                    ((Nube) ub).setActiva(1);
                 }
 
                 if (("Sonic".equals(ua) && "Robot".equals(ub)) ||
