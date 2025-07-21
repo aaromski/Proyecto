@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.*;
 //import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import io.github.Sonic_V0.*;
+import io.github.Sonic_V0.Mundo.Mundo;
 
 public class PantallaJuego extends BaseMenu {
     //Box2DDebugRenderer debugRenderer;

@@ -4,14 +4,15 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.World;
 
 public abstract class Enemigas extends Personaje {
     protected Animation<TextureRegion> KO;
     protected Body objetivo;
     protected boolean destruido = false;
 
-    public Enemigas(Body b) {
-        super(b);
+    public Enemigas(Vector2 p, World w) {
+        super(p,w);
     }
 
     public void destruir() {

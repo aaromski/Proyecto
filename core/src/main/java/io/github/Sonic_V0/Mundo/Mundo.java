@@ -1,4 +1,4 @@
-package io.github.Sonic_V0;
+package io.github.Sonic_V0.Mundo;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.*;
@@ -17,16 +17,15 @@ public class Mundo {
     private final ArrayList<CharcoAceite> listaCharcos;
     private final Sonic sonic;
     private final Etapa2 etapa2;
-    private final float fuerzaGolpe = 15f;
     private final Tails tails;
     private final Knuckles knuckles;
     private final Etapa etapa;
 
     public Mundo() {
         world = new World(new Vector2(0, 0), true);
-        knuckles = new Knuckles(crearCuerpo(new Vector2(22f, 22f), "Knuckles"));
-        sonic = new Sonic(crearCuerpo(new Vector2(25f, 22f), "Sonic")); //270-150
-        tails = new Tails(crearCuerpo(new Vector2(20f, 22f), "Tails")); //270-150
+        knuckles = new Knuckles(new Vector2(22f, 22f), world);
+        sonic = new Sonic(new Vector2(25f, 22f), world); //270-150
+        tails = new Tails(new Vector2(20f, 22f), world); //270-150
         etapa = new Etapa(this, sonic, tails, knuckles);
         etapa2 = new Etapa2(this, sonic, etapa);
         listaBasura = new ArrayList<>();
@@ -35,69 +34,7 @@ public class Mundo {
         map = new CargarMapa("Mapa1/mapa.tmx", world);
 
         // Configurar el ContactListener aquí mismo
-        world.setContactListener(new ContactListener() {
-            @Override
-            public void beginContact(Contact contact) {
-
-                Object ua = contact.getFixtureA().getUserData();
-                Object ub = contact.getFixtureB().getUserData();
-
-                if ("Sonic".equals(ua) && ub instanceof Basura) {
-                    ((Basura) ub).setActiva(1);
-                }
-
-                if ("Sonic".equals(ub) && ua instanceof Basura) {
-                    ((Basura) ua).setActiva(1);
-                }
-
-                if ("Sonic".equals(ua) && ub instanceof CharcoAceite) {
-                    ((CharcoAceite) ub).setActiva();
-                }
-
-                if ("Sonic".equals(ub) && ua instanceof CharcoAceite) {
-                    ((CharcoAceite) ua).setActiva();
-                }
-
-                if ("Sonic".equals(ua) && ub instanceof Nube) {
-                    Vector2 direccionKnockback = sonic.getCuerpo().getPosition().cpy().sub(((Nube) ub).getCuerpo().getPosition()).nor();
-                    sonic.getCuerpo().applyLinearImpulse(direccionKnockback.scl(fuerzaGolpe), sonic.getCuerpo().getWorldCenter(), true);
-                    ((Nube) ub).setActiva(1);
-                }
-
-                if (("Sonic".equals(ua) && "Robot".equals(ub)) ||
-                    ("Sonic".equals(ub) && "Robot".equals(ua))) {
-                    Constantes.VIDAS[0] -= 1;
-                    if (Constantes.VIDAS[0] > 0) {
-                        sonic.setTLT();
-                    } else {
-                        sonic.setKO();
-                    }
-                }
-
-                if (("Knuckles".equals(ua) && "Robot".equals(ub)) ||
-                    ("Knuckles".equals(ub) && "Robot".equals(ua))) {
-                    Constantes.VIDAS[1] -= 1;
-                    if (Constantes.VIDAS[1] > 0) {
-                        knuckles.setTLT();
-                    } else {
-                        knuckles.setKO();
-                    }
-                }
-
-                if (("Tails".equals(ua) && "Robot".equals(ub)) ||
-                    ("Tails".equals(ub) && "Robot".equals(ua))) {
-                    Constantes.VIDAS[2] -= 1;
-                    if (Constantes.VIDAS[2] > 0) {
-                        tails.setTLT();
-                    } else {
-                        tails.setKO();
-                    }
-                }
-            }
-            @Override public void endContact(Contact contact) {}
-            @Override public void preSolve(Contact contact, Manifold oldManifold) {}
-            @Override public void postSolve(Contact contact, ContactImpulse impulse) {}
-        });
+        world.setContactListener(new ManejarContactos());
     }
 
     public void actualizar(float delta) {
@@ -148,44 +85,7 @@ public class Mundo {
         tails.teletransportar();
         tails.actualizar(delta);
         etapa.actualizar(delta); // <-- Actualiza todos los robots generados
-        //etapa2.actualizar(delta);
-    }
-
-
-    public Body crearCuerpo(Vector2 posicion, String userData) {
-        BodyDef bd = new BodyDef();
-        bd.position.set(posicion);
-        bd.type = BodyDef.BodyType.DynamicBody;
-
-        CircleShape circle = new CircleShape();
-        circle.setRadius(0.5f);
-
-        FixtureDef fixDef = new FixtureDef();
-        fixDef.shape = circle;
-
-        Body oBody = world.createBody(bd);
-        oBody.setLinearDamping(5f); // Esto reduce el deslizamiento horizontal
-
-        if (userData.equals("Aceite")) {
-            oBody.setType(BodyDef.BodyType.StaticBody);
-            fixDef.isSensor = true;
-            oBody.createFixture(fixDef).setUserData(userData);
-        } else if (userData.equals("Robot")) {
-            fixDef.filter.categoryBits = Constantes.CATEGORY_ROBOT;
-            fixDef.filter.maskBits = (short) ~(Constantes.CATEGORY_TRASH | Constantes.CATEGORY_NUBE);
-        } else if (userData.equals("Sonic")) {
-            fixDef.filter.categoryBits = Constantes.CATEGORY_PERSONAJES;
-            fixDef.filter.maskBits = -1;
-        }   else if (userData.equals("Nube")) {
-            fixDef.filter.categoryBits = Constantes.CATEGORY_NUBE;
-            fixDef.filter.maskBits = (short) ~(Constantes.CATEGORY_ROBOT | Constantes.CATEGORY_TRASH);
-        }
-
-        Fixture f = oBody.createFixture(fixDef);
-        f.setUserData(userData);
-        circle.dispose();
-
-        return oBody;
+        etapa2.actualizar(delta);
     }
 
     //Ataques de Robots
@@ -199,11 +99,8 @@ public class Mundo {
     //Ataques de Robotnik :)
 
     public void generarCharco(Vector2 posicion) {
-        Body body = crearCuerpo(posicion, "Aceite");
-        CharcoAceite charco = new CharcoAceite(body);
-        if (!body.getFixtureList().isEmpty()) {
-            body.getFixtureList().first().setUserData(charco);
-        }
+        CharcoAceite charco = new CharcoAceite(world);
+        charco.crearCuerpo(posicion);
         listaCharcos.add(charco);
     }
 
@@ -214,7 +111,7 @@ public class Mundo {
     }
 
     public void robotEtapa2() {
-        etapa.generarRobot(crearCuerpo(etapa.getEntrada(), "Robot"));
+        etapa.generarRobot();
     }
 
 
@@ -241,7 +138,7 @@ public class Mundo {
             tails.render(batch);
         }
         etapa.renderizar(batch);
-        //etapa2.renderizar(batch);
+        etapa2.renderizar(batch);
         for (Nube n : listaNube) {
             if (n.estaActiva() && n.getCuerpo() != null) {
                 n.render(batch);
@@ -265,7 +162,7 @@ public class Mundo {
             if (charco.estaActiva()) {
                 float distancia = charco.getCuerpo().getPosition().dst(posicionAtaque);
                 if (distancia < radioAtaque) {
-                    charco.setActiva();
+                    charco.setActiva(1);
                 }
             }
         }
@@ -274,7 +171,7 @@ public class Mundo {
             if (enemigo instanceof Robot) {
                 float distancia = enemigo.getCuerpo().getPosition().dst(posicionAtaque);
                 if (distancia < radioAtaque) {
-                    ((Robot) enemigo).destruir();
+                    enemigo.destruir();
                 }
             }
         }

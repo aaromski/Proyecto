@@ -5,13 +5,17 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.World;
+import io.github.Sonic_V0.Constantes;
 
 public class Knuckles extends Amigas {
     protected Animation<TextureRegion> golpe;
     protected boolean golpeando = false;
-    public Knuckles (Body body) {
-        super(body);
+    public Knuckles (Vector2 posicion, World world) {
+        super(posicion, world);
         inicializarAnimaciones(body.getPosition().x, body.getPosition().y);
         this.name = "Knuckles";
     }
@@ -35,6 +39,11 @@ public class Knuckles extends Amigas {
         golpe = crearAnimacion("knucklesFist", 8, 0.1f); // Asegúrate de que "knucklesFist" es el nombre correcto en tu atlas
 
         frameActual = new TextureRegion(sprite);
+    }
+
+    public void configurarFiltro(FixtureDef fdef) {
+        fdef.filter.categoryBits = Constantes.CATEGORY_PERSONAJES;
+        fdef.filter.maskBits = -1;
     }
 
     public void golpear() {

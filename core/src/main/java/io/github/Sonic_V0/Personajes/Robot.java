@@ -1,20 +1,21 @@
 package io.github.Sonic_V0.Personajes;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 //import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
-import io.github.Sonic_V0.Mundo;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
+import io.github.Sonic_V0.Constantes;
+import io.github.Sonic_V0.Mundo.Mundo;
 
 public class Robot extends Enemigas{
     private float tiempoBasura;
     private final Mundo world;
     private float deathTimer = 0f;
 
-    public Robot(Body b, Body objetivo, Mundo world) {
-        super(b);
+    public Robot(Vector2 posicion, Body objetivo, Mundo world) {
+        super(posicion, world.getWorld());
         this.destruido = false;
         inicializarAnimaciones(body.getPosition().x, body.getPosition().y);
         this.objetivo = objetivo;
@@ -60,6 +61,11 @@ public class Robot extends Enemigas{
             world.generarBasura(posicionActual);
             tiempoBasura = 0f;
         }
+    }
+
+    public void configurarFiltro(FixtureDef fdef) {
+        fdef.filter.categoryBits = Constantes.CATEGORY_ROBOT;
+        fdef.filter.maskBits = (short) ~(Constantes.CATEGORY_TRASH | Constantes.CATEGORY_NUBE);
     }
 
 

@@ -5,8 +5,11 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
-import io.github.Sonic_V0.Mundo;
-import io.github.Sonic_V0.Nube;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
+import io.github.Sonic_V0.Constantes;
+import io.github.Sonic_V0.Mundo.Etapa;
+import io.github.Sonic_V0.Mundo.Etapa2;
+import io.github.Sonic_V0.Mundo.Mundo;
 
 public class Robotnik extends Enemigas {
 
@@ -17,8 +20,8 @@ public class Robotnik extends Enemigas {
     private float habilidadTimer = 0;
     private int nubeCounter = 0;
 
-    public Robotnik(Body b, Body objetivo, Mundo world, Etapa2 etapa, Etapa etapa1) {
-        super(b);
+    public Robotnik(Body objetivo, Mundo world, Etapa2 etapa, Etapa etapa1, Vector2 posicion) {
+        super(posicion, world.getWorld());
         this.etapa1 = etapa1;
         inicializarAnimaciones(body.getPosition().x, body.getPosition().y);
         this.objetivo = objetivo;
@@ -43,6 +46,11 @@ public class Robotnik extends Enemigas {
             atlas.createSprite("dr-robotnik-44"),
             atlas.createSprite("dr-robotnik-48"),
             atlas.createSprite("dr-robotnik-49"));
+    }
+
+    public void configurarFiltro(FixtureDef fdef) {
+        fdef.filter.categoryBits = Constantes.CATEGORY_ROBOT;
+        fdef.filter.maskBits = (short) ~(Constantes.CATEGORY_TRASH | Constantes.CATEGORY_NUBE);
     }
 
     @Override

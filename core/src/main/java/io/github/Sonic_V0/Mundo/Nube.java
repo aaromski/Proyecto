@@ -1,12 +1,12 @@
-package io.github.Sonic_V0;
+package io.github.Sonic_V0.Mundo;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
+import io.github.Sonic_V0.Constantes;
 
-public class Nube extends Contaminacion{
+public class Nube extends Contaminacion {
 
     public Nube(World world) {
         super(world);

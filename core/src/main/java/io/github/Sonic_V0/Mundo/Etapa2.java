@@ -1,10 +1,10 @@
-package io.github.Sonic_V0.Personajes;
+package io.github.Sonic_V0.Mundo;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Body;
-import io.github.Sonic_V0.CharcoAceite;
-import io.github.Sonic_V0.Mundo;
+import io.github.Sonic_V0.Personajes.Robot;
+import io.github.Sonic_V0.Personajes.Robotnik;
+import io.github.Sonic_V0.Personajes.Sonic;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -38,7 +38,7 @@ public class Etapa2 {
             float intervalo = 5f;
             if (timer >= intervalo) {
                 timer = 0f;
-                generarRobotnik(mundo.crearCuerpo(getEntrada(), "Robotnik"));
+                generarRobotnik();
             }
         }
 
@@ -72,8 +72,7 @@ public class Etapa2 {
     }
 
     public void generarRobot(Vector2 posicion) {
-        Body body = mundo.crearCuerpo(posicion, "Robot");
-        Robot robot = new Robot(body, sonic.getCuerpo(), mundo);
+        Robot robot = new Robot(posicion, sonic.getCuerpo(), mundo);
         robots.add(robot);
     }
 
@@ -91,8 +90,8 @@ public class Etapa2 {
         return puntosEntrada.get(index);
     }
 
-    private void generarRobotnik(Body body) {
-        Robotnik robotnik = new Robotnik(body, sonic.getCuerpo(), mundo, this, etapa1); // primer objetivo
+    private void generarRobotnik() {
+        Robotnik robotnik = new Robotnik(sonic.getCuerpo(), mundo, this, etapa1, getEntrada()); // primer objetivo
         robotniks.add(robotnik);
     }
 

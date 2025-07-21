@@ -4,12 +4,16 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.World;
+import io.github.Sonic_V0.Constantes;
 
 public class Sonic extends Amigas {
 
-    public Sonic (Body body) {
-        super(body);
+    public Sonic (Vector2 posicion, World world) {
+        super(posicion, world);
         inicializarAnimaciones(body.getPosition().x, body.getPosition().y);
         this.name = "Sonic";
 
@@ -66,6 +70,11 @@ public class Sonic extends Amigas {
             }
             super.actualizar(delta);
         }
+    }
+
+    public void configurarFiltro(FixtureDef fdef) {
+        fdef.filter.categoryBits = Constantes.CATEGORY_PERSONAJES;
+        fdef.filter.maskBits = -1;
     }
 
     @Override

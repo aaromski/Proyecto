@@ -5,8 +5,12 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
+import io.github.Sonic_V0.Constantes;
 
 public class Tails extends Amigas {
     private boolean isFlying = false;
@@ -27,8 +31,8 @@ public class Tails extends Amigas {
     private Animation<TextureRegion> recoger;
 
 
-    public Tails(Body body) {
-        super(body);
+    public Tails(Vector2 posicion, World world) {
+        super(posicion, world);
         inicializarAnimaciones(body.getPosition().x, body.getPosition().y);
         this.name = "Tails";
     }
@@ -59,6 +63,11 @@ public class Tails extends Amigas {
         recoger = crearAnimacion("recoger", 4, 0.1f);
 
         frameActual = new TextureRegion();
+    }
+
+    public void configurarFiltro(FixtureDef fdef) {
+        fdef.filter.categoryBits = Constantes.CATEGORY_PERSONAJES;
+        fdef.filter.maskBits = -1;
     }
 
     @Override

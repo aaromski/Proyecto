@@ -1,4 +1,4 @@
-package io.github.Sonic_V0;
+package io.github.Sonic_V0.Mundo;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Rectangle;

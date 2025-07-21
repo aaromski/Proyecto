@@ -1,12 +1,13 @@
-package io.github.Sonic_V0;
+package io.github.Sonic_V0.Mundo;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
+import io.github.Sonic_V0.Constantes;
 
-public class Basura extends Contaminacion{
+
+public class Basura extends Contaminacion {
 
     public Basura(World world) {
         super(world);

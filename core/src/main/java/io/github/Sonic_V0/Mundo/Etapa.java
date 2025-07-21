@@ -1,9 +1,8 @@
-package io.github.Sonic_V0.Personajes;
+package io.github.Sonic_V0.Mundo;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Body;
-import io.github.Sonic_V0.Mundo;
+import io.github.Sonic_V0.Personajes.*;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -41,7 +40,7 @@ public class Etapa {
         float intervalo2 = 10f;
         if (timer >= intervalo) {
             timer = 0f;
-            generarRobot(mundo.crearCuerpo(getEntrada(), "Robot"));
+            generarRobot();
         }
 
         if (timer2 >= intervalo2) {
@@ -51,10 +50,7 @@ public class Etapa {
 
         }
 
-        // Actualiza cada robot y destruye si están cerca de Knuckles
-        Iterator<Robot> it = robots.iterator();
-        while (it.hasNext()) {
-            Robot r = it.next();
+        for (Robot r : robots) {
             r.actualizar(delta);
         }
     }
@@ -71,16 +67,19 @@ public class Etapa {
     }
 
 
-    public void generarRobot(Body body) {
+    public void generarRobot() {
         Amigas objetivo;
 
-        if (Math.random() < 0.5) {
+        int ra = (int) (Math.random() * 3);
+        if (ra == 0) {
             objetivo = sonic;
-        } else {
+        } else if (ra == 1) {
             objetivo = knuckles;
+        } else {
+            objetivo = tails;
         }
 
-        Robot r = new Robot(body, sonic.getCuerpo(), mundo); // primer objetivo
+        Robot r = new Robot(getEntrada(), sonic.getCuerpo(), mundo); // primer objetivo
 
         if (!objetivo.getKO()) {
             r.setObjetivo(objetivo.getCuerpo());

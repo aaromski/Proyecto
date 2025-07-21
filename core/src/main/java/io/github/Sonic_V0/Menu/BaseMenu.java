@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import io.github.Sonic_V0.*;
+import io.github.Sonic_V0.Mundo.Camara;
 
 public abstract class BaseMenu implements Screen {
     protected Camara camara;
