@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import io.github.Sonic_V0.Constantes;
 import io.github.Sonic_V0.Main;
 
 public class PantallaRanking extends BaseMenu {
@@ -51,7 +52,7 @@ public class PantallaRanking extends BaseMenu {
         // Texto ranking
         font.setColor(1, 1, 1, 1); // Texto negro
         font.draw(batch, "RANKING DE JUGADORES", 100, 450);
-        font.draw(batch, "1. SonicMaster   - 1500 pts", 100, 390);
+        font.draw(batch, "1. SonicMaster   - " + Constantes.SCORE[0] + " pts", 100, 390);
         font.draw(batch, "2. ShadowPlayer  - 1200 pts", 100, 360);
         font.draw(batch, "3. AmyRocker     - 900 pts", 100, 330);
 

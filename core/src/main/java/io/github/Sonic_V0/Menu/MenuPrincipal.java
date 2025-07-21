@@ -4,7 +4,10 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Color;
+import io.github.Sonic_V0.Constantes;
 import io.github.Sonic_V0.Main;
+
+import java.util.Arrays;
 
 public class MenuPrincipal extends BaseMenu {
     private Texture logo;
@@ -64,6 +67,7 @@ public class MenuPrincipal extends BaseMenu {
                 if (mx >= startX && mx <= startX + botonW && my >= by && my <= by + botonH) {
                     switch (i) {
                         case 0:
+                            reiniciar();
                             game.setScreen(new PantallaJuego(game));
                             break;
                         case 1:
@@ -98,6 +102,14 @@ public class MenuPrincipal extends BaseMenu {
         float textoX = startX + botonW / 2f - layout.width / 2f;
         float textoY = y + botonH / 2f + layout.height / 2f;
         font.draw(batch, texto, textoX, textoY);
+    }
+
+    public void reiniciar() {
+        // Reiniciar vidas
+        Arrays.fill(Constantes.VIDAS, 3);
+
+        // Reiniciar score
+        Arrays.fill(Constantes.SCORE, 0);
     }
 
 
