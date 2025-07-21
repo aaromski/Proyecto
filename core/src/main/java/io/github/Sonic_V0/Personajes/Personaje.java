@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.Array;
-import io.github.Sonic_V0.Constantes;
+
 
 public abstract class Personaje {
     protected Vector2 velocidad;  //200

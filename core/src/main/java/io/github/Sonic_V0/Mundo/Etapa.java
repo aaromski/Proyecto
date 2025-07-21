@@ -5,7 +5,6 @@ import com.badlogic.gdx.math.Vector2;
 import io.github.Sonic_V0.Personajes.*;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 

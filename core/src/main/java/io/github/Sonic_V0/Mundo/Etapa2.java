@@ -42,9 +42,7 @@ public class Etapa2 {
             }
         }
 
-        Iterator<Robotnik> it = robotniks.iterator();
-        while (it.hasNext()) {
-            Robotnik r = it.next();
+        for (Robotnik r : robotniks) {
             r.actualizar(delta);
         }
 
