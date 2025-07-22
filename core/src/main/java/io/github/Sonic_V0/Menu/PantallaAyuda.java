@@ -76,16 +76,23 @@ public class PantallaAyuda extends BaseMenu {
 
         // Mostrar contenido según sección
         if (seccionActual == 0) {
+            font.setColor(0.0f, 0.0f, 1.0f, 1.0f); // Or use Color.BLUE if you have it imported
+
             font.draw(batch,
                 "Controles:\n" +
-                "- A: Izquierda\n" +
-                "- D: Derecha\n" +
-                "- W/ESPACIO: Saltar\n" +
-                "- ESC: Pausar\n\n " +
+                    "-                SONIC:       KNUCKLES:       TAILS:\n" +
+                    "- ARRIBA:         W             I               flecha arriba\n" +
+                    "- ABAJO:           S             K               flecha abajo\n" +
+                    "- IZQUIERDA:    A             J               f. izquierda\n" +
+                    "- DERECHA:     D             L               f. derecha\n" +
+                    "- GOLPE:          G             P               TABULADOR\n" +
+                    "- PODER:\n" +
+                    "-                                                   VOLAR: F.ARRIBA (DOS VECES)\n" +
+                    "- ESC: Pausar\n\n" +
 
-                "Reglas:\n"+
-                "- No caer al vacío\n" +
-                "- Completar niveles sin perder vidas",
+                    "Reglas:\n" +
+                    "- No dejarse tocar por los robots\n" +
+                    "- Limpiar el mundo de chatarra",
                 100, 400);
         } else {
             font.draw(batch,
@@ -98,7 +105,7 @@ public class PantallaAyuda extends BaseMenu {
                     "- Yoryelis Ocando\n" +
                     "- Miguel Carreño\n\n" +
                     "Versión: 1.0.3",
-                 100, 400);
+                100, 400);
         }
 
         // Botón VOLVER
