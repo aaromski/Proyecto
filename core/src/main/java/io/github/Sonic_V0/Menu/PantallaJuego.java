@@ -4,12 +4,12 @@ import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.*;
-//import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import io.github.Sonic_V0.*;
 import io.github.Sonic_V0.Mundo.Mundo;
 
 public class PantallaJuego extends BaseMenu {
-    //Box2DDebugRenderer debugRenderer;
+    Box2DDebugRenderer debugRenderer;
     private final Mundo mundo;
     private ShapeRenderer shape;
 
@@ -19,7 +19,7 @@ public class PantallaJuego extends BaseMenu {
 
     public PantallaJuego(Main game) {
         super(game);
-       // debugRenderer = new Box2DDebugRenderer();
+       debugRenderer = new Box2DDebugRenderer();
         mundo = new Mundo();
     }
 
@@ -46,7 +46,7 @@ public class PantallaJuego extends BaseMenu {
 
         batch.setProjectionMatrix(camara.getCamara().combined);
 
-     //  debugRenderer.render(mundo.getWorld(), camara.getCamara().combined);
+      debugRenderer.render(mundo.getWorld(), camara.getCamara().combined);
         batch.begin();
         mundo.render(batch);
         batch.end();

@@ -54,6 +54,7 @@ public class CargarMapa {
             font.draw(batch, "X" + Constantes.VIDAS[0], 80, 970);
             font.draw(batch, "X" + Constantes.VIDAS[1], 180, 970);
             font.draw(batch, "X" + Constantes.VIDAS[2], 280, 970);
+            font.draw(batch, "FPS: " + Gdx.graphics.getFramesPerSecond(), 90, 960);
             font.draw(batch, String.valueOf(aux) , 1080, 960);
         }
         batch.end();
@@ -63,6 +64,9 @@ public class CargarMapa {
         for (MapLayer capa : map.getLayers()) {
             MapObjects objetos = capa.getObjects();
             for (MapObject objeto : objetos) {
+
+                FixtureDef def = new FixtureDef();
+
                 if (objeto instanceof RectangleMapObject) {
                     Rectangle rect = ((RectangleMapObject) objeto).getRectangle();
 
@@ -76,12 +80,14 @@ public class CargarMapa {
                     PolygonShape shape = new PolygonShape();
                     shape.setAsBox(rect.width / 2 * Constantes.WORLD_ESCALA, rect.height / 2 * Constantes.WORLD_ESCALA);
 
+                    def.shape = shape;
+                    configurarFiltroMapa(def);
+
                     Body cuerpo = world.createBody(bdef);
-                    cuerpo.createFixture(shape, 0.0f);
+                    cuerpo.createFixture(def).setUserData("Objeto");
                     shape.dispose();
                 }
 
-                // Si tienes objetos poligonales:
                 if (objeto instanceof PolygonMapObject) {
                     PolygonMapObject poly = (PolygonMapObject) objeto;
                     float[] vertices = poly.getPolygon().getTransformedVertices();
@@ -96,8 +102,12 @@ public class CargarMapa {
 
                     BodyDef bdef = new BodyDef();
                     bdef.type = BodyDef.BodyType.StaticBody;
+
+                    def.shape = shape;
+                    configurarFiltroMapa(def);
+
                     Body cuerpo = world.createBody(bdef);
-                    cuerpo.createFixture(shape, 0.0f);
+                    cuerpo.createFixture(def).setUserData("Objeto");
                     shape.dispose();
                 }
 
@@ -114,12 +124,21 @@ public class CargarMapa {
 
                     BodyDef bdef = new BodyDef();
                     bdef.type = BodyDef.BodyType.StaticBody;
+
+                    def.shape = shape;
+                    configurarFiltroMapa(def);
+
                     Body cuerpo = world.createBody(bdef);
-                    cuerpo.createFixture(shape, 0.0f);
+                    cuerpo.createFixture(def).setUserData("Objeto");
                     shape.dispose();
                 }
             }
         }
+    }
+
+    public void configurarFiltroMapa(FixtureDef def) {
+        def.filter.categoryBits = Constantes.CATEGORY_OBJETOS;
+        def.filter.maskBits = -1;
     }
 
     public void dispose() {

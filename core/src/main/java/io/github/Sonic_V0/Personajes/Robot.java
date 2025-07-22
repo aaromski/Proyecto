@@ -2,10 +2,8 @@ package io.github.Sonic_V0.Personajes;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-//import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.*;
 import io.github.Sonic_V0.Constantes;
 import io.github.Sonic_V0.Mundo.Mundo;
 
@@ -61,6 +59,27 @@ public class Robot extends Enemigas{
             world.generarBasura(posicionActual);
             tiempoBasura = 0f;
         }
+    }
+
+    @Override
+    public void crearCuerpo(Vector2 posicion, World world) {
+        super.crearCuerpo(posicion, world); // crea el cuerpo base desde Enemigas/Personaje
+
+        CircleShape sensorShape = new CircleShape();
+        sensorShape.setRadius(0.7f); // más grande que el cuerpo para detección
+
+        FixtureDef sensorDef = new FixtureDef();
+        sensorDef.shape = sensorShape;
+        sensorDef.isSensor = true;
+
+        configurarFiltroSensor(sensorDef); // si quieres filtro específico
+        body.createFixture(sensorDef).setUserData("sensor");
+        sensorShape.dispose();
+    }
+
+    public void configurarFiltroSensor(FixtureDef fdef) {
+        fdef.filter.categoryBits = Constantes.CATEGORY_SENSOR;
+        fdef.filter.maskBits = Constantes.CATEGORY_TRASH | Constantes.CATEGORY_NUBE;
     }
 
     public void configurarFiltro(FixtureDef fdef) {

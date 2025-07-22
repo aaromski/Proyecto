@@ -2,6 +2,7 @@ package io.github.Sonic_V0.Mundo;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
 import io.github.Sonic_V0.Personajes.*;
 
 import java.util.ArrayList;
@@ -50,6 +51,9 @@ public class Etapa {
         }
 
         for (Robot r : robots) {
+            if(r.sinObjetivo()) {
+                r.setObjetivo(objetivoDisponible());
+            }
             r.actualizar(delta);
         }
     }
@@ -67,25 +71,20 @@ public class Etapa {
 
 
     public void generarRobot() {
-        Amigas objetivo;
-
-        int ra = (int) (Math.random() * 3);
-        if (ra == 0) {
-            objetivo = sonic;
-        } else if (ra == 1) {
-            objetivo = knuckles;
-        } else {
-            objetivo = tails;
-        }
-
-        Robot r = new Robot(getEntrada(), sonic.getCuerpo(), mundo); // primer objetivo
-
-        if (!objetivo.getKO()) {
-            r.setObjetivo(objetivo.getCuerpo());
-        } else {
-            r.setObjetivo(r.getCuerpo());
-        }
+        Robot r = new Robot(getEntrada(), objetivoDisponible(), mundo); // primer objetivo
         robots.add(r);
+    }
+
+    private Body objetivoDisponible() {
+        List<Amigas> posibles = new ArrayList<>();
+        if (!sonic.getKO()) posibles.add(sonic);
+        if (!tails.getKO()) posibles.add(tails);
+        if (!knuckles.getKO()) posibles.add(knuckles);
+
+        if (posibles.isEmpty()) return null;
+
+        Amigas elegido = posibles.get(random.nextInt(posibles.size()));
+        return elegido.getCuerpo();
     }
 
     public void dispose() {

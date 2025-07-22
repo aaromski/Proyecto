@@ -66,6 +66,9 @@ public abstract class Personaje {
         fixDef.shape = circle;
 
         body = world.createBody(bd);
+
+        body.setUserData(this);
+
         body.setLinearDamping(5f); // Esto reduce el deslizamiento horizontal
 
         configurarFiltro(fixDef); // sigue pasando como argumento

@@ -81,7 +81,7 @@ public abstract class Amigas extends Personaje {
 
 
     public void teletransportar() {
-        if(TLT) {
+        if(TLT && body != null) {
             body.setTransform(25, 22, body.getAngle());
             setTLT();
         }

@@ -10,6 +10,11 @@ public abstract class Enemigas extends Personaje {
     protected Animation<TextureRegion> KO;
     protected Body objetivo;
     protected boolean destruido = false;
+    private Vector2 ultimaPosicion;
+    private float tiempoAtascado = 0f;
+    private Vector2 direccionRodeo = null;
+    private float tiempoRodeando = 0f;
+    private final float DURACION_RODEO = 1.5f;
 
     public Enemigas(Vector2 p, World w) {
         super(p,w);
@@ -27,15 +32,19 @@ public abstract class Enemigas extends Personaje {
         }
     }
 
+    public boolean sinObjetivo() {
+        return objetivo == null;
+    }
+
     @Override
     public void actualizar(float delta) {
         posicion = body.getPosition();
+
         if (ko) {
             body.setLinearVelocity(0, 0);
             objetivo = null;
 
             if (KO.isAnimationFinished(stateTime)) {
-                System.out.println("Paso por aqui");
                 frameActual = KO.getKeyFrame(KO.getAnimationDuration(), false);
             } else {
                 frameActual = KO.getKeyFrame(stateTime, false);
@@ -45,28 +54,81 @@ public abstract class Enemigas extends Personaje {
         }
 
         if (objetivo == null) {
-            // Si no hay objetivo, quedarse quieto
             body.setLinearVelocity(0, 0);
             return;
         }
-        stateTime += delta;
-        if (objetivo.getPosition() != null && objetivo != body) {
-            // Vector hacia el objetivo
-            Vector2 direccion = objetivo.getPosition().cpy().sub(posicion).nor().scl(velocidad);
-            body.setLinearVelocity(direccion);
 
-            // Voltear sprite si el objetivo está a la izquierda o derecha
-            boolean haciaIzq = direccion.x < 0;
-            if (frameActual != null) {
-                if (haciaIzq && !frameActual.isFlipX()) {
-                    frameActual.flip(true, false);
-                } else if (!haciaIzq && frameActual.isFlipX()) {
-                    frameActual.flip(true, false);
+        stateTime += delta;
+
+        // Detectar si está atascado (solo si no está en rodeo)
+        if (direccionRodeo == null) {
+            if (ultimaPosicion != null && posicion.dst(ultimaPosicion) < 0.03f) {
+                tiempoAtascado += delta;
+            } else {
+                tiempoAtascado = 0f;
+            }
+
+            if (tiempoAtascado > 0.6f) {
+                Vector2 direccionObjetivo = objetivo.getPosition().cpy().sub(posicion).nor();
+                direccionRodeo = new Vector2(-direccionObjetivo.y, direccionObjetivo.x).nor();
+                if (Math.random() < 0.5f) {
+                    direccionRodeo.scl(-1); // izquierda o derecha al azar
                 }
+
+                tiempoRodeando = 0f;
+                tiempoAtascado = 0f;
             }
         }
-        // Animación de movimiento
+
+        ultimaPosicion = posicion.cpy();
+
+        // Si está en modo de rodeo
+        if (direccionRodeo != null) {
+            tiempoRodeando += delta;
+            body.setLinearVelocity(direccionRodeo.cpy().scl(velocidad));
+
+            if (tiempoRodeando >= DURACION_RODEO) {
+                direccionRodeo = null;
+            }
+
+            frameActual = correr.getKeyFrame(stateTime, true);
+            return;
+        }
+
+        // Movimiento normal hacia el objetivo
+        Vector2 direccion = objetivo.getPosition().cpy().sub(posicion).nor().scl(velocidad);
+        body.setLinearVelocity(direccion);
+
+        boolean haciaIzq = direccion.x < 0;
+        if (frameActual != null) {
+            if (haciaIzq && !frameActual.isFlipX()) {
+                frameActual.flip(true, false);
+            } else if (!haciaIzq && frameActual.isFlipX()) {
+                frameActual.flip(true, false);
+            }
+        }
+
         frameActual = correr.getKeyFrame(stateTime, true);
     }
+
+    public void activarRodeo(Vector2 posicionObstaculo) {
+        if (ko || direccionRodeo != null || objetivo == null) return;
+
+        Vector2 direccionObjetivo = objetivo.getPosition().cpy().sub(body.getPosition()).nor();
+
+        // Opción A: rodear según el obstáculo detectado
+        Vector2 direccionDesdeObstaculo = body.getPosition().cpy().sub(posicionObstaculo).nor();
+
+        // Generar dirección perpendicular para rodear
+        direccionRodeo = new Vector2(-direccionObjetivo.y, direccionObjetivo.x).nor();
+
+        if (Math.random() < 0.5f) {
+            direccionRodeo.scl(-1); // izquierda o derecha al azar
+        }
+
+        tiempoRodeando = 0f;
+        tiempoAtascado = 0f;
+    }
+
 
 }
