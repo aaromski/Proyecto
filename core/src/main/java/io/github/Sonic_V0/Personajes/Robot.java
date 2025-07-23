@@ -1,9 +1,9 @@
 package io.github.Sonic_V0.Personajes;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 //import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import io.github.Sonic_V0.Constantes;
@@ -158,15 +158,7 @@ public class Robot extends Enemigas {
         fdef.filter.maskBits = (short) (Constantes.CATEGORY_PERSONAJES | Constantes.CATEGORY_OBJETOS |
             Constantes.CATEGORY_GOLPE_PERSONAJES);
     }
-    @Override
-    public void destruir() {
-        if (!destruido) {
-            destruido = true;
-            stateTime = 0f;
-            body.setLinearVelocity(0, 0);
-            body.getWorld().destroyBody(body); // destruye físicamente
-        }
-    }
+
 
     @Override
     public void dispose() {
