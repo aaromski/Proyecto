@@ -37,7 +37,7 @@ public class Tails extends Amigas {
 
     @Override
     void inicializarAnimaciones(float x, float y) {
-        atlas = new TextureAtlas(Gdx.files.internal("SpriteTails/Tails..atlas"));
+        atlas = new TextureAtlas(Gdx.files.internal("SpriteTails/Tails.atlas"));
         sprite = atlas.createSprite("TailsSprite0");
         sprite.setSize(30 / PPM, 39f / PPM);
         sprite.setPosition(
@@ -47,15 +47,15 @@ public class Tails extends Amigas {
 
         // Animaciones normales
         correr = crearAnimacion("TailsSprite", 7, 0.09f);
-        abajo = crearAnimacion("abajo", 4, 0.1f);
-        arriba = crearAnimacion("arriba", 6, 0.1f);
-        diagonalarr = crearAnimacion("diagonal", 5, 0.1f);
-        diagonalabj = crearAnimacion("diagonalabj", 3, 0.1f);
+        abajo = crearAnimacion("abajo", 3, 0.1f);
+        arriba = crearAnimacion("arriba", 7, 0.1f);
+        diagonalarr = crearAnimacion("diagonal", 9, 0.1f);
+        diagonalabj = crearAnimacion("diagonalabj", 4, 0.1f);
 
         // Animaciones de vuelo
         volar = crearAnimacion("vuelo", 7, 0.1f);
         vueloabajo = crearAnimacion("vuelo", 7, 0.1f);
-        vueloarriba = crearAnimacion("vuelo", 7, 0.1f);
+        vueloarriba = crearAnimacion("vuelo", 3, 0.1f);
 
         // Animación para recoger objetos
         recoger = crearAnimacion("recoger", 4, 0.1f);
@@ -70,6 +70,10 @@ public class Tails extends Amigas {
 
     @Override
     public void actualizar(float delta) {
+        if (body == null) {
+            return; // No actualizar si el cuerpo no existe
+        }
+
         if (!puedeRecoger) {
             tiempoRecoger += delta;
             frameActual = recoger.getKeyFrame(tiempoRecoger, false);

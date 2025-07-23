@@ -1,0 +1,94 @@
+Tails.png
+size: 500, 108
+format: RGBA8888
+filter: Linear, Linear
+repeat: none
+pma: false
+abajo1
+  bounds: 0, 0, 28, 28
+abajo2
+  bounds: 28, 0, 28, 28
+abajo3
+  bounds: 56, 0, 28, 28
+arriba0
+  bounds: 453, 64, 25, 44
+arriba1
+  bounds: 295, 64, 26, 41
+arriba2
+  bounds: 347, 64, 26, 43
+arriba3
+  bounds: 373, 64, 27, 43
+arriba4
+  bounds: 478, 64, 22, 44
+arriba5
+  bounds: 321, 64, 26, 41
+arriba6
+  bounds: 400, 64, 26, 43
+arriba7
+  bounds: 426, 64, 27, 43
+diagonal1
+  bounds: 0, 64, 31, 36
+diagonal2
+  bounds: 94, 64, 32, 38
+diagonal3
+  bounds: 126, 64, 32, 38
+diagonal4
+  bounds: 31, 64, 33, 37
+diagonal5
+  bounds: 64, 64, 30, 37
+diagonal6
+  bounds: 264, 64, 31, 40
+diagonal7
+  bounds: 158, 64, 34, 39
+diagonal8
+  bounds: 192, 64, 36, 39
+diagonal9
+  bounds: 228, 64, 36, 39
+diagonalabj1
+  bounds: 84, 0, 48, 28
+diagonalabj2
+  bounds: 132, 0, 48, 28
+diagonalabj3
+  bounds: 180, 0, 48, 28
+diagonalabj4
+  bounds: 228, 0, 48, 28
+recoger0
+  bounds: 276, 0, 21, 28
+recoger1
+  bounds: 334, 0, 22, 31
+recoger2
+  bounds: 356, 0, 27, 31
+recoger3
+  bounds: 418, 0, 29, 32
+recoger4
+  bounds: 447, 0, 34, 32
+TailsSprite0
+  bounds: 383, 0, 35, 31
+TailsSprite1
+  bounds: 0, 32, 41, 32
+TailsSprite2
+  bounds: 41, 32, 36, 32
+TailsSprite3
+  bounds: 77, 32, 40, 32
+TailsSprite4
+  bounds: 117, 32, 42, 32
+TailsSprite5
+  bounds: 159, 32, 37, 32
+TailsSprite6
+  bounds: 196, 32, 42, 32
+TailsSprite7
+  bounds: 238, 32, 43, 32
+vuelo1
+  bounds: 297, 0, 37, 28
+vuelo2
+  bounds: 281, 32, 36, 32
+vuelo3
+  bounds: 317, 32, 36, 32
+vuelo4
+  bounds: 353, 32, 36, 32
+vuelo5
+  bounds: 389, 32, 36, 32
+vuelo6
+  bounds: 425, 32, 36, 32
+vuelo7
+  bounds: 461, 32, 36, 32
