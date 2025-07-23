@@ -25,9 +25,8 @@ public class ManejarContactos implements ContactListener {
                 contaminante.setActiva(4);
             } else if (contaminante instanceof Basura || contaminante instanceof CharcoAceite) {
                 if (personaje instanceof Sonic) {
-                    contaminante.setActiva(1); // solo Sonic activa
+                    contaminante.setActiva(1);
                 }
-                // Si es Tails o Knuckles, no hace nada
             }
         }
 
@@ -40,10 +39,10 @@ public class ManejarContactos implements ContactListener {
         }
 
         if ("Objeto".equals(fa.getUserData()) && ub instanceof Nube
-         || "Objeto".equals(fb.getUserData()) && ua instanceof Nube) {
+            || "Objeto".equals(fb.getUserData()) && ua instanceof Nube) {
             System.out.println("PAso por aqui");
             Nube nube = (ub instanceof Nube) ? (Nube) ub : (Nube) ua;
-            nube.setActiva(4); // activación especial
+            nube.setActiva(4);
         }
 
         if (esSensorYObstaculo(fa, fb)) {
@@ -54,6 +53,16 @@ public class ManejarContactos implements ContactListener {
             Vector2 posicionObstaculo = obstaculoFixture.getBody().getPosition();
 
             enemigo.activarRodeo(posicionObstaculo);
+        }
+
+        // NUEVA LÓGICA: Detección del golpe de Knuckles a un Robot
+        if ((("golpeKnuckles".equals(ua) && ub instanceof Robot) ||
+            ("golpeKnuckles".equals(ub) && ua instanceof Robot))) {
+
+            Robot robotAfectado = (Robot) (ua instanceof Robot ? ua : ub);
+            if (!robotAfectado.getKO()) { // Si el robot no está ya KO, lo ponemos en KO
+                robotAfectado.setKO(); // Llama al método setKO del robot
+            }
         }
     }
 
@@ -92,5 +101,3 @@ public class ManejarContactos implements ContactListener {
     @Override public void preSolve(Contact contact, Manifold oldManifold) {}
     @Override public void postSolve(Contact contact, ContactImpulse impulse) {}
 }
-
-

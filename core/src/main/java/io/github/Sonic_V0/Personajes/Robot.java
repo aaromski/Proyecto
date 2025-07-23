@@ -1,16 +1,21 @@
 package io.github.Sonic_V0.Personajes;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import io.github.Sonic_V0.Constantes;
 import io.github.Sonic_V0.Mundo.Mundo;
 
-public class Robot extends Enemigas{
+public class Robot extends Enemigas {
     private float tiempoBasura;
     private final Mundo world;
-    private float deathTimer = 0f;
+
+    protected TextureRegion chatarraSprite;
+    private float tiempoEnChatarra = 0f;
+    private final float DURACION_CHATARRA = 5.0f;
 
     public Robot(Vector2 posicion, Body objetivo, Mundo world) {
         super(posicion, world.getWorld());
@@ -22,39 +27,82 @@ public class Robot extends Enemigas{
     }
 
     @Override
-    public void inicializarAnimaciones(float x, float y){
+    public void inicializarAnimaciones(float x, float y) {
         atlas = new TextureAtlas(Gdx.files.internal("Robot/robot.atlas"));
         sprite = atlas.createSprite("robot");
-        sprite.setSize(30f / PPM, 39f / PPM); // ≈ 0.91 x 1.19
+        sprite.setSize(30f / PPM, 39f / PPM);
         sprite.setPosition(
             x - sprite.getWidth() / 2f,
             y - sprite.getHeight() / 2f
         );
-        correr = crearAnimacion("robotmove", 7, 0.09f);       // del 1 al 8
+        correr = crearAnimacion("robotmove", 7, 0.09f);
         KO = crearAnimacion("robot", 4, 0.15f);
 
-
+        chatarraSprite = atlas.createSprite("robotKO");
+        if(chatarraSprite == null) {
+            chatarraSprite = KO.getKeyFrame(KO.getAnimationDuration(), true);
+        }
     }
+
     @Override
-    public void destruir() {
+    public void setKO() {
         if (!ko) {
             ko = true;
             stateTime = 0f;
-            body.setLinearVelocity(0, 0);
-            body.getWorld().destroyBody(body); // destruye físicamente
+            tiempoEnChatarra = 0f;
+            if (body != null) {
+                body.setLinearVelocity(0, 0);
+
+                for (Fixture fixture : body.getFixtureList()) {
+                    Filter filter = fixture.getFilterData();
+                    filter.maskBits = 0;
+                    fixture.setFilterData(filter);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void destruir() {
+        if (!destruido) {
+            destruido = true;
+            if (body != null) {
+                body.getWorld().destroyBody(body);
+                body = null;
+            }
         }
     }
 
     public boolean estaListoParaEliminar() {
-        return destruido && deathTimer >= 1.0f;
+        return destruido && tiempoEnChatarra >= DURACION_CHATARRA;
     }
 
     @Override
     public void actualizar(float delta) {
-        super.actualizar(delta); // si el padre tiene lógica
-        if (ko) {return;}
+        if (ko) {
+            tiempoEnChatarra += delta;
+            stateTime += delta;
+
+            // --- INICIO DE LA MODIFICACIÓN IMPORTANTE ---
+            // Actualiza la posición del sprite a la posición actual del body
+            // Esto asegura que la animación KO se dibuje donde el robot fue detenido
+            if (body != null) { // Asegúrate de que el body no sea null si ya fue destruido
+                sprite.setPosition(body.getPosition().x - sprite.getWidth() / 2f,
+                    body.getPosition().y - sprite.getHeight() / 2f);
+            }
+            // --- FIN DE LA MODIFICACIÓN IMPORTANTE ---
+
+            if (tiempoEnChatarra >= DURACION_CHATARRA) {
+                if (!destruido) {
+                    destruir();
+                }
+            }
+            return;
+        }
+
+        super.actualizar(delta);
         tiempoBasura += delta;
-        if (tiempoBasura >= 30f) { // cada 3 segundos, por ejemplo
+        if (tiempoBasura >= 30f) {
             Vector2 posicionActual = body.getPosition().cpy();
             world.generarBasura(posicionActual);
             tiempoBasura = 0f;
@@ -62,33 +110,46 @@ public class Robot extends Enemigas{
     }
 
     @Override
+    public void render(com.badlogic.gdx.graphics.g2d.SpriteBatch batch) {
+        if (ko) {
+            if (KO != null && !KO.isAnimationFinished(stateTime)) {
+                batch.draw(KO.getKeyFrame(stateTime), sprite.getX(), sprite.getY(), sprite.getWidth(), sprite.getHeight());
+            } else if (chatarraSprite != null) {
+                batch.draw(chatarraSprite, sprite.getX(), sprite.getY(), sprite.getWidth(), sprite.getHeight());
+            }
+        } else {
+            super.render(batch);
+        }
+    }
+
+    @Override
     public void crearCuerpo(Vector2 posicion, World world) {
-        super.crearCuerpo(posicion, world); // crea el cuerpo base desde Enemigas/Personaje
+        super.crearCuerpo(posicion, world);
 
         CircleShape sensorShape = new CircleShape();
-        sensorShape.setRadius(0.7f); // más grande que el cuerpo para detección
+        sensorShape.setRadius(0.7f);
 
         FixtureDef sensorDef = new FixtureDef();
         sensorDef.shape = sensorShape;
         sensorDef.isSensor = true;
 
-        configurarFiltroSensor(sensorDef); // si quieres filtro específico
+        configurarFiltroSensor(sensorDef);
         body.createFixture(sensorDef).setUserData("sensor");
         sensorShape.dispose();
     }
 
     public void configurarFiltroSensor(FixtureDef fdef) {
         fdef.filter.categoryBits = Constantes.CATEGORY_SENSOR;
-        fdef.filter.maskBits = Constantes.CATEGORY_TRASH | Constantes.CATEGORY_NUBE;
+        fdef.filter.maskBits = Constantes.CATEGORY_TRASH | Constantes.CATEGORY_NUBE |
+            Constantes.CATEGORY_PERSONAJES | Constantes.CATEGORY_ROBOT | Constantes.CATEGORY_OBJETOS;
     }
 
+    @Override
     public void configurarFiltro(FixtureDef fdef) {
         fdef.filter.categoryBits = Constantes.CATEGORY_ROBOT;
-        fdef.filter.maskBits = (short) ~(Constantes.CATEGORY_TRASH | Constantes.CATEGORY_NUBE);
+        fdef.filter.maskBits = (short) (Constantes.CATEGORY_PERSONAJES | Constantes.CATEGORY_OBJETOS |
+            Constantes.CATEGORY_GOLPE_PERSONAJES);
     }
-
-
-
 
     @Override
     public void dispose() {

@@ -11,8 +11,10 @@ public final class Constantes {
     public static final short CATEGORY_PERSONAJES = 0x0008;
     public static final short CATEGORY_NUBE = 0x0010;
     public static final short CATEGORY_OBJETOS = 0x0020;
+    public static final short CATEGORY_GOLPE_PERSONAJES = 0x0040; // Nueva categoría para el golpe de personajes
 
 
+    public static final float PPM = 32.0f; // Standard value for Pixels Per Meter
     // Tamaños estándar
     public static final float TRASH_WIDTH = 0.8f;
     public static final float TRASH_HEIGHT = 0.8f;
