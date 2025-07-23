@@ -15,7 +15,7 @@ public class Robot extends Enemigas {
 
     protected TextureRegion chatarraSprite;
     private float tiempoEnChatarra = 0f;
-    private final float DURACION_CHATARRA = 5.0f;
+    private final float DURACION_CHATARRA = 30f;
 
     public Robot(Vector2 posicion, Body objetivo, Mundo world) {
         super(posicion, world.getWorld());
@@ -55,7 +55,8 @@ public class Robot extends Enemigas {
 
                 for (Fixture fixture : body.getFixtureList()) {
                     Filter filter = fixture.getFilterData();
-                    filter.maskBits = 0;
+                    filter.categoryBits = Constantes.CATEGORY_OBJETOS;
+                    filter.maskBits = -1;
                     fixture.setFilterData(filter);
                 }
             }
@@ -70,6 +71,12 @@ public class Robot extends Enemigas {
                 body.getWorld().destroyBody(body);
                 body = null;
             }
+        }
+    }
+
+    public void reactivacion() {
+        if (ko) {
+            ko = false;
         }
     }
 
@@ -94,7 +101,8 @@ public class Robot extends Enemigas {
 
             if (tiempoEnChatarra >= DURACION_CHATARRA) {
                 if (!destruido) {
-                    destruir();
+                    ko = false;
+                    tiempoEnChatarra = 0f;
                 }
             }
             return;

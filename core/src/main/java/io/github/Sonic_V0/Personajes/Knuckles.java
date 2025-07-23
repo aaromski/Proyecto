@@ -3,6 +3,7 @@ package io.github.Sonic_V0.Personajes;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
@@ -11,83 +12,93 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.Filter;
+import com.badlogic.gdx.utils.Array;
 import io.github.Sonic_V0.Constantes; // Ensure this is imported
 
 public class Knuckles extends Amigas {
-    protected Animation<TextureRegion> golpe;
-    protected boolean golpeando = false;
-    private Fixture golpeFixtureRight; // Fixture for right punch
-    private Fixture golpeFixtureLeft;  // Fixture for left punch
+    private Animation<TextureRegion> explosion;
+    private boolean golpeando = false;
+    private Fixture golpeFixture; // único fixture
+    private CircleShape golpeShape;
     private float tiempoGolpeActivo = 0f;
     private final float DURACION_GOLPE_ACTIVO = 0.1f;
     private final float TIEMPO_GOLPE_COMIENZO = 0.2f;
+    private boolean mostrarImpacto = false;
+    private float estadoImpacto = 0f;
+    private TextureRegion frameImpacto;
+    private int direccionImpacto = 0; // 0=Ninguna, 1=Izq, 2=Der, 3=Arriba, 4=Abajo
 
     public Knuckles (Vector2 posicion, World world) {
         super(posicion, world);
         inicializarAnimaciones(body.getPosition().x, body.getPosition().y);
         this.name = "Knuckles";
-        crearGolpeFixtures(); // Call this to create both left and right fixtures
+        crearGolpeFixture(); // Call this to create both left and right fixtures
     }
 
-    private void crearGolpeFixtures() {
-        // Offset for the punch hitbox relative to Knuckles' center (in meters)
-        // This is the distance from the center of Knuckles' body to the center of the punch hitbox.
-        final float HORIZONTAL_PUNCH_OFFSET = 0.8f;
-        final float PUNCH_RADIUS = 0.7f; // Radius of the punch hitbox
+    private void crearGolpeFixture() {
+        final float PALO_RADIUS = 0.7f;
+        golpeShape = new CircleShape();
+        golpeShape.setRadius(PALO_RADIUS);
 
-        // --- Fixture for punching RIGHT ---
-        CircleShape shapeRight = new CircleShape();
-        shapeRight.setRadius(PUNCH_RADIUS);
-        // Position the circle's center OFFSET to the right of Knuckles' body center
-        shapeRight.setPosition(new Vector2(HORIZONTAL_PUNCH_OFFSET, 0));
+        // Posición inicial en el centro
+        golpeShape.setPosition(new Vector2(0f, 0f));
 
-        FixtureDef fdefRight = new FixtureDef();
-        fdefRight.shape = shapeRight;
-        fdefRight.isSensor = true;
-        fdefRight.filter.categoryBits = Constantes.CATEGORY_GOLPE_PERSONAJES;
-        fdefRight.filter.maskBits = Constantes.CATEGORY_ROBOT;
+        FixtureDef fdef = new FixtureDef();
+        fdef.shape = golpeShape;
+        fdef.isSensor = true;
+        fdef.filter.categoryBits = Constantes.CATEGORY_GOLPE_PERSONAJES;
+        fdef.filter.maskBits = 0; // inicialmente inactivo
 
-        golpeFixtureRight = body.createFixture(fdefRight);
-        golpeFixtureRight.setUserData("golpeKnuckles");
-        shapeRight.dispose();
-
-        // --- Fixture for punching LEFT ---
-        CircleShape shapeLeft = new CircleShape();
-        shapeLeft.setRadius(PUNCH_RADIUS);
-        // Position the circle's center OFFSET to the left of Knuckles' body center
-        shapeLeft.setPosition(new Vector2(-HORIZONTAL_PUNCH_OFFSET, 0));
-
-        FixtureDef fdefLeft = new FixtureDef();
-        fdefLeft.shape = shapeLeft;
-        fdefLeft.isSensor = true;
-        fdefLeft.filter.categoryBits = Constantes.CATEGORY_GOLPE_PERSONAJES;
-        fdefLeft.filter.maskBits = Constantes.CATEGORY_ROBOT;
-
-        golpeFixtureLeft = body.createFixture(fdefLeft);
-        golpeFixtureLeft.setUserData("golpeKnuckles");
-        shapeLeft.dispose();
-
-        // Ensure both are inactive at start
-        desactivarGolpeFixtures();
+        golpeFixture = body.createFixture(fdef);
+        golpeFixture.setUserData("golpeKnuckles");
     }
 
-    // New method to activate the correct punch fixture based on direction
-    private void activarGolpeFixture() {
-        if (body == null) return; // Guard against null body
-
-        if (sprite.isFlipX()) { // Knuckles is facing left
-            setFixtureActive(golpeFixtureLeft, true);
-            setFixtureActive(golpeFixtureRight, false);
-        } else { // Knuckles is facing right
-            setFixtureActive(golpeFixtureRight, true);
-            setFixtureActive(golpeFixtureLeft, false);
+    private void moverGolpeSegunDireccion() {
+        if (golpeFixture != null) {
+            body.destroyFixture(golpeFixture); // eliminar anterior
         }
+
+        final float RADIO = 0.7f;
+        final float DISTANCIA = 0.8f;
+        Vector2 offset = new Vector2();
+
+        switch (direccionImpacto) {
+            case 1: offset.set(-DISTANCIA, 0); break;
+            case 2: offset.set(DISTANCIA, 0); break;
+            case 3: offset.set(0, DISTANCIA); break;
+            case 4: offset.set(0, -DISTANCIA); break;
+            case 5: offset.set(-DISTANCIA, DISTANCIA); break;
+            case 6: offset.set(DISTANCIA, DISTANCIA); break;
+            case 7: offset.set(-DISTANCIA, -DISTANCIA); break;
+            case 8: offset.set(DISTANCIA, -DISTANCIA); break;
+        }
+
+        CircleShape newShape = new CircleShape();
+        newShape.setRadius(RADIO);
+        newShape.setPosition(offset);
+
+        FixtureDef fdef = new FixtureDef();
+        fdef.shape = newShape;
+        fdef.isSensor = true;
+        fdef.filter.categoryBits = Constantes.CATEGORY_GOLPE_PERSONAJES;
+        fdef.filter.maskBits = Constantes.CATEGORY_ROBOT;
+
+        golpeFixture = body.createFixture(fdef);
+        golpeFixture.setUserData("golpeKnuckles");
+
+        newShape.dispose();
     }
 
-    // New method to deactivate all punch fixtures
+    private void activarGolpeFixture() {
+        activarGolpe(); // ya tienes este método
+    }
+
     private void desactivarGolpeFixtures() {
-        setFixtureActive(golpeFixtureRight, false);
-        setFixtureActive(golpeFixtureLeft, false);
+        if (golpeFixture != null) {
+            Filter filter = golpeFixture.getFilterData();
+            filter.maskBits = 0; // desactivado
+            golpeFixture.setFilterData(filter);
+        }
     }
 
     // Helper method to set a fixture's active state
@@ -106,6 +117,7 @@ public class Knuckles extends Amigas {
     @Override
     void inicializarAnimaciones(float x, float y) {
         atlas = new TextureAtlas(Gdx.files.internal("SpriteKnuckles/KnucklesSprite.atlas"));
+        TextureAtlas atlas2 = new TextureAtlas((Gdx.files.internal("SpriteKnuckles/explosion.atlas")));
         sprite = atlas.createSprite("KnucklesStanding1");
         // Corrected PPM usage:
         sprite.setSize(30f / Constantes.PPM, 39f / Constantes.PPM);
@@ -119,7 +131,18 @@ public class Knuckles extends Amigas {
         diagonalarr = crearAnimacion("DiagonalTrasera", 8, 0.1f);
         diagonalabj = crearAnimacion("DiagonalDelantera", 6, 0.1f);
 
-        golpe = crearAnimacion("knucklesFist", 8, 0.1f);
+        habilidad = crearAnimacion("knucklesFist", 8, 0.1f);
+
+        Array<TextureRegion> framesExplosion = new Array<>();
+        for (int i = 1; i <= 12; i++) {
+            TextureRegion frame = atlas2.findRegion("explosion" + i);
+            if (frame == null) {
+                System.out.println("No se encontró explosion" + i);
+            } else {
+                framesExplosion.add(frame);
+            }
+        }
+        explosion = new Animation<>(0.1f, framesExplosion, Animation.PlayMode.NORMAL);
 
         frameActual = new TextureRegion(sprite);
     }
@@ -132,11 +155,29 @@ public class Knuckles extends Amigas {
             Constantes.CATEGORY_OBJETOS);
     }
 
+    private void activarGolpe() {
+        if (golpeFixture != null) {
+            Filter filter = golpeFixture.getFilterData();
+            filter.maskBits = Constantes.CATEGORY_ROBOT;
+            golpeFixture.setFilterData(filter);
+        }
+    }
+
     public void golpear() {
         if (!golpeando) {
             golpeando = true;
             stateTime = 0f;
             tiempoGolpeActivo = 0f;
+
+            if (izq && arr) direccionImpacto = 5;
+            else if (der && arr) direccionImpacto = 6;
+            else if (izq && abj) direccionImpacto = 7;
+            else if (der && abj) direccionImpacto = 8;
+            else if (izq) direccionImpacto = 1;
+            else if (der) direccionImpacto = 2;
+            else if (arr) direccionImpacto = 3;
+            else if (abj) direccionImpacto = 4;
+            else direccionImpacto = 0;
         }
     }
 
@@ -153,14 +194,22 @@ public class Knuckles extends Amigas {
 
             if (tiempoGolpeActivo >= TIEMPO_GOLPE_COMIENZO &&
                 tiempoGolpeActivo < (TIEMPO_GOLPE_COMIENZO + DURACION_GOLPE_ACTIVO)) {
-                activarGolpeFixture(); // Activate the correct fixture based on direction
+
+                moverGolpeSegunDireccion(); // <-- aquí se actualiza la posición del palo
+
+                activarGolpeFixture();      // activa el fixture con la posición ya actualizada
+
+                if (!mostrarImpacto) {
+                    mostrarImpacto = true;
+                    estadoImpacto = 0f;
+                }
             } else {
                 desactivarGolpeFixtures(); // Deactivate both outside the active window
             }
 
-            frameActual = golpe.getKeyFrame(stateTime);
+            frameActual = habilidad.getKeyFrame(stateTime);
 
-            if (golpe.isAnimationFinished(stateTime)) {
+            if (habilidad.isAnimationFinished(stateTime)) {
                 golpeando = false;
                 desactivarGolpeFixtures(); // Ensure both are deactivated when animation finishes
             }
@@ -204,6 +253,46 @@ public class Knuckles extends Amigas {
             super.actualizar(alpha);
         }
         posicion = body.getPosition();
+    }
+
+    @Override
+    public void render(SpriteBatch batch) {
+        super.render(batch);
+        if (mostrarImpacto) {
+            estadoImpacto += Gdx.graphics.getDeltaTime();
+            frameImpacto = explosion.getKeyFrame(estadoImpacto, false); // no looping
+
+            float distancia = 0.8f;
+            float offsetX = 0, offsetY = 0;
+
+            switch (direccionImpacto) {
+                case 1: offsetX = -distancia; break;
+                case 2: offsetX = distancia; break;
+                case 3: offsetY = distancia; break;
+                case 4: offsetY = -distancia; break;
+                case 5: offsetX = -distancia; offsetY = distancia; break;
+                case 6: offsetX = distancia;  offsetY = distancia; break;
+                case 7: offsetX = -distancia; offsetY = -distancia; break;
+                case 8: offsetX = distancia;  offsetY = -distancia; break;
+            }
+
+            float x = body.getPosition().x + offsetX;
+            float y = body.getPosition().y + offsetY;
+
+            if (frameImpacto != null) {
+                batch.draw(frameImpacto,
+                    x - frameImpacto.getRegionWidth() / 2f / Constantes.PPM,
+                    y - frameImpacto.getRegionHeight() / 2f / Constantes.PPM,
+                    frameImpacto.getRegionWidth() / Constantes.PPM,
+                    frameImpacto.getRegionHeight() / Constantes.PPM
+                );
+            }
+
+            // Cuando termina la animación, desactívala
+            if (explosion.isAnimationFinished(estadoImpacto)) {
+                mostrarImpacto = false;
+            }
+        }
     }
 
     @Override

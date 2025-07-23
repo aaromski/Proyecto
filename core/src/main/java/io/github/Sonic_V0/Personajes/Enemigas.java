@@ -40,19 +40,6 @@ public abstract class Enemigas extends Personaje {
     public void actualizar(float delta) {
         posicion = body.getPosition();
 
-        if (ko) {
-            body.setLinearVelocity(0, 0);
-            objetivo = null;
-
-            if (KO.isAnimationFinished(stateTime)) {
-                frameActual = KO.getKeyFrame(KO.getAnimationDuration(), false);
-            } else {
-                frameActual = KO.getKeyFrame(stateTime, false);
-                stateTime += delta;
-            }
-            return;
-        }
-
         if (objetivo == null) {
             body.setLinearVelocity(0, 0);
             return;

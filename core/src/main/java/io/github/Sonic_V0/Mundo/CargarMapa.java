@@ -54,7 +54,7 @@ public class CargarMapa {
             font.draw(batch, "X" + Constantes.VIDAS[0], 80, 970);
             font.draw(batch, "X" + Constantes.VIDAS[1], 180, 970);
             font.draw(batch, "X" + Constantes.VIDAS[2], 280, 970);
-            font.draw(batch, "FPS: " + Gdx.graphics.getFramesPerSecond(), 90, 960);
+            font.draw(batch, "FPS: " + Gdx.graphics.getFramesPerSecond(), 900, 960);
             font.draw(batch, String.valueOf(aux) , 1080, 960);
         }
         batch.end();

@@ -30,17 +30,25 @@ public class ManejarContactos implements ContactListener {
             }
         }
 
+
         if ((ua instanceof Amigas && ub instanceof Enemigas) ||
             (ua instanceof Enemigas && ub instanceof Amigas)) {
 
-            Amigas personaje = (Amigas) (ua instanceof Amigas ? ua : ub);
+            Amigas personaje = (ua instanceof Amigas) ? (Amigas) ua : (Amigas) ub;
+            Enemigas enemigo = (ua instanceof Enemigas) ? (Enemigas) ua : (Enemigas) ub;
 
-            aplicarDaño(personaje);
+            // Obtener el fixture principal del enemigo
+            Fixture fixtureEnemigo = enemigo.getCuerpo().getFixtureList().first();
+            Filter filtro = fixtureEnemigo.getFilterData();
+
+            // Verificar si todavía está activo
+            if (filtro.categoryBits == Constantes.CATEGORY_ROBOT) {
+                aplicarDaño(personaje);
+            }
         }
 
         if ("Objeto".equals(fa.getUserData()) && ub instanceof Nube
             || "Objeto".equals(fb.getUserData()) && ua instanceof Nube) {
-            System.out.println("PAso por aqui");
             Nube nube = (ub instanceof Nube) ? (Nube) ub : (Nube) ua;
             nube.setActiva(4);
         }
@@ -62,6 +70,7 @@ public class ManejarContactos implements ContactListener {
             Robot robotAfectado = (Robot) (ua instanceof Robot ? ua : ub);
             if (!robotAfectado.getKO()) { // Si el robot no está ya KO, lo ponemos en KO
                 robotAfectado.setKO(); // Llama al método setKO del robot
+                Constantes.SCORE[1] += 10;
             }
         }
     }

@@ -6,12 +6,17 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
 
 public abstract class Amigas extends Personaje {
-    protected  boolean izq = false,  der = false, arr = false, abj = false;
+    protected  boolean izq = false,  der = false, arr = false, abj = false, hab = false, presionando = false;
     protected Animation<TextureRegion> abajo;
     protected Animation<TextureRegion> arriba;
     protected Animation<TextureRegion> diagonalarr;
     protected Animation<TextureRegion> diagonalabj;
+    protected Animation<TextureRegion> habilidad;
     protected boolean TLT = false;
+    protected float tiempoRestante = 5f; // comienza cargada
+    protected boolean usandoHabilidad = false;
+    protected boolean puedeUsarHabilidad = true;
+    protected final float MAX_TIEMPO = 30f;
 
     public Amigas(Vector2 p, World w) {
         super(p,w);
@@ -23,14 +28,24 @@ public abstract class Amigas extends Personaje {
         boolean diagonalAbajo = abj && (izq || der);
 
         // solo sumar stateTime si se anima
-        if (diagonalArriba || diagonalAbajo || izq || der || abj || arr) {
+        if (diagonalArriba || diagonalAbajo || izq || der || abj || arr || hab) {
             stateTime += delta;
         } else {
             stateTime = 0;
         }
 
-        // Lógica de animaciones
-        if (diagonalArriba) {
+        if (hab && presionando) {
+            frameActual = habilidad.getKeyFrame(stateTime, true);
+
+            // Flip según dirección
+            if (der && frameActual.isFlipX()) {
+                frameActual.flip(true, false); // mirar hacia la derecha
+            } else if (izq && !frameActual.isFlipX()) {
+                frameActual.flip(true, false); // mirar hacia la izquierda
+            }
+
+            // Lógica de animaciones
+        } else if (diagonalArriba) {
             frameActual = diagonalarr.getKeyFrame(stateTime, true);
             if (this instanceof Sonic) {
                 if (der && !frameActual.isFlipX()) frameActual.flip(true, false); // invertir para mirar derecha
