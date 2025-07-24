@@ -3,14 +3,14 @@ package io.github.Sonic_V0.Personajes;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch; // Añadido para dibujarIman
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
 import io.github.Sonic_V0.Constantes;
-import com.badlogic.gdx.utils.Array; // Necesario para TextureAtlas
+import com.badlogic.gdx.utils.Array;
 
 public class Tails extends Amigas {
     private boolean isFlying = false;
@@ -23,16 +23,16 @@ public class Tails extends Amigas {
     private boolean puedeRecoger = true;
     private float tiempoRecoger = 0f;
 
-    // --- Variables del Imán ---
     private boolean imanActivo = false;
-    protected TextureRegion imanSprite; // Se usa para el frame actual, si es necesario antes de la animación
+    // float radioAtraccionIman = 3f; // Esta variable no se usa en los cambios visuales, pero se mantiene si es parte de otra funcionalidad.
+    protected TextureRegion imanSprite;
     private TextureAtlas imanAtlas;
     private Animation<TextureRegion> imanAnimation;
     private long lastImanPressTime = 0;
     private static final long DOUBLE_PRESS_IMAN_TIME = 200;
+
     private float imanOrbitAngle = 0f;
-    private float imanOrbitRadius = 0.5f;
-    // --- Fin Variables del Imán ---
+    private float imanOrbitRadius = 1f;
 
     private Animation<TextureRegion> volar;
     private Animation<TextureRegion> vueloarriba;
@@ -50,7 +50,7 @@ public class Tails extends Amigas {
     void inicializarAnimaciones(float x, float y) {
         atlas = new TextureAtlas(Gdx.files.internal("SpriteTails/Tails.atlas"));
         sprite = atlas.createSprite("TailsSprite0");
-        sprite.setSize(30 / Constantes.PPM, 39f / Constantes.PPM); // Usar Constantes.PPM aquí
+        sprite.setSize(30 / Constantes.PPM, 39f / Constantes.PPM);
         sprite.setPosition(
             x - sprite.getWidth() / 2f,
             y - sprite.getHeight() / 2f
@@ -68,7 +68,6 @@ public class Tails extends Amigas {
 
         recoger = crearAnimacion("recoger", 4, 0.1f);
 
-        // --- Carga del Atlas del Imán ---
         try {
             imanAtlas = new TextureAtlas(Gdx.files.internal("SpriteTails/iman.atlas"));
             Array<TextureRegion> imanFrames = new Array<>();
@@ -94,7 +93,6 @@ public class Tails extends Amigas {
             imanAnimation = null;
             imanSprite = null;
         }
-        // --- Fin Carga del Atlas del Imán ---
 
         frameActual = new TextureRegion();
     }
@@ -130,7 +128,6 @@ public class Tails extends Amigas {
         boolean presionando = false;
         stateTime += delta;
 
-        // --- Lógica de Actualización del Imán ---
         if (imanActivo) {
             imanOrbitAngle = (imanOrbitAngle + (200f * delta)) % 360f;
         } else {
@@ -145,10 +142,10 @@ public class Tails extends Amigas {
             }
             lastImanPressTime = currentTime;
         }
-        // --- Fin Lógica de Actualización del Imán ---
 
+        // --- La lógica de QueryAABB para atracción de robots KO va aquí si está activa
+        // --- (la hemos quitado por tu solicitud de solo cambios visuales por ahora)
 
-        // LÓGICA DE VUELO
         if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
             long currentTime = System.currentTimeMillis();
             if (currentTime - lastUpPressTime <= DOUBLE_PRESS_TIME) {
@@ -194,14 +191,11 @@ public class Tails extends Amigas {
             }
         }
 
-        // Detectar barra espaciadora para recoger (solo en modo terrestre)
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE) && !isFlying) {
             puedeRecoger = false;
             objetosRecogidos++;
         }
 
-
-        // MOVIMIENTO TERRESTRE
         if (!isFlying) {
             float velX = 0, velY = 0;
             boolean movingHorizontally = false;
@@ -220,7 +214,7 @@ public class Tails extends Amigas {
             if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
                 velX = -velocidad.x;
                 izq = true;
-                movingHorizontally = true; // Corregido: antes era 'horizontally'
+                movingHorizontally = true;
             }
             if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
                 velX = velocidad.x;
@@ -276,7 +270,6 @@ public class Tails extends Amigas {
         );
     }
 
-    // --- Método para dibujar el imán ---
     public void dibujarIman(SpriteBatch batch) {
         if (imanActivo && imanAnimation != null) {
             TextureRegion currentImanFrame = imanAnimation.getKeyFrame(stateTime, true);
@@ -295,7 +288,13 @@ public class Tails extends Amigas {
             float drawX = tailsCenterX + orbitOffsetX - (imanWidth / 2f);
             float drawY = tailsCenterY + orbitOffsetY - (imanHeight / 2f);
 
-            float rotationAngle = 0f;
+            // ---Ajusta la rotación del sprite del imán ---
+
+            float rotationOffset = 0f; // Ajusta este valor si tu sprite de imán no apunta "a la derecha" a 0 grados.
+            // Por ejemplo, si tu imán apunta hacia arriba en el sprite, usa -90f.
+            // Si apunta a la izquierda, usa 180f.
+            float rotationAngle = imanOrbitAngle + rotationOffset;
+            // --- FIN CAMBIO ---
 
             float originX = imanWidth / 2f;
             float originY = imanHeight / 2f;
@@ -312,15 +311,12 @@ public class Tails extends Amigas {
                 rotationAngle);
         }
     }
-    // --- Fin Método para dibujar el imán ---
 
     @Override
     public void dispose() {
         atlas.dispose();
-        // --- Disponer el atlas del imán ---
         if (imanAtlas != null) {
             imanAtlas.dispose();
         }
-        // --- Fin Disponer el atlas del imán ---
     }
 }
