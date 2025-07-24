@@ -24,8 +24,8 @@ public class Mundo {
     public Mundo() {
         world = new World(new Vector2(0, 0), true);
         knuckles = new Knuckles(new Vector2(22f, 22f), world);
-        sonic = new Sonic(new Vector2(25f, 22f), world); //270-150
-        tails = new Tails(new Vector2(20f, 22f), world); //270-150
+        sonic = new Sonic(new Vector2(25f, 22f), world);
+        tails = new Tails(new Vector2(20f, 22f), world);
         etapa = new Etapa(this, sonic, tails, knuckles);
         etapa2 = new Etapa2(this, sonic, tails, knuckles ,etapa);
         listaBasura = new ArrayList<>();
@@ -33,7 +33,6 @@ public class Mundo {
         listaCharcos = new ArrayList<>();
         map = new CargarMapa("Mapa1/mapa.tmx", world);
 
-        // Configurar el ContactListener aquí mismo
         world.setContactListener(new ManejarContactos());
     }
 
@@ -84,19 +83,15 @@ public class Mundo {
         knuckles.actualizar(delta);
         tails.teletransportar();
         tails.actualizar(delta);
-        etapa.actualizar(delta); // <-- Actualiza todos los robots generados
+        etapa.actualizar(delta);
         etapa2.actualizar(delta);
     }
-
-    //Ataques de Robots
 
     public void generarBasura(Vector2 posicion) {
         Basura basura = new Basura(world);
         basura.crearCuerpo(posicion);
         listaBasura.add(basura);
     }
-
-    //Ataques de Robotnik :)
 
     public void generarCharco(Vector2 posicion) {
         CharcoAceite charco = new CharcoAceite(world);
@@ -132,10 +127,13 @@ public class Mundo {
             knuckles.render(batch);
         }
         if (sonic.getCuerpo() != null) {
-           sonic.render(batch);
+            sonic.render(batch);
         }
         if(!tails.getKO()) {
             tails.render(batch);
+            // --- Llamada para dibujar el imán de Tails ---
+            tails.dibujarIman(batch);
+            // --- Fin de la llamada ---
         }
         etapa.renderizar(batch);
         etapa2.renderizar(batch);
@@ -154,8 +152,8 @@ public class Mundo {
         for (Basura b : listaBasura) {
             b.dispose();
         }
-        map.dispose();      // ← Libera el mapa
-        world.dispose();    // ← Libera el mundo Box2D
+        map.dispose();
+        world.dispose();
         sonic.dispose();
         knuckles.dispose();
         tails.dispose();
