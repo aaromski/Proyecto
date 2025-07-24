@@ -5,26 +5,26 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.Array;
 
-
 public abstract class Personaje {
-    protected Vector2 velocidad;  //200
+    protected Vector2 velocidad;
     protected float stateTime = 0f;
     protected TextureRegion frameActual;
     protected Sprite sprite;
     protected Animation<TextureRegion> correr;
     protected Body body;
-    public static final float PPM = 32f; // Pixels Per Meter
+    public static final float PPM = 32f;
     protected TextureAtlas atlas;
     protected Vector2 posicion;
     protected String name;
     protected boolean ko = false;
+    protected final World world; // <-- ¡NUEVO! Se guarda la referencia al mundo
 
     public Personaje (Vector2 posicion, World w) {
+        this.world = w; // <-- ¡NUEVO! Asignamos el mundo al campo de la clase
         crearCuerpo(posicion, w);
         this.posicion = body.getPosition();
         velocidad = new Vector2(3f, 3f);
     }
-
 
     abstract void inicializarAnimaciones(float x, float y);
     abstract void actualizar(float delta);
@@ -37,21 +37,21 @@ public abstract class Personaje {
         return new Animation<>(duracion, frames);
     }
 
-     public void render(SpriteBatch batch) {
-        // Si estás usando solo TextureRegion:
-         if (frameActual != null && body != null) {
-             batch.draw(
-                 frameActual,
-                 posicion.x - sprite.getWidth() / 2f,
-                 posicion.y - sprite.getHeight() / 2f,
-                 sprite.getWidth(),
-                 sprite.getHeight()
-             );
-         }
+    public void render(SpriteBatch batch) {
+        if (frameActual != null && body != null) {
+            batch.draw(
+                frameActual,
+                posicion.x - sprite.getWidth() / 2f,
+                posicion.y - sprite.getHeight() / 2f,
+                sprite.getWidth(),
+                sprite.getHeight()
+            );
+        }
     }
 
     abstract void configurarFiltro(FixtureDef fdef);
 
+    // Nota: Este método también recibe 'world' como parámetro, pero ahora 'this.world' también está disponible.
     public void crearCuerpo(Vector2 posicion, World world) {
         BodyDef bd = new BodyDef();
         bd.position.set(posicion);
@@ -63,17 +63,16 @@ public abstract class Personaje {
         FixtureDef fixDef = new FixtureDef();
         fixDef.shape = circle;
 
-        body = world.createBody(bd);
+        body = world.createBody(bd); // Usamos el 'world' que se pasa como parámetro aquí
 
         body.setUserData(this);
 
-        body.setLinearDamping(5f); // Esto reduce el deslizamiento horizontal
+        body.setLinearDamping(5f);
 
-        configurarFiltro(fixDef); // sigue pasando como argumento
+        configurarFiltro(fixDef);
 
         body.createFixture(fixDef).setUserData(this);
         circle.dispose();
-
     }
 
     public Body getCuerpo() {return body;}
@@ -81,10 +80,16 @@ public abstract class Personaje {
     public boolean getKO() {return ko;}
 
     public void setKO() {ko = !ko;
-    stateTime = 0f;
+        stateTime = 0f;
     }
 
+    // Método destruir para personajes. No necesita parámetro porque 'this.world' ya está disponible.
+    public void destruir() {
+        if (ko && body != null) {
+            this.world.destroyBody(body); // Usa el 'this.world' almacenado
+            body = null;
+        }
+    }
 
     public abstract void dispose();
 }
-

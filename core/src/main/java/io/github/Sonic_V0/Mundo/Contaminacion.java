@@ -14,7 +14,6 @@ public abstract class Contaminacion {
 
     public Contaminacion(World world) {
         this.world = world;
-
     }
 
     public void crearCuerpo(Vector2 posicion) {
@@ -37,14 +36,13 @@ public abstract class Contaminacion {
 
         cuerpo = world.createBody(bdef);
 
-        configurarFiltro(fdef); // sigue pasando como argumento
+        configurarFiltro(fdef);
 
         cuerpo.createFixture(fdef).setUserData(this);
         shape.dispose();
     }
 
     abstract void configurarFiltro(FixtureDef fdef);
-
 
     public void render(SpriteBatch batch) {
         if (!activa) return;
@@ -58,10 +56,14 @@ public abstract class Contaminacion {
         textura.draw(batch);
     }
 
-    public void destruir(World world) {
-        if (!activa) {
-            world.destroyBody(cuerpo);
+    // <-- ¡MODIFICADO! Ya no recibe el parámetro 'World'.
+    // Utiliza 'this.world' (el campo de la clase).
+    public void destruir() {
+        // Solo destruye el cuerpo si está activo y el cuerpo no es nulo
+        if (cuerpo != null && activa) {
+            this.world.destroyBody(cuerpo); // Usa 'this.world'
             cuerpo = null;
+            activa = false; // Asegura que se desactiva después de destruir el cuerpo
         }
     }
 
@@ -70,7 +72,7 @@ public abstract class Contaminacion {
     }
 
     public void setActiva (int op) {
-        if (activa) {
+        if (activa) { // Solo si está activo puede sumar puntos y desactivarse
             switch (op) {
                 case 1:
                     Constantes.SCORE[0] += 5;
@@ -83,8 +85,8 @@ public abstract class Contaminacion {
                     break;
                 default: break;
             }
+            activa = false; // Desactiva la contaminación
         }
-        activa = false;
     }
 
     public Body getCuerpo() {
@@ -95,5 +97,10 @@ public abstract class Contaminacion {
         if (textura != null && textura.getTexture() != null) {
             textura.getTexture().dispose();
         }
+        // Nota: El cuerpo se destruye en el método destruir(), no aquí.
+        // Si necesitas asegurarte de que el cuerpo se destruya si dispose() es llamado
+        // sin que destruir() haya sido llamado, podrías añadir:
+        // if (cuerpo != null) { world.destroyBody(cuerpo); cuerpo = null; }
+        // Pero idealmente, llamar a destruir() antes de dispose() es lo correcto.
     }
 }

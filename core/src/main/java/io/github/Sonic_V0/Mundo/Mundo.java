@@ -24,8 +24,8 @@ public class Mundo {
     public Mundo() {
         world = new World(new Vector2(0, 0), true);
         knuckles = new Knuckles(new Vector2(22f, 22f), world);
-        sonic = new Sonic(new Vector2(25f, 22f), world); //270-150
-        tails = new Tails(new Vector2(20f, 22f), world); //270-150
+        sonic = new Sonic(new Vector2(25f, 22f), world);
+        tails = new Tails(new Vector2(20f, 22f), world);
         etapa = new Etapa(this, sonic, tails, knuckles);
         etapa2 = new Etapa2(this, sonic, tails, knuckles ,etapa);
         listaBasura = new ArrayList<>();
@@ -33,7 +33,6 @@ public class Mundo {
         listaCharcos = new ArrayList<>();
         map = new CargarMapa("Mapa1/mapa.tmx", world);
 
-        // Configurar el ContactListener aquí mismo
         world.setContactListener(new ManejarContactos());
     }
 
@@ -41,28 +40,28 @@ public class Mundo {
         world.step(delta, 8, 6);
         listaBasura.removeIf(b -> {
             if (!b.estaActiva()) {
-                b.destruir(world);
+                b.destruir(); // <-- ¡MODIFICADO! Sin parámetro
                 b.dispose();
                 return true;
             }
             return false;
         });
         if(sonic.getKO()) {
-            sonic.destruir(world);
+            sonic.destruir(); // <-- ¡MODIFICADO! Sin parámetro
             sonic.dispose();
         }
         if(knuckles.getKO()) {
-            knuckles.destruir(world);
+            knuckles.destruir(); // <-- ¡MODIFICADO! Sin parámetro
             knuckles.dispose();
         }
         if(tails.getKO()) {
-            tails.destruir(world);
+            tails.destruir(); // <-- ¡MODIFICADO! Sin parámetro
             tails.dispose();
         }
 
         listaNube.removeIf(n -> {
             if (!n.estaActiva()) {
-                n.destruir(world);
+                n.destruir(); // <-- ¡MODIFICADO! Sin parámetro
                 n.dispose();
                 return true;
             }
@@ -71,7 +70,7 @@ public class Mundo {
 
         listaCharcos.removeIf(c -> {
             if (!c.estaActiva()) {
-                c.destruir(world);
+                c.destruir(); // <-- ¡MODIFICADO! Sin parámetro
                 c.dispose();
                 return true;
             }
@@ -84,19 +83,15 @@ public class Mundo {
         knuckles.actualizar(delta);
         tails.teletransportar();
         tails.actualizar(delta);
-        etapa.actualizar(delta); // <-- Actualiza todos los robots generados
+        etapa.actualizar(delta);
         etapa2.actualizar(delta);
     }
-
-    //Ataques de Robots
 
     public void generarBasura(Vector2 posicion) {
         Basura basura = new Basura(world);
         basura.crearCuerpo(posicion);
         listaBasura.add(basura);
     }
-
-    //Ataques de Robotnik :)
 
     public void generarCharco(Vector2 posicion) {
         CharcoAceite charco = new CharcoAceite(world);
@@ -132,10 +127,11 @@ public class Mundo {
             knuckles.render(batch);
         }
         if (sonic.getCuerpo() != null) {
-           sonic.render(batch);
+            sonic.render(batch);
         }
         if(!tails.getKO()) {
             tails.render(batch);
+            tails.dibujarIman(batch);
         }
         etapa.renderizar(batch);
         etapa2.renderizar(batch);
@@ -154,14 +150,13 @@ public class Mundo {
         for (Basura b : listaBasura) {
             b.dispose();
         }
-        map.dispose();      // ← Libera el mapa
-        world.dispose();    // ← Libera el mundo Box2D
+        map.dispose();
+        world.dispose();
         sonic.dispose();
         knuckles.dispose();
         tails.dispose();
         etapa.dispose();
     }
-
 
     public World getWorld() {
         return world;

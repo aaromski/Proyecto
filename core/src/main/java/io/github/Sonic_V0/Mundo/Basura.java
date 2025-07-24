@@ -10,7 +10,7 @@ import io.github.Sonic_V0.Constantes;
 public class Basura extends Contaminacion {
 
     public Basura(World world) {
-        super(world);
+        super(world); // Pasa el world al constructor de Contaminacion
         textura = new Sprite(new Texture("Mapa1/trash.png"));
         textura.setSize(0.8f, 0.8f);
     }
@@ -24,5 +24,4 @@ public class Basura extends Contaminacion {
         fdef.filter.categoryBits = Constantes.CATEGORY_TRASH;
         fdef.filter.maskBits = ~(Constantes.CATEGORY_ROBOT);
     }
-
 }

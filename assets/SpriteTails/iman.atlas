@@ -1,0 +1,14 @@
+iman.png
+size: 27, 95
+format: RGBA8888
+filter: Linear, Linear
+repeat: none
+pma: false
+iman1
+  bounds: 1, 1, 25, 22
+iman2
+  bounds: 1, 25, 25, 22
+iman3
+  bounds: 1, 73, 25, 21
+iman4
+  bounds: 1, 49, 25, 22

@@ -85,9 +85,10 @@ public class PantallaAyuda extends BaseMenu {
                     "- ABAJO:           S             K               flecha abajo\n" +
                     "- IZQUIERDA:    A             J               f. izquierda\n" +
                     "- DERECHA:     D             L               f. derecha\n" +
-                    "- GOLPE:          F             P               NUMPAD_0\n" +
-                    "- PODER:\n" +
-                    "-                                                   VOLAR: F.ARRIBA (DOS VECES)\n" +
+                    "- GOLPE:          F             P               \n" +
+                    "- PODERES:\n" +
+                    "-                                             VOLAR: F.ARRIBA (DOS VECES)\n" +
+                    "-                                             IMAN: M (DOS VECES ACTIVA/DES)\n" +
                     "- ESC: Pausar\n\n" +
 
                     "Reglas:\n" +
