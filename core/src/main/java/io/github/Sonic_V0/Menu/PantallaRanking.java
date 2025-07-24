@@ -11,6 +11,7 @@ import io.github.Sonic_V0.Main;
 
 public class PantallaRanking extends BaseMenu {
     private final Fondo fondo;
+
     public PantallaRanking(Main game) {
         super(game);
         fondo = new Fondo();
@@ -21,20 +22,21 @@ public class PantallaRanking extends BaseMenu {
     }
 
     private boolean dibujarBotonConTexto(SpriteBatch batch, BitmapFont font, GlyphLayout layout,
-                                         Texture botonTex) {
-        batch.draw(botonTex, (float) 100, (float) 100, botonW, botonH);
+                                         Texture botonTex, String texto,
+                                         float x, float y, float width, float height) {
+        batch.draw(botonTex, x, y, width, height);
         font.setColor(1, 1, 1, 1);
-        layout.setText(font, "VOLVER");
-        float textoX = (float) 100 + (float) 200 / 2f - layout.width / 2f;
-        float textoY = (float) 100 + (float) 60 / 2f + layout.height / 2f;
-        font.draw(batch, "VOLVER", textoX, textoY);
+        layout.setText(font, texto);
+        float textoX = x + width / 2f - layout.width / 2f;
+        float textoY = y + height / 2f + layout.height / 2f;
+        font.draw(batch, texto, textoX, textoY);
 
         int mx = Gdx.input.getX();
         int my = Gdx.graphics.getHeight() - Gdx.input.getY();
 
         return Gdx.input.justTouched()
-            && mx >= (float) 100 && mx <= (float) 100 + (float) 200
-            && my >= (float) 100 && my <= (float) 100 + (float) 60;
+            && mx >= x && mx <= x + width
+            && my >= y && my <= y + height;
     }
 
     @Override
@@ -46,18 +48,28 @@ public class PantallaRanking extends BaseMenu {
 
         batch.begin();
 
-
         fondo.dibujar(batch, screenW, screenH);
 
-        // Texto ranking
-        font.setColor(1, 1, 1, 1); // Texto negro
+        // Título
+        font.setColor(1, 1, 0, 1); // Amarillo
         font.draw(batch, "RANKING DE JUGADORES", 100, 450);
-        font.draw(batch, "1. SonicMaster   - " + Constantes.SCORE[0] + " pts", 100, 390);
-        font.draw(batch, "2. ShadowPlayer  - 1200 pts", 100, 360);
-        font.draw(batch, "3. AmyRocker     - 900 pts", 100, 330);
 
-        // Botón VOLVER
-        boolean clicVolver = dibujarBotonConTexto(batch, font, layout, boton);
+        // Puntajes individuales
+        font.setColor(0, 0, 1, 1); // Azul
+        font.draw(batch, "1. Sonic      - " + Constantes.SCORE[0] + " pts", 100, 390);
+        font.draw(batch, "2. Knuckles   - " + Constantes.SCORE[1] + " pts", 100, 360);
+        font.draw(batch, "3. Tails      - " + Constantes.SCORE[2] + " pts", 100, 330);
+
+        // Total
+        int total = Constantes.SCORE[0] + Constantes.SCORE[1] + Constantes.SCORE[2];
+        font.setColor(1, 0.5f, 0, 1); // Naranja
+        font.draw(batch, "TOTAL: " + total + " pts", 100, 290);
+
+        // Botón VOLVER centrado
+        float botonVolverX = (Gdx.graphics.getWidth() - botonW) / 2f;
+        float botonVolverY = 100;
+        boolean clicVolver = dibujarBotonConTexto(batch, font, layout, boton, "VOLVER",
+            botonVolverX, botonVolverY, botonW, botonH);
 
         batch.end();
 

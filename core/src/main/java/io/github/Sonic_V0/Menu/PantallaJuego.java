@@ -39,6 +39,13 @@ public class PantallaJuego extends BaseMenu {
             mundo.actualizar(delta);
         }
 
+        // Verificar condición de fin de juego
+        if (Constantes.VIDAS[0] <= 0 && Constantes.VIDAS[1] <= 0 && Constantes.VIDAS[2] <= 0) {
+            game.setScreen(new PantallaFin(game));
+            dispose();
+            return;
+        }
+
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         camara.getCamara().update();
@@ -129,10 +136,7 @@ public class PantallaJuego extends BaseMenu {
 
     @Override
     public void dispose() {
-        batch.dispose();
         shape.dispose();
-        font.dispose();
-        boton.dispose();
         mundo.dispose();
     }
 }

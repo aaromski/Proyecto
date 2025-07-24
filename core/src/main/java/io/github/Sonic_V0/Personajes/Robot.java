@@ -1,6 +1,7 @@
 package io.github.Sonic_V0.Personajes;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 //import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -8,6 +9,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import io.github.Sonic_V0.Constantes;
 import io.github.Sonic_V0.Mundo.Mundo;
+
+import java.util.List;
 
 public class Robot extends Enemigas {
     private float tiempoBasura;
@@ -44,6 +47,31 @@ public class Robot extends Enemigas {
         }
     }
 
+    public void seleccionarObjetivoMasCercano(List<Amigas> posibles) {
+        if (posibles == null || posibles.isEmpty()) return;
+
+
+        if (posibles.size() == 1) {
+            setObjetivo(posibles.get(0).getCuerpo());
+            return;
+        }
+
+        Amigas masCercano = null;
+        float distanciaMin = Float.MAX_VALUE;
+
+        for (Amigas objetivo : posibles) {
+            float distancia = objetivo.getCuerpo().getPosition().dst2(body.getPosition());
+            if (distancia < distanciaMin) {
+                distanciaMin = distancia;
+                masCercano = objetivo;
+            }
+        }
+
+        if (masCercano != null) {
+            setObjetivo(masCercano.getCuerpo());
+        }
+    }
+
     @Override
     public void setKO() {
         if (!ko) {
@@ -77,8 +105,11 @@ public class Robot extends Enemigas {
     public void reactivacion() {
         if (ko) {
             ko = false;
+            tiempoEnChatarra = 0f;
         }
     }
+
+
 
     public boolean estaListoParaEliminar() {
         return destruido && tiempoEnChatarra >= DURACION_CHATARRA;
@@ -101,8 +132,7 @@ public class Robot extends Enemigas {
 
             if (tiempoEnChatarra >= DURACION_CHATARRA) {
                 if (!destruido) {
-                    ko = false;
-                    tiempoEnChatarra = 0f;
+                    reactivacion();
                 }
             }
             return;
@@ -118,7 +148,7 @@ public class Robot extends Enemigas {
     }
 
     @Override
-    public void render(com.badlogic.gdx.graphics.g2d.SpriteBatch batch) {
+    public void render(SpriteBatch batch) {
         if (ko) {
             if (KO != null && !KO.isAnimationFinished(stateTime)) {
                 batch.draw(KO.getKeyFrame(stateTime), sprite.getX(), sprite.getY(), sprite.getWidth(), sprite.getHeight());

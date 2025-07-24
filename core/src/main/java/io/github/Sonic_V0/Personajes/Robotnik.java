@@ -20,6 +20,10 @@ public class Robotnik extends Enemigas {
     private float habilidadTimer = 0;
     private int nubeCounter = 0;
 
+    private float activoTimer = 0;
+    private final float MAX_ACTIVO_TIME = 30f;
+    private boolean listoDespawn = false;
+
     public Robotnik(Body objetivo, Mundo world, Etapa2 etapa, Etapa etapa1, Vector2 posicion) {
         super(posicion, world.getWorld());
         this.etapa1 = etapa1;
@@ -59,7 +63,7 @@ public class Robotnik extends Enemigas {
             destruido = true;
             stateTime = 0f;
             body.setLinearVelocity(0, 0);
-            body.getWorld().destroyBody(body);
+            listoDespawn = true;
         }
     }
 
@@ -67,21 +71,28 @@ public class Robotnik extends Enemigas {
     public void actualizar(float delta) {
         super.actualizar(delta);
 
-        habilidadTimer += delta;
-        if (habilidadTimer >= 1.5f) {
-            lanzarNube();
-            habilidadTimer = 0;
+        activoTimer += delta;
+
+        if (activoTimer >= MAX_ACTIVO_TIME) {
+            destruir();
+        } else {
+            habilidadTimer += delta;
+            if (habilidadTimer >= 1.5f) {
+                lanzarNube();
+                habilidadTimer = 0;
+            }
         }
     }
 
     private void lanzarNube() {
-        Vector2 direccion = objetivo.getPosition().cpy().sub(body.getPosition()).nor();
-        world.generarNube(body.getPosition().cpy(), direccion);
-        nubeCounter++;
+        if (!listoDespawn && objetivo!=null) {
+            Vector2 direccion = objetivo.getPosition().cpy().sub(body.getPosition()).nor();
+            world.generarNube(body.getPosition().cpy(), direccion);
+            nubeCounter++;
 
-        if (nubeCounter >= 5) {
-            cambiarFase();
-
+            if (nubeCounter >= 5) {
+                cambiarFase();
+            }
         }
     }
 
@@ -102,6 +113,9 @@ public class Robotnik extends Enemigas {
         habilidadTimer = 0;
     }
 
+    public boolean isListoDespawn() {
+        return listoDespawn;
+    }
 
     @Override
     public void dispose() {

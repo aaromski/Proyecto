@@ -16,7 +16,6 @@ public class Etapa {
     private final List<Robot> robots = new ArrayList<>();
     private final List<Vector2> puntosEntrada = new ArrayList<>();
     private float timer = 0f;
-    private float timer2 = 0f;
     private final Random random = new Random();
     private final Tails tails;
 
@@ -36,23 +35,17 @@ public class Etapa {
     public void actualizar(float delta) {
         timer += delta;
         float intervalo = 8f;
-        timer2 += delta;
-        float intervalo2 = 10f;
         if (timer >= intervalo) {
             timer = 0f;
             generarRobot();
         }
 
-        if (timer2 >= intervalo2) {
-            timer2 = 0f;
-            Robot primerRobot = robots.get(0);
-            primerRobot.setKO();
-
-        }
-
         for (Robot r : robots) {
             if(r.sinObjetivo()) {
-                r.setObjetivo(objetivoDisponible());
+                r.seleccionarObjetivoMasCercano(obtenerObjetivosVivos());
+                System.out.println("PAso por aqui");
+            } else if (!r.getKO()) {
+                r.seleccionarObjetivoMasCercano(obtenerObjetivosVivos());
             }
             r.actualizar(delta);
         }
@@ -85,6 +78,14 @@ public class Etapa {
 
         Amigas elegido = posibles.get(random.nextInt(posibles.size()));
         return elegido.getCuerpo();
+    }
+
+    public List<Amigas> obtenerObjetivosVivos() {
+        List<Amigas> activos = new ArrayList<>();
+        if (!sonic.getKO()) activos.add(sonic);
+        if (!tails.getKO()) activos.add(tails);
+        if (!knuckles.getKO()) activos.add(knuckles);
+        return activos;
     }
 
     public void dispose() {

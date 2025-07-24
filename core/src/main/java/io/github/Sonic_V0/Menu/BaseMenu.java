@@ -33,4 +33,11 @@ public abstract class BaseMenu implements Screen {
         screenW = width;
         screenH = height;
     }
+
+    @Override
+    public void dispose() {
+        batch.dispose();
+        font.dispose();
+        boton.dispose();
+    }
 }

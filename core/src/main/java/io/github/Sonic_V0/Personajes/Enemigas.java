@@ -14,7 +14,7 @@ public abstract class Enemigas extends Personaje {
     private float tiempoAtascado = 0f;
     private Vector2 direccionRodeo = null;
     private float tiempoRodeando = 0f;
-    private final float DURACION_RODEO = 1.5f;
+    private final float DURACION_RODEO = 1f;
 
     public Enemigas(Vector2 p, World w) {
         super(p,w);

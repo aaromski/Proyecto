@@ -78,7 +78,6 @@ public class Sonic extends Amigas {
                 hab = true;
                 usandoHabilidad = true;
                 tiempoRestante -= delta;
-                System.out.println(tiempoRestante);
                 if (tiempoRestante <= 0f) {
                     puedeUsarHabilidad = false;
                     usandoHabilidad = false;

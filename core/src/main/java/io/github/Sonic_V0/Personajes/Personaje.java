@@ -47,8 +47,6 @@ public abstract class Personaje {
                  sprite.getWidth(),
                  sprite.getHeight()
              );
-         } else {
-             System.out.println("⚠️ Textura nula en: " + this.name);
          }
     }
 

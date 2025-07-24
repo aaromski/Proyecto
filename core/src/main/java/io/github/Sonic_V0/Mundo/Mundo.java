@@ -27,7 +27,7 @@ public class Mundo {
         sonic = new Sonic(new Vector2(25f, 22f), world); //270-150
         tails = new Tails(new Vector2(20f, 22f), world); //270-150
         etapa = new Etapa(this, sonic, tails, knuckles);
-        etapa2 = new Etapa2(this, sonic, etapa);
+        etapa2 = new Etapa2(this, sonic, tails, knuckles ,etapa);
         listaBasura = new ArrayList<>();
         listaNube = new ArrayList<>();
         listaCharcos = new ArrayList<>();
@@ -144,45 +144,6 @@ public class Mundo {
                 n.render(batch);
             }
         }
-    }
-
-    public void limpiarArea(Vector2 posicionAtaque) {
-        float radioAtaque = 1.3f;
-
-        for (Basura basura : listaBasura) {
-            if (basura.estaActiva()) {
-                float distancia = basura.getCuerpo().getPosition().dst(posicionAtaque);
-                if (distancia < radioAtaque) {
-                    basura.setActiva(1);
-                }
-            }
-        }
-
-        for (CharcoAceite charco : listaCharcos) {
-            if (charco.estaActiva()) {
-                float distancia = charco.getCuerpo().getPosition().dst(posicionAtaque);
-                if (distancia < radioAtaque) {
-                    charco.setActiva(1);
-                }
-            }
-        }
-
-        for (Enemigas enemigo : etapa2.getEnemigos()) {
-            if (enemigo instanceof Robot) {
-                float distancia = enemigo.getCuerpo().getPosition().dst(posicionAtaque);
-                if (distancia < radioAtaque) {
-                    enemigo.destruir();
-                }
-            }
-        }
-
-        for (Robot robot : etapa2.getRobots()) {
-            float distancia = robot.getCuerpo().getPosition().dst(posicionAtaque);
-            if (distancia < radioAtaque) {
-                robot.destruir();
-            }
-        }
-
     }
 
     public void renderizarMapa(OrthographicCamera camara) {

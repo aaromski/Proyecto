@@ -72,11 +72,11 @@ public class PantallaAyuda extends BaseMenu {
             font.draw(batch, "ACERCA DE", botonAcercaX + botonPestanaW / 2f - layout.width / 2f, botonAcercaY + botonPestanaH / 2f + layout.height / 2f);
         }
 
-        font.setColor(1, 1, 1, 1); // Texto negro normal
+        font.setColor(0, 0, 1, 1); // Texto negro normal
 
         // Mostrar contenido según sección
         if (seccionActual == 0) {
-            font.setColor(0.0f, 0.0f, 1.0f, 1.0f); // Or use Color.BLUE if you have it imported
+            font.setColor(0f, 0f, 1f, 1f); // Or use Color.BLUE if you have it imported
 
             font.draw(batch,
                 "Controles:\n" +
@@ -85,7 +85,7 @@ public class PantallaAyuda extends BaseMenu {
                     "- ABAJO:           S             K               flecha abajo\n" +
                     "- IZQUIERDA:    A             J               f. izquierda\n" +
                     "- DERECHA:     D             L               f. derecha\n" +
-                    "- GOLPE:          G             P               TABULADOR\n" +
+                    "- GOLPE:          F             P               NUMPAD_0\n" +
                     "- PODER:\n" +
                     "-                                                   VOLAR: F.ARRIBA (DOS VECES)\n" +
                     "- ESC: Pausar\n\n" +
@@ -93,10 +93,16 @@ public class PantallaAyuda extends BaseMenu {
                     "Reglas:\n" +
                     "- No dejarse tocar por los robots\n" +
                     "- Limpiar el mundo de chatarra",
-                100, 400);
+                100, 450);
         } else {
             font.draw(batch,
                 "Lenguaje: Java\n" +
+                    "El juego se basa en lo siguiente:\n" +
+                    "- Sonic recoge basura y se mueve rápido\n" +
+                    "- Knuckles destruye los robots enemigos\n" +
+                    "- Tails recoge piezas de los robots destruidos\n" +
+                    "- Cada personaje tiene una tarea distinta\n" +
+                    "- Si tardas mucho, los robots se reactivan\n\n" +
                     "Librerías: LibGDX\n" +
                     "Desarrolladores:\n" +
                     "- Aarom Luces\n" +
@@ -105,14 +111,14 @@ public class PantallaAyuda extends BaseMenu {
                     "- Yoryelis Ocando\n" +
                     "- Miguel Carreño\n\n" +
                     "Versión: 1.0.3",
-                100, 400);
+                100, 460);
         }
 
         // Botón VOLVER
         // Botones
         int botonW = 200;
         int botonH = 60;
-        int botonVolverX = 100;
+        float botonVolverX = (Gdx.graphics.getWidth() - botonW) / 2f;
         int botonVolverY = 100;
         boolean clicVolver = dibujarBotonConTexto(batch, font, layout, boton, "VOLVER", botonVolverX, botonVolverY, botonW, botonH);
 
@@ -132,9 +138,6 @@ public class PantallaAyuda extends BaseMenu {
 
     @Override
     public void dispose() {
-        batch.dispose();
-        font.dispose();
         fondo.dispose();
-        boton.dispose();
     }
 }
