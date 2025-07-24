@@ -17,6 +17,8 @@ public abstract class Amigas extends Personaje {
     protected boolean usandoHabilidad = false;
     protected boolean puedeUsarHabilidad = true;
     protected final float MAX_TIEMPO = 30f;
+    private boolean invulnerable = false;
+    private float tiempoInvulnerable = 0f;
 
     public Amigas(Vector2 p, World w) {
         super(p,w);
@@ -24,6 +26,12 @@ public abstract class Amigas extends Personaje {
 
     protected void actualizar(float delta) {
         this.posicion = body.getPosition(); // actualiza posición
+        if (invulnerable) {
+            tiempoInvulnerable -= delta;
+            if (tiempoInvulnerable <= 0f) {
+                invulnerable = false;
+            }
+        }
         boolean diagonalArriba = arr && (izq || der);
         boolean diagonalAbajo = abj && (izq || der);
 
@@ -93,11 +101,20 @@ public abstract class Amigas extends Personaje {
             }
     }
 
+    public void activarInvulnerabilidad(float duracion) {
+        invulnerable = true;
+        tiempoInvulnerable = duracion;
+    }
+
+    public boolean esInvulnerable() {
+        return invulnerable;
+    }
 
 
     public void teletransportar() {
         if(TLT && body != null) {
             body.setTransform(25, 22, body.getAngle());
+            activarInvulnerabilidad(3f);
             setTLT();
         }
     }

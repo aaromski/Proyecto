@@ -20,6 +20,8 @@ public class ManejarContactos implements ContactListener {
             Amigas personaje = (Amigas) (ua instanceof Amigas ? ua : ub);
             Contaminacion contaminante = (Contaminacion) (ua instanceof Contaminacion ? ua : ub);
 
+            if (personaje.esInvulnerable()) return;
+
             if (contaminante instanceof Nube) {
                 aplicarDaño(personaje);
                 contaminante.setActiva(4);
@@ -40,7 +42,7 @@ public class ManejarContactos implements ContactListener {
             // Obtener el fixture principal del enemigo
             Fixture fixtureEnemigo = enemigo.getCuerpo().getFixtureList().first();
             Filter filtro = fixtureEnemigo.getFilterData();
-
+            if (personaje.esInvulnerable()) return;
             // Verificar si todavía está activo
             if (filtro.categoryBits == Constantes.CATEGORY_ROBOT) {
                 aplicarDaño(personaje);
