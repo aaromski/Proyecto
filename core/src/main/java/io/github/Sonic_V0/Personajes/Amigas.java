@@ -13,21 +13,21 @@ public abstract class Amigas extends Personaje {
     protected Animation<TextureRegion> diagonalabj;
     protected Animation<TextureRegion> habilidad;
     protected boolean TLT = false;
-    protected float tiempoRestante = 5f; // comienza cargada
+    protected float tiempoRestante = 5f;
     protected boolean usandoHabilidad = false;
     protected boolean puedeUsarHabilidad = true;
     protected final float MAX_TIEMPO = 30f;
 
     public Amigas(Vector2 p, World w) {
-        super(p,w);
+        super(p,w); // Llama al constructor de Personaje que inicializa 'this.world'
     }
 
+    @Override
     protected void actualizar(float delta) {
-        this.posicion = body.getPosition(); // actualiza posición
+        this.posicion = body.getPosition();
         boolean diagonalArriba = arr && (izq || der);
         boolean diagonalAbajo = abj && (izq || der);
 
-        // solo sumar stateTime si se anima
         if (diagonalArriba || diagonalAbajo || izq || der || abj || arr || hab) {
             stateTime += delta;
         } else {
@@ -37,32 +37,30 @@ public abstract class Amigas extends Personaje {
         if (hab && presionando) {
             frameActual = habilidad.getKeyFrame(stateTime, true);
 
-            // Flip según dirección
             if (der && frameActual.isFlipX()) {
-                frameActual.flip(true, false); // mirar hacia la derecha
+                frameActual.flip(true, false);
             } else if (izq && !frameActual.isFlipX()) {
-                frameActual.flip(true, false); // mirar hacia la izquierda
+                frameActual.flip(true, false);
             }
 
-            // Lógica de animaciones
         } else if (diagonalArriba) {
             frameActual = diagonalarr.getKeyFrame(stateTime, true);
             if (this instanceof Sonic) {
-                if (der && !frameActual.isFlipX()) frameActual.flip(true, false); // invertir para mirar derecha
-                if (izq && frameActual.isFlipX()) frameActual.flip(true, false); // restaurar si está invertido
+                if (der && !frameActual.isFlipX()) frameActual.flip(true, false);
+                if (izq && frameActual.isFlipX()) frameActual.flip(true, false);
             } else {
-                if (der && frameActual.isFlipX()) frameActual.flip(true, false); // invertir para mirar derecha
-                if (izq && !frameActual.isFlipX()) frameActual.flip(true, false); // restaurar si está invertido
+                if (der && frameActual.isFlipX()) frameActual.flip(true, false);
+                if (izq && !frameActual.isFlipX()) frameActual.flip(true, false);
             }
 
         } else if (diagonalAbajo) {
             frameActual = diagonalabj.getKeyFrame(stateTime, true);
             if (this instanceof Sonic || this instanceof Tails) {
-                if (izq && !frameActual.isFlipX()) frameActual.flip(true, false); // invertir para mirar izquierda
-                if (der && frameActual.isFlipX()) frameActual.flip(true, false); // restaurar si está invertido
+                if (izq && !frameActual.isFlipX()) frameActual.flip(true, false);
+                if (der && frameActual.isFlipX()) frameActual.flip(true, false);
             } else {
-                if (izq && frameActual.isFlipX()) frameActual.flip(true, false); // invertir para mirar izquierda
-                if (der && !frameActual.isFlipX()) frameActual.flip(true, false); // restaurar si está invertido
+                if (izq && frameActual.isFlipX()) frameActual.flip(true, false);
+                if (der && !frameActual.isFlipX()) frameActual.flip(true, false);
             }
 
         } else if (abj) {
@@ -75,7 +73,6 @@ public abstract class Amigas extends Personaje {
             frameActual = sprite;
         }
 
-        // Flip adicional por si hay inversión en otras direcciones
         if (!diagonalArriba && !diagonalAbajo) {
             if (izq && frameActual != null && !frameActual.isFlipX()) {
                 frameActual.flip(true, false);
@@ -83,17 +80,15 @@ public abstract class Amigas extends Personaje {
                 frameActual.flip(true, false);
             }
         }
-
     }
 
-    public void destruir(World world) {
-            if (ko && body != null) {
-                world.destroyBody(body);
-                body = null;
-            }
+    @Override // Sobreescribe el destruir de Personaje
+    public void destruir() { // Sin parámetro 'World'
+        if (ko && body != null) {
+            this.world.destroyBody(body); // Usa 'this.world'
+            body = null;
+        }
     }
-
-
 
     public void teletransportar() {
         if(TLT && body != null) {

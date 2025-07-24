@@ -40,28 +40,28 @@ public class Mundo {
         world.step(delta, 8, 6);
         listaBasura.removeIf(b -> {
             if (!b.estaActiva()) {
-                b.destruir(world);
+                b.destruir(); // <-- ¡MODIFICADO! Sin parámetro
                 b.dispose();
                 return true;
             }
             return false;
         });
         if(sonic.getKO()) {
-            sonic.destruir(world);
+            sonic.destruir(); // <-- ¡MODIFICADO! Sin parámetro
             sonic.dispose();
         }
         if(knuckles.getKO()) {
-            knuckles.destruir(world);
+            knuckles.destruir(); // <-- ¡MODIFICADO! Sin parámetro
             knuckles.dispose();
         }
         if(tails.getKO()) {
-            tails.destruir(world);
+            tails.destruir(); // <-- ¡MODIFICADO! Sin parámetro
             tails.dispose();
         }
 
         listaNube.removeIf(n -> {
             if (!n.estaActiva()) {
-                n.destruir(world);
+                n.destruir(); // <-- ¡MODIFICADO! Sin parámetro
                 n.dispose();
                 return true;
             }
@@ -70,7 +70,7 @@ public class Mundo {
 
         listaCharcos.removeIf(c -> {
             if (!c.estaActiva()) {
-                c.destruir(world);
+                c.destruir(); // <-- ¡MODIFICADO! Sin parámetro
                 c.dispose();
                 return true;
             }
@@ -131,9 +131,7 @@ public class Mundo {
         }
         if(!tails.getKO()) {
             tails.render(batch);
-            // --- Llamada para dibujar el imán de Tails ---
             tails.dibujarIman(batch);
-            // --- Fin de la llamada ---
         }
         etapa.renderizar(batch);
         etapa2.renderizar(batch);
@@ -159,7 +157,6 @@ public class Mundo {
         tails.dispose();
         etapa.dispose();
     }
-
 
     public World getWorld() {
         return world;

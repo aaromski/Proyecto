@@ -9,6 +9,10 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.physics.box2d.QueryCallback;
+import com.badlogic.gdx.physics.box2d.Fixture;
+import com.badlogic.gdx.physics.box2d.joints.MouseJoint;
+import com.badlogic.gdx.physics.box2d.joints.MouseJointDef;
 import io.github.Sonic_V0.Constantes;
 import com.badlogic.gdx.utils.Array;
 
@@ -24,7 +28,7 @@ public class Tails extends Amigas {
     private float tiempoRecoger = 0f;
 
     private boolean imanActivo = false;
-    // float radioAtraccionIman = 3f; // Esta variable no se usa en los cambios visuales, pero se mantiene si es parte de otra funcionalidad.
+    private float radioAtraccionIman = 1.8f;
     protected TextureRegion imanSprite;
     private TextureAtlas imanAtlas;
     private Animation<TextureRegion> imanAnimation;
@@ -32,13 +36,17 @@ public class Tails extends Amigas {
     private static final long DOUBLE_PRESS_IMAN_TIME = 200;
 
     private float imanOrbitAngle = 0f;
-    private float imanOrbitRadius = 1f;
+    private float imanOrbitRadius = 0.5f;
+
+    private float robotOffsetDistance = 0.1f;
 
     private Animation<TextureRegion> volar;
     private Animation<TextureRegion> vueloarriba;
     private Animation<TextureRegion> vueloabajo;
     private Animation<TextureRegion> recoger;
 
+    private MouseJoint robotAtraidoJoint;
+    private Robot robotSiendoAtraido;
 
     public Tails(Vector2 posicion, World world) {
         super(posicion, world);
@@ -130,8 +138,37 @@ public class Tails extends Amigas {
 
         if (imanActivo) {
             imanOrbitAngle = (imanOrbitAngle + (200f * delta)) % 360f;
+
+            if (robotAtraidoJoint != null && robotSiendoAtraido != null && robotSiendoAtraido.body != null) {
+                Vector2 tailsCurrentPos = body.getPosition();
+                Vector2 tailsDirection = body.getLinearVelocity().cpy().nor();
+
+                Vector2 targetPos = tailsCurrentPos.cpy();
+
+                if (tailsDirection.len2() > 0.01f) {
+                    targetPos.x -= tailsDirection.x * robotOffsetDistance;
+                    targetPos.y -= tailsDirection.y * robotOffsetDistance;
+                } else {
+                    targetPos.x += robotOffsetDistance * 0.5f;
+                    targetPos.y += robotOffsetDistance * 0.5f;
+                }
+
+                float currentDistance = tailsCurrentPos.dst(robotSiendoAtraido.body.getPosition());
+                if (currentDistance < robotOffsetDistance * 0.8f) {
+                    Vector2 currentDirToRobot = robotSiendoAtraido.body.getPosition().cpy().sub(tailsCurrentPos).nor();
+                    targetPos = tailsCurrentPos.cpy().add(currentDirToRobot.scl(robotOffsetDistance));
+                }
+
+                robotAtraidoJoint.setTarget(targetPos);
+            }
+
         } else {
             imanOrbitAngle = 0f;
+            if (robotAtraidoJoint != null) {
+                Tails.this.world.destroyJoint(robotAtraidoJoint);
+                robotAtraidoJoint = null;
+                robotSiendoAtraido = null;
+            }
         }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.M)) {
@@ -139,12 +176,57 @@ public class Tails extends Amigas {
             if (currentTime - lastImanPressTime <= DOUBLE_PRESS_IMAN_TIME) {
                 imanActivo = !imanActivo;
                 Gdx.app.log("Tails", "Imán " + (imanActivo ? "ACTIVADO" : "DESACTIVADO"));
+
+                if (!imanActivo && robotAtraidoJoint != null) {
+                    Tails.this.world.destroyJoint(robotAtraidoJoint);
+                    robotAtraidoJoint = null;
+                    robotSiendoAtraido = null;
+                    Gdx.app.log("Tails", "Robot soltado.");
+                }
             }
             lastImanPressTime = currentTime;
         }
 
-        // --- La lógica de QueryAABB para atracción de robots KO va aquí si está activa
-        // --- (la hemos quitado por tu solicitud de solo cambios visuales por ahora)
+        if (imanActivo && robotAtraidoJoint == null) {
+            this.world.QueryAABB(new QueryCallback() {
+                                     @Override
+                                     public boolean reportFixture(Fixture fixture) {
+                                         if (fixture.getUserData() instanceof Robot) {
+                                             Robot robot = (Robot) fixture.getUserData();
+
+                                             if (robot.ko && robot.body != null) {
+                                                 Vector2 tailsPos = body.getPosition();
+                                                 Vector2 robotPos = robot.body.getPosition();
+                                                 float distance = tailsPos.dst(robotPos);
+
+                                                 if (distance < radioAtraccionIman) {
+                                                     if (robotAtraidoJoint == null) {
+                                                         MouseJointDef md = new MouseJointDef();
+                                                         md.bodyA = body;
+                                                         md.bodyB = robot.body;
+                                                         md.collideConnected = false;
+                                                         md.target.set(tailsPos.x, tailsPos.y + robotOffsetDistance);
+                                                         md.maxForce = robot.body.getMass() * 100f;
+                                                         md.frequencyHz = 8f;
+                                                         md.dampingRatio = 0.8f;
+
+                                                         robotAtraidoJoint = (MouseJoint) Tails.this.world.createJoint(md);
+                                                         robotSiendoAtraido = robot;
+
+                                                         Gdx.app.log("Tails", "Robot KO detectado y enganchado con MouseJoint.");
+                                                     }
+                                                     return false;
+                                                 }
+                                             }
+                                         }
+                                         return true;
+                                     }
+                                 },
+                body.getPosition().x - radioAtraccionIman,
+                body.getPosition().y - radioAtraccionIman,
+                body.getPosition().x + radioAtraccionIman,
+                body.getPosition().y + radioAtraccionIman);
+        }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
             long currentTime = System.currentTimeMillis();
@@ -278,23 +360,27 @@ public class Tails extends Amigas {
             float imanHeight = currentImanFrame.getRegionHeight() / Constantes.PPM;
 
             float tailsCenterX = body.getPosition().x;
-            float tailsCenterY = body.getPosition().y + (sprite.getHeight() / 4f / Constantes.PPM);
+            // Ajustar esta posición de Y para que el imán se vea claramente
+            // Aquí lo posicionamos un poco por encima de Tails y ligeramente a la derecha.
+            float tailsCenterY = body.getPosition().y + (sprite.getHeight() / 2f / Constantes.PPM) + 0.1f; // Ajuste en Y
+
+            // Si hay un robot atraído, podemos hacer que el imán tenga un ligero desplazamiento fijo
+            // o simplemente que orbite como antes, pero siempre visible.
+            // Para asegurar visibilidad, vamos a hacer que orbite alrededor de Tails.
+            // La lógica para que se dibujara "sobre el robot atraído" la quitamos de aquí.
 
             float angleRadians = (float) Math.toRadians(imanOrbitAngle);
 
             float orbitOffsetX = (float) (imanOrbitRadius * Math.cos(angleRadians));
             float orbitOffsetY = (float) (imanOrbitRadius * Math.sin(angleRadians));
 
+            // Dibujamos el imán siempre orbitando alrededor de Tails cuando el imán está activo.
+            // La posición del robot atraído no influye en la posición de dibujado del imán.
             float drawX = tailsCenterX + orbitOffsetX - (imanWidth / 2f);
             float drawY = tailsCenterY + orbitOffsetY - (imanHeight / 2f);
 
-            // ---Ajusta la rotación del sprite del imán ---
-
-            float rotationOffset = 0f; // Ajusta este valor si tu sprite de imán no apunta "a la derecha" a 0 grados.
-            // Por ejemplo, si tu imán apunta hacia arriba en el sprite, usa -90f.
-            // Si apunta a la izquierda, usa 180f.
+            float rotationOffset = 0f; // Puedes añadir una rotación si deseas
             float rotationAngle = imanOrbitAngle + rotationOffset;
-            // --- FIN CAMBIO ---
 
             float originX = imanWidth / 2f;
             float originY = imanHeight / 2f;
@@ -317,6 +403,11 @@ public class Tails extends Amigas {
         atlas.dispose();
         if (imanAtlas != null) {
             imanAtlas.dispose();
+        }
+        if (robotAtraidoJoint != null) {
+            Tails.this.world.destroyJoint(robotAtraidoJoint);
+            robotAtraidoJoint = null;
+            robotSiendoAtraido = null;
         }
     }
 }
