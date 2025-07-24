@@ -43,7 +43,6 @@ public class Etapa {
         for (Robot r : robots) {
             if(r.sinObjetivo()) {
                 r.seleccionarObjetivoMasCercano(obtenerObjetivosVivos());
-                System.out.println("PAso por aqui");
             } else if (!r.getKO()) {
                 r.seleccionarObjetivoMasCercano(obtenerObjetivosVivos());
             }
@@ -53,7 +52,9 @@ public class Etapa {
 
     public void renderizar(SpriteBatch batch) {
         for (Robot r : robots) {
-            r.render(batch);
+            if (r.getCuerpo() != null) {
+                r.render(batch);
+            }
         }
     }
 
@@ -86,6 +87,18 @@ public class Etapa {
         if (!tails.getKO()) activos.add(tails);
         if (!knuckles.getKO()) activos.add(knuckles);
         return activos;
+    }
+
+    public List<Robot> destruirRobots() {
+        List<Robot> listaDestruidos = new ArrayList<>();
+
+        for (Robot robot : robots) {
+            if (robot.getDestuido()) { // Método que verifica si está destruido
+                listaDestruidos.add(robot);
+            }
+        }
+
+        return listaDestruidos;
     }
 
     public void dispose() {

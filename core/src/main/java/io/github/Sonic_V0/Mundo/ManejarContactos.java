@@ -75,6 +75,16 @@ public class ManejarContactos implements ContactListener {
                 Constantes.SCORE[1] += 10;
             }
         }
+
+        // Detección de contacto entre Robot y Casa
+        if (("Casa".equals(ua) && ub instanceof Robot) || ("Casa".equals(ub) && ua instanceof Robot)) {
+            Robot robot = ua instanceof Robot ? (Robot) ua : (Robot) ub;
+            if(robot.getKO()) {
+                robot.setDestruido();
+                Constantes.SCORE[2] += 10; // Ejemplo: sumar puntos
+                // efectosVisuales.explotarCasa(cuerpoCasa.getPosition()); // hipotético
+            }
+        }
     }
 
     public static void aplicarDaño(Amigas personaje) {

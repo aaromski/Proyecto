@@ -87,8 +87,7 @@ public class PantallaAyuda extends BaseMenu {
                     "- DERECHA:     D             L               f. derecha\n" +
                     "- GOLPE:          F             P               \n" +
                     "- PODERES:\n" +
-                    "-                                             VOLAR: F.ARRIBA (DOS VECES)\n" +
-                    "-                                             IMAN: M (DOS VECES ACTIVA/DES)\n" +
+                    "-                                             IMAN: NUMPAD_0 (DOS VECES ACTIVA/DES)\n" +
                     "- ESC: Pausar\n\n" +
 
                     "Reglas:\n" +
@@ -99,11 +98,16 @@ public class PantallaAyuda extends BaseMenu {
             font.draw(batch,
                 "Lenguaje: Java\n" +
                     "El juego se basa en lo siguiente:\n" +
-                    "- Sonic recoge basura y se mueve rápido\n" +
-                    "- Knuckles destruye los robots enemigos\n" +
-                    "- Tails recoge piezas de los robots destruidos\n" +
-                    "- Cada personaje tiene una tarea distinta\n" +
-                    "- Si tardas mucho, los robots se reactivan\n\n" +
+                    "- Sonic recoge basura para ganar puntos\n" +
+                    "- Knuckles convierte robots enemigos en chatarra\n" +
+                    "- Tails destruye robots llevándolos a la fábrica\n" +
+                    "- Los robots se destruyen dentro de la fábrica\n" +
+                    "- Si los robots te tocan, pierdes vida\n" +
+                    "- Al perder vida, reapareces invencible por unos segundos\n" +
+                    "- Si tardas en destruirlos, los robots se reactivan\n" +
+                    "- Eggman aparece cada cierto tiempo generando más robots\n" +
+                    "- Cada personaje tiene una tarea única\n\n" +
+                    "Modo de juego: Sin límite de tiempo\n\n" +
                     "Librerías: LibGDX\n" +
                     "Desarrolladores:\n" +
                     "- Aarom Luces\n" +

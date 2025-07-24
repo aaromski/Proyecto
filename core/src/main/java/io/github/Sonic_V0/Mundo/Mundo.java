@@ -7,6 +7,7 @@ import com.badlogic.gdx.physics.box2d.*;
 import io.github.Sonic_V0.Personajes.*;
 
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class Mundo {
@@ -76,6 +77,11 @@ public class Mundo {
             }
             return false;
         });
+
+        for (Robot robot : etapa.destruirRobots()) {
+            System.out.println("PAso por el for " +etapa.destruirRobots().size());
+            robot.destruir();
+        }
 
         sonic.teletransportar();
         knuckles.teletransportar();

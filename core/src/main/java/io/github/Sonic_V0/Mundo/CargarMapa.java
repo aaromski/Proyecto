@@ -62,6 +62,9 @@ public class CargarMapa {
 
     public void objetosMapa(World world) {
         for (MapLayer capa : map.getLayers()) {
+
+            String nombreCapa = capa.getName(); // nombre de la capa actual
+
             MapObjects objetos = capa.getObjects();
             for (MapObject objeto : objetos) {
 
@@ -78,13 +81,23 @@ public class CargarMapa {
                     );
 
                     PolygonShape shape = new PolygonShape();
-                    shape.setAsBox(rect.width / 2 * Constantes.WORLD_ESCALA, rect.height / 2 * Constantes.WORLD_ESCALA);
+                    shape.setAsBox(
+                        rect.width / 2 * Constantes.WORLD_ESCALA,
+                        rect.height / 2 * Constantes.WORLD_ESCALA
+                    );
 
                     def.shape = shape;
                     configurarFiltroMapa(def);
 
                     Body cuerpo = world.createBody(bdef);
-                    cuerpo.createFixture(def).setUserData("Objeto");
+
+                    // UserData según el nombre de la capa
+                    if ("Casa".equals(nombreCapa)) {
+                        cuerpo.createFixture(def).setUserData("Casa");
+                    } else {
+                        cuerpo.createFixture(def).setUserData("Objeto");
+                    }
+
                     shape.dispose();
                 }
 

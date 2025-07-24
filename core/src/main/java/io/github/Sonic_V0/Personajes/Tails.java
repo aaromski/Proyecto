@@ -17,18 +17,8 @@ import io.github.Sonic_V0.Constantes;
 import com.badlogic.gdx.utils.Array;
 
 public class Tails extends Amigas {
-    private boolean isFlying = false;
-    private float flyTime = 0f;
-    private float maxFlyTime = 3f;
-    private long lastUpPressTime = 0;
-    private static final long DOUBLE_PRESS_TIME = 300;
-
-    private int objetosRecogidos = 0;
-    private boolean puedeRecoger = true;
-    private float tiempoRecoger = 0f;
-
     private boolean imanActivo = false;
-    private float radioAtraccionIman = 1.8f;
+    private final float radioAtraccionIman = 1.8f;
     protected TextureRegion imanSprite;
     private TextureAtlas imanAtlas;
     private Animation<TextureRegion> imanAnimation;
@@ -38,15 +28,17 @@ public class Tails extends Amigas {
     private float imanOrbitAngle = 0f;
     private float imanOrbitRadius = 0.5f;
 
-    private float robotOffsetDistance = 0.1f;
-
-    private Animation<TextureRegion> volar;
-    private Animation<TextureRegion> vueloarriba;
-    private Animation<TextureRegion> vueloabajo;
-    private Animation<TextureRegion> recoger;
+    private final float robotOffsetDistance = 0.1f;
 
     private MouseJoint robotAtraidoJoint;
     private Robot robotSiendoAtraido;
+
+    private boolean puedeActivarIman = true;
+    private float tiempoImanActivo = 0f;
+    private float tiempoCooldownIman = 0f;
+
+    private static final float DURACION_IMAN = 10f;
+    private static final float COOLDOWN_IMAN = 10f;
 
     public Tails(Vector2 posicion, World world) {
         super(posicion, world);
@@ -70,21 +62,14 @@ public class Tails extends Amigas {
         diagonalarr = crearAnimacion("diagonal", 9, 0.1f);
         diagonalabj = crearAnimacion("diagonalabj", 4, 0.1f);
 
-        volar = crearAnimacion("vuelo", 7, 0.1f);
-        vueloabajo = crearAnimacion("vuelo", 7, 0.1f);
-        vueloarriba = crearAnimacion("vuelo", 3, 0.1f);
-
-        recoger = crearAnimacion("recoger", 4, 0.1f);
-
         try {
             imanAtlas = new TextureAtlas(Gdx.files.internal("SpriteTails/iman.atlas"));
             Array<TextureRegion> imanFrames = new Array<>();
+
             for (int i = 1; i <= 4; i++) {
                 TextureRegion frame = imanAtlas.findRegion("iman" + i);
                 if (frame != null) {
                     imanFrames.add(frame);
-                } else {
-                    Gdx.app.error("Tails", "¡Advertencia! No se encontró el frame 'iman" + i + "' en el atlas del imán.");
                 }
             }
 
@@ -92,12 +77,10 @@ public class Tails extends Amigas {
                 imanAnimation = new Animation<>(0.15f, imanFrames, Animation.PlayMode.LOOP);
                 imanSprite = imanAnimation.getKeyFrame(0);
             } else {
-                Gdx.app.error("Tails", "No se pudieron cargar frames para la animación del imán. imanAnimation y imanSprite serán nulos.");
                 imanAnimation = null;
                 imanSprite = null;
             }
         } catch (Exception e) {
-            Gdx.app.error("Tails", "Error al cargar 'SpriteTails/iman.atlas': " + e.getMessage());
             imanAnimation = null;
             imanSprite = null;
         }
@@ -116,20 +99,21 @@ public class Tails extends Amigas {
             return;
         }
 
-        if (!puedeRecoger) {
-            tiempoRecoger += delta;
-            frameActual = recoger.getKeyFrame(tiempoRecoger, false);
+        // ⚙️ Control de duración y cooldown del imán
+        if (imanActivo) {
+            tiempoImanActivo += delta;
 
-            if (tiempoRecoger >= 0.4f) {
-                puedeRecoger = true;
-                tiempoRecoger = 0f;
+            if (tiempoImanActivo >= DURACION_IMAN) {
+                imanActivo = false;
+                tiempoCooldownIman = 0f;
+                Gdx.app.log("Tails", "Imán desactivado automáticamente");
             }
-
-            sprite.setPosition(
-                body.getPosition().x - sprite.getWidth() / 2f,
-                body.getPosition().y - sprite.getHeight() / 2f
-            );
-            return;
+        } else if (!puedeActivarIman) {
+            tiempoCooldownIman += delta;
+            if (tiempoCooldownIman >= COOLDOWN_IMAN) {
+                puedeActivarIman = true;
+                Gdx.app.log("Tails", "Imán listo para reactivarse");
+            }
         }
 
         izq = der = abj = arr = false;
@@ -140,28 +124,34 @@ public class Tails extends Amigas {
             imanOrbitAngle = (imanOrbitAngle + (200f * delta)) % 360f;
 
             if (robotAtraidoJoint != null && robotSiendoAtraido != null && robotSiendoAtraido.body != null) {
-                Vector2 tailsCurrentPos = body.getPosition();
-                Vector2 tailsDirection = body.getLinearVelocity().cpy().nor();
-
-                Vector2 targetPos = tailsCurrentPos.cpy();
-
-                if (tailsDirection.len2() > 0.01f) {
-                    targetPos.x -= tailsDirection.x * robotOffsetDistance;
-                    targetPos.y -= tailsDirection.y * robotOffsetDistance;
+                if (!robotSiendoAtraido.body.isActive()) {
+                    // El cuerpo está inactivo o destruido, desmonta el joint
+                    Tails.this.world.destroyJoint(robotAtraidoJoint);
+                    robotAtraidoJoint = null;
+                    robotSiendoAtraido = null;
                 } else {
-                    targetPos.x += robotOffsetDistance * 0.5f;
-                    targetPos.y += robotOffsetDistance * 0.5f;
-                }
+                    Vector2 tailsCurrentPos = body.getPosition();
+                    Vector2 tailsDirection = body.getLinearVelocity().cpy().nor();
 
-                float currentDistance = tailsCurrentPos.dst(robotSiendoAtraido.body.getPosition());
-                if (currentDistance < robotOffsetDistance * 0.8f) {
-                    Vector2 currentDirToRobot = robotSiendoAtraido.body.getPosition().cpy().sub(tailsCurrentPos).nor();
-                    targetPos = tailsCurrentPos.cpy().add(currentDirToRobot.scl(robotOffsetDistance));
-                }
+                    Vector2 targetPos = tailsCurrentPos.cpy();
 
-                robotAtraidoJoint.setTarget(targetPos);
+                    if (tailsDirection.len2() > 0.01f) {
+                        targetPos.x -= tailsDirection.x * robotOffsetDistance;
+                        targetPos.y -= tailsDirection.y * robotOffsetDistance;
+                    } else {
+                        targetPos.x += robotOffsetDistance * 0.5f;
+                        targetPos.y += robotOffsetDistance * 0.5f;
+                    }
+
+                    float currentDistance = tailsCurrentPos.dst(robotSiendoAtraido.body.getPosition());
+                    if (currentDistance < robotOffsetDistance * 0.8f) {
+                        Vector2 currentDirToRobot = robotSiendoAtraido.body.getPosition().cpy().sub(tailsCurrentPos).nor();
+                        targetPos = tailsCurrentPos.cpy().add(currentDirToRobot.scl(robotOffsetDistance));
+                    }
+
+                    robotAtraidoJoint.setTarget(targetPos);
+                }
             }
-
         } else {
             imanOrbitAngle = 0f;
             if (robotAtraidoJoint != null) {
@@ -171,18 +161,14 @@ public class Tails extends Amigas {
             }
         }
 
-        if (Gdx.input.isKeyJustPressed(Input.Keys.M)) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.NUMPAD_0)) {
             long currentTime = System.currentTimeMillis();
-            if (currentTime - lastImanPressTime <= DOUBLE_PRESS_IMAN_TIME) {
-                imanActivo = !imanActivo;
-                Gdx.app.log("Tails", "Imán " + (imanActivo ? "ACTIVADO" : "DESACTIVADO"));
-
-                if (!imanActivo && robotAtraidoJoint != null) {
-                    Tails.this.world.destroyJoint(robotAtraidoJoint);
-                    robotAtraidoJoint = null;
-                    robotSiendoAtraido = null;
-                    Gdx.app.log("Tails", "Robot soltado.");
-                }
+            if (puedeActivarIman && (currentTime - lastImanPressTime <= DOUBLE_PRESS_IMAN_TIME)) {
+                imanActivo = true;
+                puedeActivarIman = false; // desactivar posibilidad de volver a activarlo
+                tiempoImanActivo = 0f;
+                tiempoCooldownIman = 0f;
+                Gdx.app.log("Tails", "Imán ACTIVADO");
             }
             lastImanPressTime = currentTime;
         }
@@ -228,129 +214,36 @@ public class Tails extends Amigas {
                 body.getPosition().y + radioAtraccionIman);
         }
 
-        if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
-            long currentTime = System.currentTimeMillis();
-            if (currentTime - lastUpPressTime <= DOUBLE_PRESS_TIME) {
-                isFlying = true;
-                flyTime = 0f;
-            }
-            lastUpPressTime = currentTime;
+        if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
+            body.setLinearVelocity(0, velocidad.y);
+            arr = true;
+            presionando = true;
         }
-
-        if (isFlying) {
-            flyTime += delta;
-
-            if (flyTime >= maxFlyTime) {
-                isFlying = false;
-            } else {
-                float velX = body.getLinearVelocity().x * 0.9f;
-                float velY = 0;
-
-                if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-                    velY = -velocidad.y * 0.8f;
-                    frameActual = vueloabajo.getKeyFrame(stateTime, true);
-                    abj = true;
-                } else if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
-                    velY = velocidad.y * 1.8f;
-                    frameActual = vueloarriba.getKeyFrame(stateTime, true);
-                    arr = true;
-                } else {
-                    frameActual = volar.getKeyFrame(stateTime, true);
-                }
-
-                if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-                    velX = -velocidad.x * 0.7f;
-                    if (!frameActual.isFlipX()) frameActual.flip(true, false);
-                    izq = true;
-                } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-                    velX = velocidad.x * 0.7f;
-                    if (frameActual.isFlipX()) frameActual.flip(true, false);
-                    der = true;
-                }
-
-                body.setLinearVelocity(velX, velY);
-                presionando = true;
-            }
+        if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+            body.setLinearVelocity(0, -velocidad.y);
+            abj = true;
+            presionando = true;
         }
-
-        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE) && !isFlying) {
-            puedeRecoger = false;
-            objetosRecogidos++;
+        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+            body.setLinearVelocity(-velocidad.x, body.getLinearVelocity().y);
+            izq = true;
+            presionando = true;
         }
-
-        if (!isFlying) {
-            float velX = 0, velY = 0;
-            boolean movingHorizontally = false;
-            boolean movingVertically = false;
-
-            if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
-                velY = velocidad.y;
-                arr = true;
-                movingVertically = true;
-            }
-            if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-                velY = -velocidad.y;
-                abj = true;
-                movingVertically = true;
-            }
-            if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-                velX = -velocidad.x;
-                izq = true;
-                movingHorizontally = true;
-            }
-            if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-                velX = velocidad.x;
-                der = true;
-                movingHorizontally = true;
-            }
-
-            body.setLinearVelocity(velX, velY);
-            presionando = movingHorizontally || movingVertically;
-
-            if (presionando) {
-                if (movingHorizontally && movingVertically) {
-                    if (arr) {
-                        frameActual = diagonalarr.getKeyFrame(stateTime, true);
-                    } else if (abj) {
-                        frameActual = diagonalabj.getKeyFrame(stateTime, true);
-                    }
-                    if (izq && !frameActual.isFlipX()) {
-                        frameActual.flip(true, false);
-                    } else if (der && frameActual.isFlipX()) {
-                        frameActual.flip(true, false);
-                    }
-                } else if (movingHorizontally) {
-                    frameActual = correr.getKeyFrame(stateTime, true);
-                    if (izq && !frameActual.isFlipX()) {
-                        frameActual.flip(true, false);
-                    } else if (der && frameActual.isFlipX()) {
-                        frameActual.flip(true, false);
-                    }
-                } else if (movingVertically) {
-                    if (arr) {
-                        frameActual = arriba.getKeyFrame(stateTime, true);
-                    } else if (abj) {
-                        frameActual = abajo.getKeyFrame(stateTime, true);
-                    }
-                }
-            }
+        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+            body.setLinearVelocity(velocidad.x, body.getLinearVelocity().y);
+            der = true;
+            presionando = true;
         }
-
         if (!presionando) {
-            body.setLinearVelocity(body.getLinearVelocity().x * 0.5f, body.getLinearVelocity().y * 0.5f);
-            if (!isFlying) {
-                frameActual = sprite;
-                if (frameActual.isFlipX()) {
-                    frameActual.flip(true, false);
-                }
-            }
+            body.setLinearVelocity(0, 0);
+            frameActual = sprite;
+            stateTime = 0f;
         }
-
-        sprite.setPosition(
-            body.getPosition().x - sprite.getWidth() / 2f,
-            body.getPosition().y - sprite.getHeight() / 2f
-        );
+        super.actualizar(delta);
     }
+
+
+
 
     public void dibujarIman(SpriteBatch batch) {
         if (imanActivo && imanAnimation != null) {
@@ -396,6 +289,10 @@ public class Tails extends Amigas {
                 1f,
                 rotationAngle);
         }
+    }
+
+    public void setIman() {
+        imanActivo = false;
     }
 
     @Override

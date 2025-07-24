@@ -76,10 +76,14 @@ public class Etapa2 {
 
     public void renderizar(SpriteBatch batch) {
         for (Robotnik r : robotniks) {
-            r.render(batch);
+            if (r.getCuerpo() != null) {
+                r.render(batch);
+            }
         }
         for (Robot r : robots) {
-            r.render(batch);
+            if (r.getCuerpo() != null) {
+                r.render(batch);
+            }
         }
 
     }

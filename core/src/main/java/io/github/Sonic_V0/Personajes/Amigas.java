@@ -90,13 +90,6 @@ public abstract class Amigas extends Personaje {
         }
     }
 
-    @Override // Sobreescribe el destruir de Personaje
-    public void destruir() { // Sin parámetro 'World'
-        if (ko && body != null) {
-            this.world.destroyBody(body); // Usa 'this.world'
-            body = null;
-        }
-    }
 
     public void activarInvulnerabilidad(float duracion) {
         invulnerable = true;

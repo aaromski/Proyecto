@@ -73,17 +73,8 @@ public abstract class Contaminacion {
 
     public void setActiva (int op) {
         if (activa) { // Solo si está activo puede sumar puntos y desactivarse
-            switch (op) {
-                case 1:
-                    Constantes.SCORE[0] += 5;
-                    break;
-                case 2:
-                    Constantes.SCORE[1] += 5;
-                    break;
-                case 3:
-                    Constantes.SCORE[2] += 5;
-                    break;
-                default: break;
+            if (op == 1) {
+                Constantes.SCORE[0] += 5;
             }
             activa = false; // Desactiva la contaminación
         }

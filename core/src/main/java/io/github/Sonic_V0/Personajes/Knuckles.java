@@ -136,9 +136,7 @@ public class Knuckles extends Amigas {
         Array<TextureRegion> framesExplosion = new Array<>();
         for (int i = 1; i <= 12; i++) {
             TextureRegion frame = atlas2.findRegion("explosion" + i);
-            if (frame == null) {
-                System.out.println("No se encontró explosion" + i);
-            } else {
+            if (frame != null) {
                 framesExplosion.add(frame);
             }
         }
