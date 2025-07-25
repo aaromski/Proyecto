@@ -9,19 +9,52 @@ import io.github.Sonic_V0.Personajes.*;
 import java.util.ArrayList;
 import java.util.List;
 
-
+/**
+ * Clase que representa el entorno principal del juego.
+ *
+ * Contiene y gestiona los personajes principales (Sonic, Tails, Knuckles), enemigos y elementos del escenario como basura,
+ * nubes contaminantes y charcos de aceite. Se encarga de generar, actualizar, renderizar y liberar los recursos asociados.
+ *
+ * También administra el mapa, físicas del mundo con Box2D y la lógica de contacto entre objetos.
+ *
+ * @author Aarom Luces
+ */
 public class Mundo {
+
+    /** Mundo físico de Box2D */
     private final World world;
+
+    /** Mapa cargado desde TMX */
     private final CargarMapa map;
+
+    /** Lista de objetos basura activos */
     private final ArrayList<Basura> listaBasura;
+
+    /** Lista de nubes contaminantes activas */
     private final ArrayList<Nube> listaNube;
+
+    /** Lista de charcos de aceite activos */
     private final ArrayList<CharcoAceite> listaCharcos;
+
+    /** Personaje principal: Sonic */
     private final Sonic sonic;
-    private final Etapa2 etapa2;
-    private final Tails tails;
+
+    /** Personaje: Knuckles */
     private final Knuckles knuckles;
+
+    /** Personaje: Tails */
+    private final Tails tails;
+
+    /** Etapa inicial del juego */
     private final Etapa etapa;
 
+    /** Etapa secundaria del juego */
+    private final Etapa2 etapa2;
+
+    /**
+     * Constructor de la clase Mundo. Inicializa el mundo físico,
+     * personajes, etapas y configura el mapa y el listener de contactos.
+     */
     public Mundo() {
         world = new World(new Vector2(0, 0), true);
         knuckles = new Knuckles(new Vector2(22f, 22f), world);
@@ -37,32 +70,46 @@ public class Mundo {
         world.setContactListener(new ManejarContactos());
     }
 
+    /**
+     * Actualiza el estado del mundo, personajes y enemigos.
+     * Elimina elementos inactivos y teletransporta personajes.
+     *
+     * @param delta Tiempo transcurrido desde el último frame.
+     */
     public void actualizar(float delta) {
         world.step(delta, 8, 6);
+
         listaBasura.removeIf(b -> {
             if (!b.estaActiva()) {
-                b.destruir(); // <-- ¡MODIFICADO! Sin parámetro
+                b.destruir();
                 b.dispose();
                 return true;
             }
             return false;
         });
-        if(sonic.getKO()) {
-            sonic.destruir(); // <-- ¡MODIFICADO! Sin parámetro
+
+        if (sonic.getKO()) {
+            sonic.destruir();
             sonic.dispose();
         }
-        if(knuckles.getKO()) {
-            knuckles.destruir(); // <-- ¡MODIFICADO! Sin parámetro
+
+        if (knuckles.getKO()) {
+            knuckles.destruir();
             knuckles.dispose();
         }
-        if(tails.getKO()) {
-            tails.destruir(); // <-- ¡MODIFICADO! Sin parámetro
+
+        if (tails.getKO()) {
+            tails.destruir();
             tails.dispose();
+        }
+
+        if (tails.getDestruirJoin()) {
+            tails.setDestruirJoin();
         }
 
         listaNube.removeIf(n -> {
             if (!n.estaActiva()) {
-                n.destruir(); // <-- ¡MODIFICADO! Sin parámetro
+                n.destruir();
                 n.dispose();
                 return true;
             }
@@ -71,7 +118,7 @@ public class Mundo {
 
         listaCharcos.removeIf(c -> {
             if (!c.estaActiva()) {
-                c.destruir(); // <-- ¡MODIFICADO! Sin parámetro
+                c.destruir();
                 c.dispose();
                 return true;
             }
@@ -79,7 +126,6 @@ public class Mundo {
         });
 
         for (Robot robot : etapa.destruirRobots()) {
-
             robot.destruir();
         }
 
@@ -93,29 +139,52 @@ public class Mundo {
         etapa2.actualizar(delta);
     }
 
+    /**
+     * Genera una nueva basura en la posición indicada.
+     *
+     * @param posicion Posición en el mundo físico.
+     */
     public void generarBasura(Vector2 posicion) {
         Basura basura = new Basura(world);
         basura.crearCuerpo(posicion);
         listaBasura.add(basura);
     }
 
+    /**
+     * Genera un nuevo charco de aceite en la posición indicada.
+     *
+     * @param posicion Posición en el mundo físico.
+     */
     public void generarCharco(Vector2 posicion) {
         CharcoAceite charco = new CharcoAceite(world);
         charco.crearCuerpo(posicion);
         listaCharcos.add(charco);
     }
 
+    /**
+     * Genera una nueva nube contaminante en una posición y dirección dada.
+     *
+     * @param posicion  Posición inicial.
+     * @param direccion Dirección del movimiento de la nube.
+     */
     public void generarNube(Vector2 posicion, Vector2 direccion) {
         Nube nube = new Nube(world);
         nube.crearCuerpo(posicion, direccion);
         listaNube.add(nube);
     }
 
+    /**
+     * Invoca generación de robots desde la etapa principal.
+     */
     public void robotEtapa2() {
         etapa.generarRobot();
     }
 
-
+    /**
+     * Renderiza todos los elementos visuales en pantalla.
+     *
+     * @param batch SpriteBatch utilizado para dibujar.
+     */
     public void render(SpriteBatch batch) {
         for (CharcoAceite c : listaCharcos) {
             if (c.estaActiva() && c.getCuerpo() != null) {
@@ -132,15 +201,19 @@ public class Mundo {
         if (knuckles.getCuerpo() != null) {
             knuckles.render(batch);
         }
+
         if (sonic.getCuerpo() != null) {
             sonic.render(batch);
         }
-        if(!tails.getKO()) {
+
+        if (!tails.getKO()) {
             tails.render(batch);
             tails.dibujarIman(batch);
         }
+
         etapa.renderizar(batch);
         etapa2.renderizar(batch);
+
         for (Nube n : listaNube) {
             if (n.estaActiva() && n.getCuerpo() != null) {
                 n.render(batch);
@@ -148,10 +221,18 @@ public class Mundo {
         }
     }
 
+    /**
+     * Renderiza el mapa usando la cámara ortográfica actual.
+     *
+     * @param camara Cámara utilizada para visualizar el mapa.
+     */
     public void renderizarMapa(OrthographicCamera camara) {
         map.renderarMapa(camara);
     }
 
+    /**
+     * Libera todos los recursos utilizados en el mundo.
+     */
     public void dispose() {
         for (Basura b : listaBasura) {
             b.dispose();
@@ -164,6 +245,11 @@ public class Mundo {
         etapa.dispose();
     }
 
+    /**
+     * Retorna la instancia del mundo físico de Box2D.
+     *
+     * @return El mundo físico utilizado en el juego.
+     */
     public World getWorld() {
         return world;
     }

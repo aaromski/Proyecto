@@ -104,6 +104,7 @@ public class CargarMapa {
      */
     public void objetosMapa(World world) {
         for (MapLayer capa : map.getLayers()) {
+            String nombreCapa = capa.getName(); // nombre de la capa actual
             MapObjects objetos = capa.getObjects();
             for (MapObject objeto : objetos) {
 
@@ -125,8 +126,15 @@ public class CargarMapa {
                     def.shape = shape;
                     configurarFiltroMapa(def); // Configura los filtros de colisión
                     Body cuerpo = world.createBody(bdef);
-                    cuerpo.createFixture(def).setUserData("Objeto"); // Asigna un identificador al fixture
-                    shape.dispose(); // Libera los recursos de la forma
+
+                    // UserData según el nombre de la capa
+                    if ("Casa".equals(nombreCapa)) {
+                        cuerpo.createFixture(def).setUserData("Casa");
+                    } else {
+                        cuerpo.createFixture(def).setUserData("Objeto");
+                    }
+
+                    shape.dispose();
                 }
 
                 if (objeto instanceof PolygonMapObject) {

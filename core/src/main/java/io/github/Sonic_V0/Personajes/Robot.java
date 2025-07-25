@@ -134,12 +134,9 @@ public class Robot extends Enemigas {
      */
     @Override
     public void destruir() {
-        if (!destruido) {
-            destruido = true;
-            if (body != null) {
-                body.getWorld().destroyBody(body);
-                body = null;
-            }
+        if (destruido && body != null) {
+            world.getWorld().destroyBody(body); // Usa el 'this.world' almacenado
+            body = null;
         }
     }
 

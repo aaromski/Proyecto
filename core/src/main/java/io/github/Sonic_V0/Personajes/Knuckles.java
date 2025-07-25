@@ -193,9 +193,7 @@ public class Knuckles extends Amigas {
     @Override
     public void configurarFiltro(FixtureDef fdef) {
         fdef.filter.categoryBits = Constantes.CATEGORY_PERSONAJES; // Pertenece a la categoría de personajes
-        fdef.filter.maskBits = (short) (Constantes.CATEGORY_ROBOT | Constantes.CATEGORY_TRASH |
-            Constantes.CATEGORY_SENSOR | Constantes.CATEGORY_NUBE |
-            Constantes.CATEGORY_OBJETOS); // Colisiona con estas categorías
+        fdef.filter.maskBits = -1;
     }
 
     /**
@@ -215,7 +213,8 @@ public class Knuckles extends Amigas {
      * Establece el estado de golpeo, reinicia el tiempo de animación y determina la dirección del impacto.
      */
     public void golpear() {
-        if (!golpeando) { // Solo permite golpear si no está golpeando ya
+        boolean moviendo = izq || der || arr || abj;
+        if (!golpeando && moviendo) { // Solo permite golpear si no está golpeando ya y si se esta moviendo
             golpeando = true;
             stateTime = 0f; // Reinicia el tiempo de estado para la animación de golpe
             tiempoGolpeActivo = 0f; // Reinicia el temporizador de golpe activo

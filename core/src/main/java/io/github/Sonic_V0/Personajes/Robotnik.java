@@ -18,7 +18,7 @@ import io.github.Sonic_V0.Mundo.Mundo;
  * invocar refuerzos (robots secundarios), y generar charcos que afectan el entorno.
  * Se autodestruye tras cierto tiempo y pasa por ciclos de combate estratégicamente definidos.
  *
- * @author Miguel
+ * @author Miguel Carreño
  */
 public class Robotnik extends Enemigas {
 

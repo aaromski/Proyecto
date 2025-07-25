@@ -5,7 +5,21 @@ import com.badlogic.gdx.physics.box2d.*;
 import io.github.Sonic_V0.Constantes;
 import io.github.Sonic_V0.Personajes.*;
 
+/**
+ * Clase que implementa la lógica de interacción física entre entidades del juego mediante el sistema Box2D.
+ * Se encarga de manejar contactos como golpes, colisiones con enemigos, contaminación ambiental
+ * y sensores para obstáculos.
+ *
+ *@author
+ */
 public class ManejarContactos implements ContactListener {
+
+    /**
+     * Se ejecuta cuando inicia el contacto entre dos fixtures.
+     * Analiza la colisión y ejecuta lógica específica según el tipo de entidad involucrada.
+     *
+     * @param contact el objeto de contacto generado por Box2D
+     */
     @Override
     public void beginContact(Contact contact) {
         Object ua = contact.getFixtureA().getUserData();
@@ -14,13 +28,19 @@ public class ManejarContactos implements ContactListener {
         Fixture fb = contact.getFixtureB();
 
 
+        // Interacción entre amigas y elementos contaminantes
         if ((ua instanceof Amigas && ub instanceof Contaminacion) ||
             (ub instanceof Amigas && ua instanceof Contaminacion)) {
 
             Amigas personaje = (Amigas) (ua instanceof Amigas ? ua : ub);
             Contaminacion contaminante = (Contaminacion) (ua instanceof Contaminacion ? ua : ub);
 
-            if (personaje.esInvulnerable()) return;
+            if (personaje.esInvulnerable()) {
+                if (contaminante instanceof Nube) {
+                    contaminante.setActiva(4);
+                    return;
+                }
+            }
 
             if (contaminante instanceof Nube) {
                 aplicarDaño(personaje);
@@ -32,7 +52,7 @@ public class ManejarContactos implements ContactListener {
             }
         }
 
-
+        // Interacción entre amigas y enemigas (robots)
         if ((ua instanceof Amigas && ub instanceof Enemigas) ||
             (ua instanceof Enemigas && ub instanceof Amigas)) {
 
@@ -49,12 +69,14 @@ public class ManejarContactos implements ContactListener {
             }
         }
 
+        // Colisión entre nube y objeto
         if ("Objeto".equals(fa.getUserData()) && ub instanceof Nube
             || "Objeto".equals(fb.getUserData()) && ua instanceof Nube) {
             Nube nube = (ub instanceof Nube) ? (Nube) ub : (Nube) ua;
             nube.setActiva(4);
         }
 
+        // Sensor detecta obstáculo y activa rodeo
         if (esSensorYObstaculo(fa, fb)) {
             Fixture sensorFixture = "sensor".equals(fa.getUserData()) ? fa : fb;
             Fixture obstaculoFixture = sensorFixture == fa ? fb : fa;
@@ -65,14 +87,14 @@ public class ManejarContactos implements ContactListener {
             enemigo.activarRodeo(posicionObstaculo);
         }
 
-        // NUEVA LÓGICA: Detección del golpe de Knuckles a un Robot
+        // Golpe de Knuckles sobre robot
         if ((("golpeKnuckles".equals(ua) && ub instanceof Robot) ||
             ("golpeKnuckles".equals(ub) && ua instanceof Robot))) {
 
             Robot robotAfectado = (Robot) (ua instanceof Robot ? ua : ub);
-            if (!robotAfectado.getKO()) { // Si el robot no está ya KO, lo ponemos en KO
-                robotAfectado.setKO(); // Llama al método setKO del robot
-                Constantes.SCORE[1] += 5;
+            if (!robotAfectado.getKO()) {
+                robotAfectado.setKO();
+                Constantes.SCORE[1] += 10;
             }
         }
 
@@ -81,12 +103,16 @@ public class ManejarContactos implements ContactListener {
             Robot robot = ua instanceof Robot ? (Robot) ua : (Robot) ub;
             if(robot.getKO()) {
                 robot.setDestruido();
-                Constantes.SCORE[2] += 10; // Ejemplo: sumar puntos
-                // efectosVisuales.explotarCasa(cuerpoCasa.getPosition()); // hipotético
+                Constantes.SCORE[2] += 10;
             }
         }
     }
 
+    /**
+     * Aplica daño al personaje según su tipo y actualiza su estado de vida.
+     *
+     * @param personaje la instancia de Amigas afectada por el contacto
+     */
     public static void aplicarDaño(Amigas personaje) {
         int indexVida = -1;
 
@@ -109,16 +135,41 @@ public class ManejarContactos implements ContactListener {
         }
     }
 
+    /**
+     * Determina si el contacto incluye un sensor y un obstáculo.
+     *
+     * @param fa primer fixture del contacto
+     * @param fb segundo fixture del contacto
+     * @return true si hay contacto entre sensor y obstáculo
+     */
     public boolean esSensorYObstaculo(Fixture fa, Fixture fb) {
         return ("sensor".equals(fa.getUserData()) && esObstaculo(fb.getUserData())) ||
             ("sensor".equals(fb.getUserData()) && esObstaculo(fa.getUserData()));
     }
 
+    /**
+     * Verifica si el objeto especificado representa un obstáculo.
+     *
+     * @param dato el userData del fixture
+     * @return true si es un obstáculo
+     */
     public boolean esObstaculo(Object dato) {
         return "Objeto".equals(dato);
     }
 
+    /**
+     * Se ejecuta cuando finaliza el contacto entre dos cuerpos. (No utilizada)
+     */
     @Override public void endContact(Contact contact) {}
+
+    /**
+     * Se llama antes de resolver la física del contacto. (No utilizada)
+     */
     @Override public void preSolve(Contact contact, Manifold oldManifold) {}
+
+    /**
+     * Se llama después de resolver la física del contacto. (No utilizada)
+     */
     @Override public void postSolve(Contact contact, ContactImpulse impulse) {}
 }
+
