@@ -34,7 +34,7 @@ public class Etapa {
 
     public void actualizar(float delta) {
         timer += delta;
-        float intervalo = 8f;
+        float intervalo = 15f;
         if (timer >= intervalo) {
             timer = 0f;
             generarRobot();
@@ -93,7 +93,7 @@ public class Etapa {
         List<Robot> listaDestruidos = new ArrayList<>();
 
         for (Robot robot : robots) {
-            if (robot.getDestuido()) { // Método que verifica si está destruido
+            if (robot.getDestruido()) { // Método que verifica si está destruido
                 listaDestruidos.add(robot);
             }
         }

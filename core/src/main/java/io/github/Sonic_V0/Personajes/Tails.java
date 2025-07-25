@@ -7,10 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.FixtureDef;
-import com.badlogic.gdx.physics.box2d.World;
-import com.badlogic.gdx.physics.box2d.QueryCallback;
-import com.badlogic.gdx.physics.box2d.Fixture;
+import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.physics.box2d.joints.MouseJoint;
 import com.badlogic.gdx.physics.box2d.joints.MouseJointDef;
 import io.github.Sonic_V0.Constantes;
@@ -95,14 +92,19 @@ public class Tails extends Amigas {
 
     @Override
     public void actualizar(float delta) {
-        if (body == null) {
-            return;
+        if (body == null) return;
+
+        if (robotSiendoAtraido != null) {
+            Robot robot = robotSiendoAtraido;
+            Body robotBody = robot.body;
+
+            if (robotBody == null || !robotBody.isActive() || robotBody.getWorld() == null) {
+                destruirJointSeguro("Robot destruido o inválido. Imán desactivado.");
+            }
         }
 
-        // ⚙️ Control de duración y cooldown del imán
         if (imanActivo) {
             tiempoImanActivo += delta;
-
             if (tiempoImanActivo >= DURACION_IMAN) {
                 imanActivo = false;
                 tiempoCooldownIman = 0f;
@@ -116,56 +118,11 @@ public class Tails extends Amigas {
             }
         }
 
-        izq = der = abj = arr = false;
-        boolean presionando = false;
-        stateTime += delta;
-
-        if (imanActivo) {
-            imanOrbitAngle = (imanOrbitAngle + (200f * delta)) % 360f;
-
-            if (robotAtraidoJoint != null && robotSiendoAtraido != null && robotSiendoAtraido.body != null) {
-                if (!robotSiendoAtraido.body.isActive()) {
-                    // El cuerpo está inactivo o destruido, desmonta el joint
-                    Tails.this.world.destroyJoint(robotAtraidoJoint);
-                    robotAtraidoJoint = null;
-                    robotSiendoAtraido = null;
-                } else {
-                    Vector2 tailsCurrentPos = body.getPosition();
-                    Vector2 tailsDirection = body.getLinearVelocity().cpy().nor();
-
-                    Vector2 targetPos = tailsCurrentPos.cpy();
-
-                    if (tailsDirection.len2() > 0.01f) {
-                        targetPos.x -= tailsDirection.x * robotOffsetDistance;
-                        targetPos.y -= tailsDirection.y * robotOffsetDistance;
-                    } else {
-                        targetPos.x += robotOffsetDistance * 0.5f;
-                        targetPos.y += robotOffsetDistance * 0.5f;
-                    }
-
-                    float currentDistance = tailsCurrentPos.dst(robotSiendoAtraido.body.getPosition());
-                    if (currentDistance < robotOffsetDistance * 0.8f) {
-                        Vector2 currentDirToRobot = robotSiendoAtraido.body.getPosition().cpy().sub(tailsCurrentPos).nor();
-                        targetPos = tailsCurrentPos.cpy().add(currentDirToRobot.scl(robotOffsetDistance));
-                    }
-
-                    robotAtraidoJoint.setTarget(targetPos);
-                }
-            }
-        } else {
-            imanOrbitAngle = 0f;
-            if (robotAtraidoJoint != null) {
-                Tails.this.world.destroyJoint(robotAtraidoJoint);
-                robotAtraidoJoint = null;
-                robotSiendoAtraido = null;
-            }
-        }
-
         if (Gdx.input.isKeyJustPressed(Input.Keys.NUMPAD_0)) {
             long currentTime = System.currentTimeMillis();
             if (puedeActivarIman && (currentTime - lastImanPressTime <= DOUBLE_PRESS_IMAN_TIME)) {
                 imanActivo = true;
-                puedeActivarIman = false; // desactivar posibilidad de volver a activarlo
+                puedeActivarIman = false;
                 tiempoImanActivo = 0f;
                 tiempoCooldownIman = 0f;
                 Gdx.app.log("Tails", "Imán ACTIVADO");
@@ -173,46 +130,76 @@ public class Tails extends Amigas {
             lastImanPressTime = currentTime;
         }
 
-        if (imanActivo && robotAtraidoJoint == null) {
-            this.world.QueryAABB(new QueryCallback() {
-                                     @Override
-                                     public boolean reportFixture(Fixture fixture) {
-                                         if (fixture.getUserData() instanceof Robot) {
-                                             Robot robot = (Robot) fixture.getUserData();
+        if (imanActivo) {
+            imanOrbitAngle = (imanOrbitAngle + (200f * delta)) % 360f;
 
-                                             if (robot.ko && robot.body != null) {
-                                                 Vector2 tailsPos = body.getPosition();
-                                                 Vector2 robotPos = robot.body.getPosition();
-                                                 float distance = tailsPos.dst(robotPos);
+            if (robotAtraidoJoint != null && robotSiendoAtraido != null && robotSiendoAtraido.body != null && !world.isLocked()) {
+                if (!robotSiendoAtraido.body.isActive()) {
+                    destruirJointSeguro("Robot KO inactivo. Joint desmontado.");
+                } else {
+                    Vector2 tailsPos = body.getPosition();
+                    Vector2 robotPos = robotSiendoAtraido.body.getPosition();
+                    Vector2 direction = body.getLinearVelocity().cpy().nor();
+                    Vector2 target = tailsPos.cpy();
 
-                                                 if (distance < radioAtraccionIman) {
-                                                     if (robotAtraidoJoint == null) {
+                    if (direction.len2() > 0.01f) {
+                        target.sub(direction.scl(robotOffsetDistance));
+                    } else {
+                        target.add(robotOffsetDistance * 0.5f, robotOffsetDistance * 0.5f);
+                    }
+
+                    float distancia = tailsPos.dst(robotPos);
+                    if (distancia < robotOffsetDistance * 0.8f) {
+                        Vector2 dir = robotPos.cpy().sub(tailsPos).nor();
+                        target = tailsPos.cpy().add(dir.scl(robotOffsetDistance));
+                    }
+
+                    robotAtraidoJoint.setTarget(target);
+                }
+            } else if (robotAtraidoJoint == null) {
+                this.world.QueryAABB(new QueryCallback() {
+                                         @Override
+                                         public boolean reportFixture(Fixture fixture) {
+                                             Object userData = fixture.getUserData();
+                                             if (userData instanceof Robot) {
+                                                 Robot robot = (Robot) userData;
+                                                 if (robot.ko && robot.body != null) {
+                                                     float distancia = body.getPosition().dst(robot.body.getPosition());
+                                                     if (distancia < radioAtraccionIman) {
                                                          MouseJointDef md = new MouseJointDef();
                                                          md.bodyA = body;
                                                          md.bodyB = robot.body;
                                                          md.collideConnected = false;
-                                                         md.target.set(tailsPos.x, tailsPos.y + robotOffsetDistance);
+                                                         md.target.set(body.getPosition().x, body.getPosition().y + robotOffsetDistance);
                                                          md.maxForce = robot.body.getMass() * 100f;
                                                          md.frequencyHz = 8f;
                                                          md.dampingRatio = 0.8f;
 
-                                                         robotAtraidoJoint = (MouseJoint) Tails.this.world.createJoint(md);
+                                                         robotAtraidoJoint = (MouseJoint) world.createJoint(md);
                                                          robotSiendoAtraido = robot;
 
                                                          Gdx.app.log("Tails", "Robot KO detectado y enganchado con MouseJoint.");
+                                                         return false;
                                                      }
-                                                     return false;
                                                  }
                                              }
+                                             return true;
                                          }
-                                         return true;
-                                     }
-                                 },
-                body.getPosition().x - radioAtraccionIman,
-                body.getPosition().y - radioAtraccionIman,
-                body.getPosition().x + radioAtraccionIman,
-                body.getPosition().y + radioAtraccionIman);
+                                     },
+                    body.getPosition().x - radioAtraccionIman,
+                    body.getPosition().y - radioAtraccionIman,
+                    body.getPosition().x + radioAtraccionIman,
+                    body.getPosition().y + radioAtraccionIman);
+            }
+        } else {
+            imanOrbitAngle = 0f;
+            destruirJointSeguro("Imán desactivado. Joint eliminado.");
         }
+
+        // Movimiento con teclas
+        izq = der = arr = abj = false;
+        boolean presionando = false;
+        stateTime += delta;
 
         if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
             body.setLinearVelocity(0, velocidad.y);
@@ -239,7 +226,25 @@ public class Tails extends Amigas {
             frameActual = sprite;
             stateTime = 0f;
         }
+
         super.actualizar(delta);
+    }
+
+    private void destruirJointSeguro(String mensajeLog) {
+        if (!world.isLocked() && robotAtraidoJoint != null) {
+            try {
+                Body b = robotAtraidoJoint.getBodyB();
+                if (b != null && b.isActive() && b.getWorld() != null) {
+                    world.destroyJoint(robotAtraidoJoint);
+                }
+            } catch (Exception e) {
+                Gdx.app.error("Tails", "Error al destruir el joint", e);
+            }
+            robotAtraidoJoint = null;
+            robotSiendoAtraido = null;
+            imanActivo = false;
+            Gdx.app.log("Tails", mensajeLog);
+        }
     }
 
 
@@ -295,14 +300,17 @@ public class Tails extends Amigas {
         imanActivo = false;
     }
 
+    public boolean getIman() {
+        return imanActivo;
+    }
     @Override
     public void dispose() {
         atlas.dispose();
         if (imanAtlas != null) {
             imanAtlas.dispose();
         }
-        if (robotAtraidoJoint != null) {
-            Tails.this.world.destroyJoint(robotAtraidoJoint);
+        if (!world.isLocked() && robotAtraidoJoint != null) {
+            world.destroyJoint(robotAtraidoJoint);
             robotAtraidoJoint = null;
             robotSiendoAtraido = null;
         }

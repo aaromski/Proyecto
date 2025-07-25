@@ -72,7 +72,7 @@ public class ManejarContactos implements ContactListener {
             Robot robotAfectado = (Robot) (ua instanceof Robot ? ua : ub);
             if (!robotAfectado.getKO()) { // Si el robot no está ya KO, lo ponemos en KO
                 robotAfectado.setKO(); // Llama al método setKO del robot
-                Constantes.SCORE[1] += 10;
+                Constantes.SCORE[1] += 5;
             }
         }
 

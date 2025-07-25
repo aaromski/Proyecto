@@ -3,7 +3,6 @@ package io.github.Sonic_V0.Personajes;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-//import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
@@ -12,14 +11,38 @@ import io.github.Sonic_V0.Mundo.Mundo;
 
 import java.util.List;
 
+/**
+ * Clase que representa un enemigo Robot en el juego.
+ * <p>
+ * El Robot es un personaje enemigo que puede moverse, generar basura y ser derrotado.
+ * Cuando es derrotado, se convierte en chatarra por un tiempo antes de reactivarse o ser eliminado.
+ *
+ * @author Jesus
+ * @version 1.0
+ * @see Enemigas
+ * @see Mundo
+ * @see Constantes
+ */
 public class Robot extends Enemigas {
+    /** Tiempo acumulado para generar basura */
     private float tiempoBasura;
+    /** Referencia al mundo del juego */
     private final Mundo world;
 
+    /** Sprite que representa al robot como chatarra */
     protected TextureRegion chatarraSprite;
+    /** Tiempo que el robot ha estado en estado de chatarra */
     private float tiempoEnChatarra = 0f;
+    /** Duración máxima del estado de chatarra */
     private final float DURACION_CHATARRA = 30f;
 
+    /**
+     * Constructor de la clase Robot.
+     *
+     * @param posicion Posición inicial del robot en el mundo
+     * @param objetivo Cuerpo físico del objetivo al que perseguirá el robot
+     * @param world Referencia al mundo del juego
+     */
     public Robot(Vector2 posicion, Body objetivo, Mundo world) {
         super(posicion, world.getWorld());
         this.destruido = false;
@@ -29,6 +52,12 @@ public class Robot extends Enemigas {
         this.world = world;
     }
 
+    /**
+     * Inicializa las animaciones y sprites del robot.
+     *
+     * @param x Posición x inicial para el sprite
+     * @param y Posición y inicial para el sprite
+     */
     @Override
     public void inicializarAnimaciones(float x, float y) {
         atlas = new TextureAtlas(Gdx.files.internal("Robot/robot.atlas"));
@@ -47,9 +76,13 @@ public class Robot extends Enemigas {
         }
     }
 
+    /**
+     * Selecciona el objetivo más cercano de una lista de objetivos posibles.
+     *
+     * @param posibles Lista de objetivos potenciales (personajes amigables)
+     */
     public void seleccionarObjetivoMasCercano(List<Amigas> posibles) {
         if (posibles == null || posibles.isEmpty()) return;
-
 
         if (posibles.size() == 1) {
             setObjetivo(posibles.get(0).getCuerpo());
@@ -72,6 +105,10 @@ public class Robot extends Enemigas {
         }
     }
 
+    /**
+     * Pone al robot en estado KO (derrotado).
+     * Cambia sus filtros de colisión para convertirlo en chatarra.
+     */
     @Override
     public void setKO() {
         if (!ko) {
@@ -91,22 +128,41 @@ public class Robot extends Enemigas {
         }
     }
 
+    /**
+     * Destruye el cuerpo físico del robot.
+     * Marca el robot como destruido para su posterior eliminación.
+     */
     @Override
     public void destruir() {
-        if (destruido && body != null) {
-            world.getWorld().destroyBody(body); // Usa el 'this.world' almacenado
-            body = null;
+        if (!destruido) {
+            destruido = true;
+            if (body != null) {
+                body.getWorld().destroyBody(body);
+                body = null;
+            }
         }
     }
 
-    public boolean getDestuido() {
+    /**
+     * Verifica si el objeto ha sido marcado como destruido.
+     *
+     * @return true si el objeto está destruido, false si no.
+     */
+    public boolean getDestruido() {
         return destruido;
     }
 
+    /**
+     * Marca el objeto como destruido.
+     * Cambia el estado interno a destruido.
+     */
     public void setDestruido() {
         destruido = true;
     }
 
+    /**
+     * Reactiva el robot después de estar en estado KO.
+     */
     public void reactivacion() {
         if (ko) {
             ko = false;
@@ -114,26 +170,32 @@ public class Robot extends Enemigas {
         }
     }
 
-
-
+    /**
+     * Verifica si el robot está listo para ser eliminado del juego.
+     *
+     * @return true si el robot está destruido y ha cumplido su tiempo como chatarra,
+     *         false en caso contrario
+     */
     public boolean estaListoParaEliminar() {
         return destruido && tiempoEnChatarra >= DURACION_CHATARRA;
     }
 
+    /**
+     * Actualiza el estado del robot cada frame.
+     *
+     * @param delta Tiempo transcurrido desde el último frame
+     */
     @Override
     public void actualizar(float delta) {
         if (ko) {
             tiempoEnChatarra += delta;
             stateTime += delta;
 
-            // --- INICIO DE LA MODIFICACIÓN IMPORTANTE ---
             // Actualiza la posición del sprite a la posición actual del body
-            // Esto asegura que la animación KO se dibuje donde el robot fue detenido
-            if (body != null) { // Asegúrate de que el body no sea null si ya fue destruido
+            if (body != null) {
                 sprite.setPosition(body.getPosition().x - sprite.getWidth() / 2f,
                     body.getPosition().y - sprite.getHeight() / 2f);
             }
-            // --- FIN DE LA MODIFICACIÓN IMPORTANTE ---
 
             if (tiempoEnChatarra >= DURACION_CHATARRA) {
                 if (!destruido) {
@@ -152,6 +214,11 @@ public class Robot extends Enemigas {
         }
     }
 
+    /**
+     * Dibuja el robot en pantalla.
+     *
+     * @param batch SpriteBatch utilizado para dibujar
+     */
     @Override
     public void render(SpriteBatch batch) {
         if (ko) {
@@ -165,6 +232,12 @@ public class Robot extends Enemigas {
         }
     }
 
+    /**
+     * Crea el cuerpo físico del robot en el mundo Box2D.
+     *
+     * @param posicion Posición inicial del cuerpo
+     * @param world Mundo físico Box2D
+     */
     @Override
     public void crearCuerpo(Vector2 posicion, World world) {
         super.crearCuerpo(posicion, world);
@@ -181,12 +254,22 @@ public class Robot extends Enemigas {
         sensorShape.dispose();
     }
 
+    /**
+     * Configura los filtros de colisión para el sensor del robot.
+     *
+     * @param fdef Definición del fixture del sensor
+     */
     public void configurarFiltroSensor(FixtureDef fdef) {
         fdef.filter.categoryBits = Constantes.CATEGORY_SENSOR;
         fdef.filter.maskBits = Constantes.CATEGORY_TRASH | Constantes.CATEGORY_NUBE |
             Constantes.CATEGORY_PERSONAJES | Constantes.CATEGORY_ROBOT | Constantes.CATEGORY_OBJETOS;
     }
 
+    /**
+     * Configura los filtros de colisión para el cuerpo principal del robot.
+     *
+     * @param fdef Definición del fixture principal
+     */
     @Override
     public void configurarFiltro(FixtureDef fdef) {
         fdef.filter.categoryBits = Constantes.CATEGORY_ROBOT;
@@ -194,7 +277,9 @@ public class Robot extends Enemigas {
             Constantes.CATEGORY_GOLPE_PERSONAJES);
     }
 
-
+    /**
+     * Libera los recursos utilizados por el robot.
+     */
     @Override
     public void dispose() {
         atlas.dispose();

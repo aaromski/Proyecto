@@ -13,160 +13,214 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.Filter;
 import com.badlogic.gdx.utils.Array;
-import io.github.Sonic_V0.Constantes; // Ensure this is imported
+import io.github.Sonic_V0.Constantes;
 
+/**
+ * Clase que representa al personaje jugable Knuckles.
+ * <p>
+ * Knuckles es un personaje "amigable" que tiene la habilidad especial de golpear
+ * y destruir enemigos. Gestiona sus propias animaciones, movimientos y la lógica
+ * de su ataque de golpe.
+ *
+ * @author Miguel Rivas
+ * @version 1.0
+ * @see Amigas
+ * @see Constantes
+ */
 public class Knuckles extends Amigas {
+    /** Animación de la explosión o impacto de un golpe. */
     private Animation<TextureRegion> explosion;
+    /** Indica si Knuckles está actualmente realizando un golpe. */
     private boolean golpeando = false;
-    private Fixture golpeFixture; // único fixture
+    /** El fixture que representa el área de golpe de Knuckles. */
+    private Fixture golpeFixture;
+    /** La forma del círculo utilizada para el fixture de golpe. */
     private CircleShape golpeShape;
+    /** Tiempo transcurrido desde que el golpe se activó. */
     private float tiempoGolpeActivo = 0f;
+    /** Duración durante la cual el golpe es activo y puede causar daño. */
     private final float DURACION_GOLPE_ACTIVO = 0.1f;
+    /** Tiempo en la animación de golpe en el que el golpe se vuelve activo. */
     private final float TIEMPO_GOLPE_COMIENZO = 0.2f;
+    /** Indica si la animación de impacto debe mostrarse. */
     private boolean mostrarImpacto = false;
+    /** Tiempo de estado para la animación de impacto. */
     private float estadoImpacto = 0f;
+    /** El frame actual de la animación de impacto. */
     private TextureRegion frameImpacto;
-    private int direccionImpacto = 0; // 0=Ninguna, 1=Izq, 2=Der, 3=Arriba, 4=Abajo
+    /** Dirección del impacto del golpe (0=Ninguna, 1=Izq, 2=Der, 3=Arriba, 4=Abajo, 5-8 para diagonales). */
+    private int direccionImpacto = 0;
 
+    /**
+     * Constructor de la clase Knuckles.
+     *
+     * @param posicion Posición inicial de Knuckles en el mundo.
+     * @param world El mundo Box2D donde reside Knuckles.
+     */
     public Knuckles (Vector2 posicion, World world) {
         super(posicion, world);
         inicializarAnimaciones(body.getPosition().x, body.getPosition().y);
         this.name = "Knuckles";
-        crearGolpeFixture(); // Call this to create both left and right fixtures
+        crearGolpeFixture(); // Crea el fixture de golpe
     }
 
+    /**
+     * Crea el fixture de golpe (sensor) para Knuckles.
+     * Este fixture se utiliza para detectar colisiones con enemigos durante el ataque.
+     */
     private void crearGolpeFixture() {
-        final float PALO_RADIUS = 0.7f;
+        final float PALO_RADIUS = 0.7f; // Radio del área de golpe
         golpeShape = new CircleShape();
         golpeShape.setRadius(PALO_RADIUS);
 
-        // Posición inicial en el centro
+        // Posición inicial en el centro del cuerpo
         golpeShape.setPosition(new Vector2(0f, 0f));
 
         FixtureDef fdef = new FixtureDef();
         fdef.shape = golpeShape;
-        fdef.isSensor = true;
-        fdef.filter.categoryBits = Constantes.CATEGORY_GOLPE_PERSONAJES;
-        fdef.filter.maskBits = 0; // inicialmente inactivo
+        fdef.isSensor = true; // El golpe es un sensor
+        fdef.filter.categoryBits = Constantes.CATEGORY_GOLPE_PERSONAJES; // Categoría de golpe de personaje
+        fdef.filter.maskBits = 0; // Inicialmente inactivo (no colisiona con nada)
 
         golpeFixture = body.createFixture(fdef);
-        golpeFixture.setUserData("golpeKnuckles");
+        golpeFixture.setUserData("golpeKnuckles"); // Identificador del fixture
     }
 
+    /**
+     * Mueve la posición del fixture de golpe según la dirección actual de Knuckles.
+     * Esto permite que el golpe se extienda en la dirección del movimiento del personaje.
+     */
     private void moverGolpeSegunDireccion() {
         if (golpeFixture != null) {
-            body.destroyFixture(golpeFixture); // eliminar anterior
+            body.destroyFixture(golpeFixture); // Elimina el fixture anterior para recrearlo en la nueva posición
         }
 
         final float RADIO = 0.7f;
-        final float DISTANCIA = 0.8f;
-        Vector2 offset = new Vector2();
+        final float DISTANCIA = 0.8f; // Distancia del offset del golpe
+        Vector2 offset = new Vector2(); // Vector de desplazamiento del golpe
 
+        // Calcula el offset según la dirección de impacto
         switch (direccionImpacto) {
-            case 1: offset.set(-DISTANCIA, 0); break;
-            case 2: offset.set(DISTANCIA, 0); break;
-            case 3: offset.set(0, DISTANCIA); break;
-            case 4: offset.set(0, -DISTANCIA); break;
-            case 5: offset.set(-DISTANCIA, DISTANCIA); break;
-            case 6: offset.set(DISTANCIA, DISTANCIA); break;
-            case 7: offset.set(-DISTANCIA, -DISTANCIA); break;
-            case 8: offset.set(DISTANCIA, -DISTANCIA); break;
+            case 1: offset.set(-DISTANCIA, 0); break; // Izquierda
+            case 2: offset.set(DISTANCIA, 0); break;  // Derecha
+            case 3: offset.set(0, DISTANCIA); break;  // Arriba
+            case 4: offset.set(0, -DISTANCIA); break; // Abajo
+            case 5: offset.set(-DISTANCIA, DISTANCIA); break; // Diagonal Arriba Izquierda
+            case 6: offset.set(DISTANCIA, DISTANCIA); break;  // Diagonal Arriba Derecha
+            case 7: offset.set(-DISTANCIA, -DISTANCIA); break; // Diagonal Abajo Izquierda
+            case 8: offset.set(DISTANCIA, -DISTANCIA); break;  // Diagonal Abajo Derecha
         }
 
         CircleShape newShape = new CircleShape();
         newShape.setRadius(RADIO);
-        newShape.setPosition(offset);
+        newShape.setPosition(offset); // Establece la posición del sensor de golpe
 
         FixtureDef fdef = new FixtureDef();
         fdef.shape = newShape;
         fdef.isSensor = true;
         fdef.filter.categoryBits = Constantes.CATEGORY_GOLPE_PERSONAJES;
-        fdef.filter.maskBits = Constantes.CATEGORY_ROBOT;
+        fdef.filter.maskBits = Constantes.CATEGORY_ROBOT; // Solo colisiona con robots
 
         golpeFixture = body.createFixture(fdef);
         golpeFixture.setUserData("golpeKnuckles");
 
-        newShape.dispose();
+        newShape.dispose(); // Libera los recursos de la forma
     }
 
+    /**
+     * Activa el fixture de golpe de Knuckles, permitiendo que colisione con robots.
+     */
     private void activarGolpeFixture() {
-        activarGolpe(); // ya tienes este método
+        activarGolpe(); // Llama al método que realmente modifica el filtro
     }
 
+    /**
+     * Desactiva el fixture de golpe de Knuckles, impidiendo que colisione con otros cuerpos.
+     */
     private void desactivarGolpeFixtures() {
         if (golpeFixture != null) {
             Filter filter = golpeFixture.getFilterData();
-            filter.maskBits = 0; // desactivado
+            filter.maskBits = 0; // Desactiva todas las colisiones
             golpeFixture.setFilterData(filter);
         }
     }
 
-    // Helper method to set a fixture's active state
-    private void setFixtureActive(Fixture fixture, boolean active) {
-        if (fixture != null) {
-            Filter filter = fixture.getFilterData();
-            if (active) {
-                filter.maskBits = Constantes.CATEGORY_ROBOT; // Enable collision
-            } else {
-                filter.maskBits = 0; // Disable collision
-            }
-            fixture.setFilterData(filter);
-        }
-    }
-
+    /**
+     * Inicializa todas las animaciones y sprites de Knuckles.
+     * Carga las texturas y define las animaciones para correr, golpear, etc.
+     *
+     * @param x Posición X inicial para el sprite.
+     * @param y Posición Y inicial para el sprite.
+     */
     @Override
     void inicializarAnimaciones(float x, float y) {
         atlas = new TextureAtlas(Gdx.files.internal("SpriteKnuckles/KnucklesSprite.atlas"));
-        TextureAtlas atlas2 = new TextureAtlas((Gdx.files.internal("SpriteKnuckles/explosion.atlas")));
-        sprite = atlas.createSprite("KnucklesStanding1");
-        // Corrected PPM usage:
-        sprite.setSize(30f / Constantes.PPM, 39f / Constantes.PPM);
+        TextureAtlas atlas2 = new TextureAtlas((Gdx.files.internal("SpriteKnuckles/explosion.atlas"))); // Atlas para la explosión
+        sprite = atlas.createSprite("KnucklesStanding1"); // Sprite por defecto (parado)
+        sprite.setSize(30f / Constantes.PPM, 39f / Constantes.PPM); // Ajusta tamaño del sprite
         sprite.setPosition(
             x - sprite.getWidth() / 2f,
             y - sprite.getHeight() / 2f
         );
-        correr = crearAnimacion("KnucklesRunning", 10, 0.09f);
-        abajo = crearAnimacion("Abajo", 6, 0.1f);
-        arriba = crearAnimacion("Arriba", 8, 0.1f);
-        diagonalarr = crearAnimacion("DiagonalTrasera", 8, 0.1f);
-        diagonalabj = crearAnimacion("DiagonalDelantera", 6, 0.1f);
+        correr = crearAnimacion("KnucklesRunning", 10, 0.09f); // Animación de correr
+        abajo = crearAnimacion("Abajo", 6, 0.1f); // Animación de moverse hacia abajo
+        arriba = crearAnimacion("Arriba", 8, 0.1f); // Animación de moverse hacia arriba
+        diagonalarr = crearAnimacion("DiagonalTrasera", 8, 0.1f); // Animación de diagonal trasera
+        diagonalabj = crearAnimacion("DiagonalDelantera", 6, 0.1f); // Animación de diagonal delantera
 
-        habilidad = crearAnimacion("knucklesFist", 8, 0.1f);
+        habilidad = crearAnimacion("knucklesFist", 8, 0.1f); // Animación de golpe/habilidad
 
         Array<TextureRegion> framesExplosion = new Array<>();
         for (int i = 1; i <= 12; i++) {
             TextureRegion frame = atlas2.findRegion("explosion" + i);
-            if (frame != null) {
+            if (frame == null) {
+                System.out.println("No se encontró explosion" + i); // Mensaje de depuración si falta un frame
+            } else {
                 framesExplosion.add(frame);
             }
         }
-        explosion = new Animation<>(0.1f, framesExplosion, Animation.PlayMode.NORMAL);
+        explosion = new Animation<>(0.1f, framesExplosion, Animation.PlayMode.NORMAL); // Animación de explosión
 
-        frameActual = new TextureRegion(sprite);
+        frameActual = new TextureRegion(sprite); // Inicializa el frame actual
     }
 
+    /**
+     * Configura los filtros de colisión para el cuerpo principal de Knuckles.
+     * Knuckles colisiona con robots, basura, sensores, nubes y objetos del mapa.
+     *
+     * @param fdef La definición del fixture a configurar.
+     */
     @Override
     public void configurarFiltro(FixtureDef fdef) {
-        fdef.filter.categoryBits = Constantes.CATEGORY_PERSONAJES;
+        fdef.filter.categoryBits = Constantes.CATEGORY_PERSONAJES; // Pertenece a la categoría de personajes
         fdef.filter.maskBits = (short) (Constantes.CATEGORY_ROBOT | Constantes.CATEGORY_TRASH |
             Constantes.CATEGORY_SENSOR | Constantes.CATEGORY_NUBE |
-            Constantes.CATEGORY_OBJETOS);
+            Constantes.CATEGORY_OBJETOS); // Colisiona con estas categorías
     }
 
+    /**
+     * Activa el fixture de golpe de Knuckles, permitiendo que cause daño a los robots.
+     * Este método es llamado internamente.
+     */
     private void activarGolpe() {
         if (golpeFixture != null) {
             Filter filter = golpeFixture.getFilterData();
-            filter.maskBits = Constantes.CATEGORY_ROBOT;
+            filter.maskBits = Constantes.CATEGORY_ROBOT; // Habilita la colisión solo con robots
             golpeFixture.setFilterData(filter);
         }
     }
 
+    /**
+     * Inicia el ataque de golpe de Knuckles.
+     * Establece el estado de golpeo, reinicia el tiempo de animación y determina la dirección del impacto.
+     */
     public void golpear() {
-        if (!golpeando) {
+        if (!golpeando) { // Solo permite golpear si no está golpeando ya
             golpeando = true;
-            stateTime = 0f;
-            tiempoGolpeActivo = 0f;
+            stateTime = 0f; // Reinicia el tiempo de estado para la animación de golpe
+            tiempoGolpeActivo = 0f; // Reinicia el temporizador de golpe activo
 
+            // Determina la dirección del impacto basada en las teclas de movimiento presionadas
             if (izq && arr) direccionImpacto = 5;
             else if (der && arr) direccionImpacto = 6;
             else if (izq && abj) direccionImpacto = 7;
@@ -175,14 +229,20 @@ public class Knuckles extends Amigas {
             else if (der) direccionImpacto = 2;
             else if (arr) direccionImpacto = 3;
             else if (abj) direccionImpacto = 4;
-            else direccionImpacto = 0;
+            else direccionImpacto = 0; // Sin dirección específica (golpe en el lugar)
         }
     }
 
+    /**
+     * Actualiza el estado de Knuckles en cada frame, incluyendo su movimiento,
+     * la lógica de golpe y la detección de entrada del usuario.
+     *
+     * @param alpha El tiempo transcurrido desde el último frame en segundos.
+     */
     @Override
     public void actualizar(float alpha) {
-        if (ko) {
-            desactivarGolpeFixtures(); // Deactivate both if Knuckles is KO
+        if (ko) { // Si Knuckles está KO, desactiva los golpes y no procesa más lógica
+            desactivarGolpeFixtures();
             return;
         }
 
@@ -190,79 +250,86 @@ public class Knuckles extends Amigas {
             tiempoGolpeActivo += alpha;
             stateTime += alpha;
 
+            // Activa el golpe durante un corto período de tiempo en la animación
             if (tiempoGolpeActivo >= TIEMPO_GOLPE_COMIENZO &&
                 tiempoGolpeActivo < (TIEMPO_GOLPE_COMIENZO + DURACION_GOLPE_ACTIVO)) {
 
-                moverGolpeSegunDireccion(); // <-- aquí se actualiza la posición del palo
+                moverGolpeSegunDireccion(); // Actualiza la posición del fixture de golpe
+                activarGolpeFixture();      // Activa el fixture para colisionar
 
-                activarGolpeFixture();      // activa el fixture con la posición ya actualizada
-
-                if (!mostrarImpacto) {
+                if (!mostrarImpacto) { // Inicia la animación de impacto si no está activa
                     mostrarImpacto = true;
                     estadoImpacto = 0f;
                 }
             } else {
-                desactivarGolpeFixtures(); // Deactivate both outside the active window
+                desactivarGolpeFixtures(); // Desactiva el golpe fuera de la ventana activa
             }
 
-            frameActual = habilidad.getKeyFrame(stateTime);
+            frameActual = habilidad.getKeyFrame(stateTime); // Obtiene el frame actual de la animación de golpe
 
-            if (habilidad.isAnimationFinished(stateTime)) {
-                golpeando = false;
-                desactivarGolpeFixtures(); // Ensure both are deactivated when animation finishes
+            if (habilidad.isAnimationFinished(stateTime)) { // Si la animación de golpe ha terminado
+                golpeando = false; // Restablece el estado de golpeo
+                desactivarGolpeFixtures(); // Asegura que el golpe esté desactivado
             }
-        } else {
+        } else { // Lógica de movimiento normal si no está golpeando
             boolean presionando = false;
-            izq = der = abj = arr = false;
+            izq = der = abj = arr = false; // Reinicia las banderas de dirección
 
-            if (Gdx.input.isKeyPressed(Input.Keys.I)) {
+            // Detección de entrada para movimiento de Knuckles (teclas I, K, J, L)
+            if (Gdx.input.isKeyPressed(Input.Keys.I)) { // Arriba
                 body.setLinearVelocity(0, velocidad.y);
                 arr = true;
                 presionando = true;
             }
-            if (Gdx.input.isKeyPressed(Input.Keys.K)) {
+            if (Gdx.input.isKeyPressed(Input.Keys.K)) { // Abajo
                 body.setLinearVelocity(0, -velocidad.y);
                 abj = true;
                 presionando = true;
             }
-            if (Gdx.input.isKeyPressed(Input.Keys.J)) {
+            if (Gdx.input.isKeyPressed(Input.Keys.J)) { // Izquierda
                 body.setLinearVelocity(-velocidad.x, body.getLinearVelocity().y);
                 izq = true;
                 presionando = true;
             }
-            if (Gdx.input.isKeyPressed(Input.Keys.L)) {
+            if (Gdx.input.isKeyPressed(Input.Keys.L)) { // Derecha
                 body.setLinearVelocity(velocidad.x, body.getLinearVelocity().y);
                 der = true;
                 presionando = true;
             }
 
-            if (Gdx.input.isKeyJustPressed(Input.Keys.P)) {
+            if (Gdx.input.isKeyJustPressed(Input.Keys.P)) { // Tecla P para golpear
                 golpear();
                 presionando = true;
             }
 
             if (presionando) {
-                stateTime += alpha;
+                stateTime += alpha; // Actualiza el tiempo de estado si hay movimiento
             } else {
-                body.setLinearVelocity(0, 0);
-                stateTime = 0f;
+                body.setLinearVelocity(0, 0); // Detiene el movimiento si no hay teclas presionadas
+                stateTime = 0f; // Reinicia el tiempo de estado
             }
 
-            super.actualizar(alpha);
+            super.actualizar(alpha); // Llama al método actualizar de la clase padre (Amigas)
         }
-        posicion = body.getPosition();
+        posicion = body.getPosition(); // Actualiza la posición del personaje
     }
 
+    /**
+     * Dibuja a Knuckles y, si está golpeando, la animación de impacto.
+     *
+     * @param batch El SpriteBatch utilizado para dibujar.
+     */
     @Override
     public void render(SpriteBatch batch) {
-        super.render(batch);
-        if (mostrarImpacto) {
-            estadoImpacto += Gdx.graphics.getDeltaTime();
-            frameImpacto = explosion.getKeyFrame(estadoImpacto, false); // no looping
+        super.render(batch); // Dibuja el sprite principal de Knuckles
+        if (mostrarImpacto) { // Si la animación de impacto debe mostrarse
+            estadoImpacto += Gdx.graphics.getDeltaTime(); // Actualiza el tiempo de estado de la animación de impacto
+            frameImpacto = explosion.getKeyFrame(estadoImpacto, false); // Obtiene el frame actual (no en bucle)
 
             float distancia = 0.8f;
             float offsetX = 0, offsetY = 0;
 
+            // Calcula el offset para dibujar la explosión en la dirección del golpe
             switch (direccionImpacto) {
                 case 1: offsetX = -distancia; break;
                 case 2: offsetX = distancia; break;
@@ -274,8 +341,8 @@ public class Knuckles extends Amigas {
                 case 8: offsetX = distancia;  offsetY = -distancia; break;
             }
 
-            float x = body.getPosition().x + offsetX;
-            float y = body.getPosition().y + offsetY;
+            float x = body.getPosition().x + offsetX; // Posición X de la explosión
+            float y = body.getPosition().y + offsetY; // Posición Y de la explosión
 
             if (frameImpacto != null) {
                 batch.draw(frameImpacto,
@@ -286,15 +353,20 @@ public class Knuckles extends Amigas {
                 );
             }
 
-            // Cuando termina la animación, desactívala
+            // Cuando termina la animación de explosión, desactívala
             if (explosion.isAnimationFinished(estadoImpacto)) {
                 mostrarImpacto = false;
             }
         }
     }
 
+    /**
+     * Libera los recursos utilizados por Knuckles, como el atlas de texturas.
+     */
     @Override
     public void dispose() {
-        atlas.dispose();
+        atlas.dispose(); // Libera el atlas principal de texturas
+        // Nota: el atlas de explosión (atlas2) también debería ser dispuesto si no se comparte.
+        // En este caso, como se crea localmente, se asume que se gestiona adecuadamente.
     }
 }

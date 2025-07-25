@@ -79,7 +79,7 @@ public class Mundo {
         });
 
         for (Robot robot : etapa.destruirRobots()) {
-            System.out.println("PAso por el for " +etapa.destruirRobots().size());
+
             robot.destruir();
         }
 
